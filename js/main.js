@@ -71,6 +71,7 @@ var settings = new (function(){
     
     //sorters
     this.sortImagesByDate = function(desc){
+        // TODO: remove settings reference
         settings.images(settings.images().sort(function(a,b){
             return (desc || true) ? b.created - a.created : b.created - a.created;
         }));
@@ -85,19 +86,6 @@ var settings = new (function(){
         var MAX_CONNECTIONS = 10;
         var activeConnections = [];
         var queued = [];
-        
-        // TODO: redo, map-filter?
-        var cleanData = function(data){
-            var arrData = [];
-            data.sort(function(a,b){
-                return b.created - a.created;
-            }); 
-            for (i in data){
-                arrData.push(data[i].data);
-            }
-            
-            return arrData;
-        };
         
         /*
          * Calls the next request
@@ -135,10 +123,7 @@ var settings = new (function(){
                 jsonp: 'jsonp',
                 timeout: 20000, // 2 seconds timeout
                 success: function(data){
-                    var redditData = cleanData(data.data.children);
-                    if (redditData.length > 0){
-                        callback(redditData);
-                    }
+                    callback(data.data.children);
                 },
                 error: function(){
                     // stick it on the queue
@@ -228,6 +213,7 @@ var settings = new (function(){
             }.bind(this));
             
             this.select = function(){
+                $(".ad-thumbs > .vertical > .loader").show(); // TODO: remove this ASAP, as soon as the imagebar loader is redone
                 mra.imageBar.changePic(this.name);
                 selected(this);
             }
@@ -327,6 +313,7 @@ var settings = new (function(){
             var newsItems = ko.observableArray();
             var portlet = this;
             var minimized = ko.observable(false);
+            var message = ko.observable("");
             
             this.showVisited = ko.observable(false);
             
@@ -342,9 +329,17 @@ var settings = new (function(){
 				
                 // load the complete feed
                 loader.call(url, function(data){
+                    if(data.length === 0){
+                        message("No results...");
+                        return;
+                    }
+                    
+                    // populate each of the news item inside the portlet
                     for(var index in data)
-                        newsItems.push(new NewsItem(data[index]));
-						
+                        newsItems.push(new NewsItem(data[index].data));
+                    
+                    // set the last item field
+                    // used for the next call; we continue loading content from this point on
                     this.last(newsItems()[newsItems().length-1]);
                 }.bind(this));
             }.bind(this);
@@ -355,26 +350,23 @@ var settings = new (function(){
                 this.id = item.id;
                 this.title = item.title;
                 this.text = item.title.substring(0, MAX_TITLE_LENGTH) + ((item.title.length > MAX_TITLE_LENGTH)? "...": "");
-				/* This is a special url by reddit that allows the user to view the article with it in the iFrame */				
-                this.redditURL = BASE_URL + "/tb/" + item.id;
+                this.redditURL = BASE_URL + "/tb/" + item.id; // nicer link with comments, upvote.. etc at the top (iframed)
                 this.url = item.url;
                 this.score =  parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
                 this.scoreTitle = this.score + " of People Like It";
-                /* Reddit removes their own domain name from the permalink to save space so append it back in */
-				this.permalink = BASE_URL + item.permalink;
-                this.visited = ko.observable(settings.visitedLinks.visited(this.id));
+                this.permalink = BASE_URL + item.permalink; // full link to the news item
+                this.visited = ko.observable(settings.visitedLinks.visited(this.id)); // TODO: remove settings reference
                 
                 /*
                  * Observable that checks whether or not the link is visible
                  */
                 this.isVisible = ko.dependentObservable(function(){
-                    // TODO: remove the settings reference
                     // checks the the link to see if its been visited, or if all the news items are visible
                     return !this.visited() || portlet.showVisited();
                 }.bind(this));
                 
                 /*
-                 * Marks the page as seem/visited
+                 * Marks the page as seen/visited
                  */
                 this.visitPage = function(evt){
                     var element = $(evt.target);
@@ -411,10 +403,13 @@ var settings = new (function(){
                     return activeButton();
                 };
                 
+                // TODO: create an object out of each button and redo this
                 this.reloadSection = function(i,e,o){
-                    var button = $(i.target).attr("rel");
+                    var button = $(i.target).html();
                     
-                    newsItems.removeAll();
+                    portlet.last(null); // reset the last item (for the ajax call)
+                    newsItems.removeAll(); // remove all the news items
+                    message(""); // reset the messages
                     
                     activeButton(button);
                     load(); // redo this
@@ -426,11 +421,16 @@ var settings = new (function(){
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
             this.last = ko.observable();
             this.amountVisible = ko.observable(10);
-			
+            
+            /*
+             * Returns the full request URL to call reddit.com
+             * - append the last item on the list so it doenst need to reload the full pannel
+             */
             this.requestURL = function(){
                 return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
             };
             
+            // TODO: document this! (thanks richard)
             this.getNewsItems = function(){
                 return ko.utils.arrayFilter(newsItems(), function(newsItem){
                     return newsItem.isVisible() ? newsItem: null;
@@ -453,11 +453,24 @@ var settings = new (function(){
                 // ie. false ^ true -> true
                 minimized((minimized() ^ true) === 1);
             };
+            
             /*
-             * Triggers the display of the load bar to the user
+             * Triggers the display of the load bar to the user if there are no items.
+             * - its ignored if there is a message
+             *
+             * returns boolean: true if there are no items and no massage out for display
              */
             this.getShowLoadingBar = function(){
-                return !(newsItems().length > 0);
+                return !(newsItems().length > 0) && message() === "";
+            };
+            
+            /*
+             * Message display for the user (error, info, etc)
+             *
+             * returns string message description
+             */
+            this.getMessage = function(){
+                return message();
             };
             
             /*
@@ -511,7 +524,7 @@ var settings = new (function(){
          */
         this.removePortlet = function(portlet){
             portlets.remove(portlet);
-            settings.preferences.save();
+            settings.preferences.save(); // TODO: remove settings reference
         };
         
         /*
@@ -538,7 +551,7 @@ var settings = new (function(){
         };
         
         // initializes all the portlets
-        for(var index in arguments) {
+        for(var index in arguments){
             this.addPortlet(arguments[index]);
         }
     })();
@@ -899,8 +912,7 @@ var mra = {
 			});
         },
         changePic: function(evt){
-            $(".ad-gallery").hide();
-            $(".ad-gallery-loading").show();
+            settings.images.removeAll();
             mra.imageBar.currentImageBar = evt;
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
@@ -1126,9 +1138,7 @@ var mra = {
         processItems: function(pics, subReddit){ 
             var sImageBar = "";  
             window.arrPics = pics;
-            $(".ad-gallery").show();
-            $(".ad-gallery-loading").hide(); 
-            settings.images.removeAll(); 
+            $(".ad-thumbs > .vertical > .loader").hide(); 
             mra.imageBar.filterElements(pics);    
             window.adGallery = $("div.ad-gallery")    
                 .attr("id", "imagebar_" + mra.imageBar.currentImageBar)

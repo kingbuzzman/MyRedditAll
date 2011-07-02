@@ -53,19 +53,6 @@
 			</div>
 		</li>
     </script>
-    <!--<script type="text/html" id="newsItemTemplate">
-      <li title="${ title }" data-bind="visible: isVisible()">
-        <a target="_blank" href="${ url }" class="link" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
-        <a target="_blank" href="${ permalink }" class="comment" title="${ scoreTitle }">${ score }</a>
-      </li>
-    </script>-->
-
-    <!-- TODO: STOP the FLOAT:RIGHT madness  -->
-    <script type="text/html" id="newsButton">
-      {{each(index, name) buttons.NEWS_BUTTONS}}
-      <span title="${ name }" rel="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
-      {{/each}}
-    </script>
 
     <script id="subredditTemplate" type="text/html">
       <div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
@@ -74,14 +61,20 @@
           <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
           <span class="ui-icon toggleView" title="Toggle visited links" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'ui-icon-pin-w': showVisited(), 'ui-icon-pin-s': !showVisited() }"></span>
           <a href="${ url }" target="_blank">${ name }</a>
-          <span data-bind="template: { name: 'newsButton', value: buttons }, visible: !isMinimized()"></span>
+          <span data-bind="visible: !isMinimized()">
+            <!-- TODO: STOP the FLOAT:RIGHT madness  -->
+            {{each(index, name) buttons.NEWS_BUTTONS}}
+            <span title="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
+            {{/each}}
+          </span>
         </div>
         <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
-        <div class="loader" data-bind="visible: getShowLoadingBar()"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
+        <div class="loader" data-bind="visible: getShowLoadingBar() && !isMinimized()"></div>
+        <div class="message" data-bind="visible: !isMinimized(), text: getMessage()"></div>
         <div class="ui-icon-more" data-bind="click: populateNext, visible: !isMinimized()">
           <div>
-            <span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
-            <span class="text" style="float:right;">Read More</span>
+            <span class="ui-icon ui-icon-carat-1-s"></span>
+            <span class="more-results">Read More</span>
           </div>
         </div>
       </div>
@@ -91,11 +84,13 @@
       <li id="metaSection">
       <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: mra.locationPicker.passEvent ">
       <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ $data.SECTION }" data-bind="click: mra.imageBar.changePic" >
+      <!-- TODO: move the function() out of here -->
       <span class="metaText" data-bind="click: function(){ mra.imageBar.popupWindow( baseurl + '/r/$data.SECTION' ) }">${$data.NAME}</span>
       </li>
     </script>
 
     <script id="loadMetaButtonTemplate" type="text/html">
+      <!-- TODO: move the function() out of here -->
       {{each ['active','over18','new','self','media','Favorites']}}
       <button id="${$value}" class="changePic fg-button" data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
       {{/each}} 
@@ -127,14 +122,12 @@
             <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>
           </div>
         </div>
-    </div>  
+    </div>
     <div id="container">
-      <div class="ad-gallery-loading" style="display:none">
-        <div style="height:150px; line-height:150px;" class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
-      </div>
-      <div class="ad-gallery" id="">
+      <div class="ad-gallery">
         <div class="ad-nav">
           <div class="ad-thumbs">
+            <div class="vertical"><div class="loader"></div></div>
             <ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: images }"></ul>
           </div>
         </div>
@@ -153,19 +146,6 @@
       </h2>
 
       <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: getSubreddits().getPortlets() }, sortableList: getSubreddits().getPortlets()"></div>
-    </div> 
-
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="" id="newsTemplate" style="display:none;">
-      <div class="portlet-header ui-widget-header ui-corner-all">
-        <span class="ui-icon ui-icon-closethick ui-close-display"></span>
-        <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
-        <a href="http://www.reddit.com/r/" target="_blank"></a>
-        <span class="ui-icon toggleView ui-icon-bullet" rel="hot" title="View hot articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">hot</span>
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="new" title="View new articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">new</span>
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="controversial" title="View controversial articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">controversial</span>                        
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="top" title="View top articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">top</span>
-      </div>
-      <div class="portlet-content"><img src="images/ajaxLoader.gif" width="126" height="22" align="middle"></div>
     </div>
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="popupAdd">
@@ -181,7 +161,7 @@
       </div>
     </div> 
 
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="left:8%; position:absolute; top:99px; width:80%; display:none; border:1px solid #ffdab9;" id="customizeDialog">
+    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="customizeDialog">
       <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
         <span class="ui-icon ui-icon-closethick" onClick="mra.customize.closeDialog()"></span>
         <a>Customize MyRedditAll</a>
@@ -194,7 +174,6 @@
               <input type="button" value="Previous" class="ui-state-default" onClick="mra.customize.prevWallpaper()">
               <input type="button" value="Next" class="ui-state-default" onClick="mra.customize.nextWallpaper()">
             </td>
-            <td><span class="cufonize">Hide Viewed</span> <input type="checkbox" data-bind="checked: settings.isNewsItemVisible, attr: { checked: settings.isNewsItemVisible }"></td>
             <td class="cufonize">Color </td>
             <td>
               <div id="colorSelector"><div></div></div>
