@@ -1,4 +1,4 @@
-if (typeof console == "undefined"){
+if(typeof console == "undefined"){
     console = { log: function(){}, error: function(){}, info: function(){} };
 }
 
@@ -326,7 +326,12 @@ var settings = new (function(){
              */
             var load = function(){
                 var url = this.requestURL();
-				
+                
+                if(!url){
+                    message("Please select a category");
+                    return;
+                }
+                
                 // load the complete feed
                 loader.call(url, function(data){
                     if(data.length === 0){
@@ -392,30 +397,6 @@ var settings = new (function(){
                 };
             };
             
-            this.buttons = new (function(){
-                var activeButton = ko.observable(NEWS_BUTTONS[0]);
-                
-                // public constants
-                this.NEWS_BUTTONS = NEWS_BUTTONS;
-                
-                // TODO: create an object out of each button and make a property inside of it with isActive()
-                this.getActiveButton = function(){
-                    return activeButton();
-                };
-                
-                // TODO: create an object out of each button and redo this
-                this.reloadSection = function(i,e,o){
-                    var button = $(i.target).html();
-                    
-                    portlet.last(null); // reset the last item (for the ajax call)
-                    newsItems.removeAll(); // remove all the news items
-                    message(""); // reset the messages
-                    
-                    activeButton(button);
-                    load(); // redo this
-                };
-            })();
-            
             // attributes
             this.name = name;
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
@@ -423,11 +404,76 @@ var settings = new (function(){
             this.amountVisible = ko.observable(10);
             
             /*
+             * Houses the navigaton button for the pannel (ie. "top", "new", .. etc)
+             */
+            this.buttons = new (function(){
+                var DEFAULT_ACTIVE_BUTTON = "hot";
+                
+                var buttons = ko.observableArray();
+                var activeButton = ko.observable();
+                
+                /*
+                 * Button specifics
+                 */
+                var Button = function(name, active){
+                    this.init = function(name, active){
+                        this.name = name;
+                        if(active) this.setActive();
+                    };
+                    
+                    this.setActive = function(event){
+                        activeButton(this);
+                        
+                        portlet.last(null); // reset the last item (for the ajax call)
+                        newsItems.removeAll(); // remove all the news items
+                        message(""); // reset the messages
+                        
+                        // if it was clicked then make request
+                        if(event)
+                            load(); // redo this
+                    }.bind(this);
+                    
+                    this.isActive = ko.dependentObservable(function(){
+                        return activeButton() === this;
+                    }.bind(this));
+                    
+                    // initialize the object
+                    this.init(name, active);
+                };
+                
+                this.init = function(){
+                    var name;
+                    
+                    for(var index in NEWS_BUTTONS){
+                        name = NEWS_BUTTONS[index];
+                        
+                        buttons.push(new Button(name, (name === DEFAULT_ACTIVE_BUTTON)));
+                    }
+                };
+                
+                this.activeButton = activeButton;
+                
+                this.all = function(){
+                    return buttons();
+                };
+                
+                // initialize the object
+                this.init();
+            })();
+            
+            /*
              * Returns the full request URL to call reddit.com
              * - append the last item on the list so it doenst need to reload the full pannel
              */
             this.requestURL = function(){
-                return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
+                var activeButton = this.buttons.activeButton();
+                
+                if(!activeButton){
+                    console.error("No active catetegory found for " + this.name);
+                    return;
+                }
+                
+                return this.url + "/" + activeButton.name + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
             };
             
             // TODO: document this! (thanks richard)

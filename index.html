@@ -63,8 +63,8 @@
           <a href="${ url }" target="_blank">${ name }</a>
           <span data-bind="visible: !isMinimized()">
             <!-- TODO: STOP the FLOAT:RIGHT madness  -->
-            {{each(index, name) buttons.NEWS_BUTTONS}}
-            <span title="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
+            {{each(index, button) buttons.all()}}
+            <span title="${ name }" class="ui-icon toggleView" data-bind="click: setActive, css: { 'ui-icon-bullet': isActive(), 'ui-icon-radio-on': !isActive() }">${ name }</span>
             {{/each}}
           </span>
         </div>
@@ -96,11 +96,12 @@
       {{/each}} 
     </script>
 
+    <!-- TODO: remove the onerror()-->
     <script type="text/html" id="imageBarTemplate">
       <li>
-      <a data-bind="attr:{ id: $data.id, title: $data.title, href: $data.url, commentLink: $data.permalink }" rel="prettyPhoto[reddit]" target="_blank">
-        <img height="150" data-bind="attr: { src: $data.thumbnail }" onerror="$(this).parent().parent().remove()">
-      </a>
+        <a id="${id}" href="${url}" title="${title}" commentLink="${permalink}" rel="prettyPhoto[reddit]" target="_blank">
+          <img height="150" src="${thumbnail}" onerror="$(this).parent().parent().remove();">
+        </a>
       </li>
     </script>
   </head>
@@ -109,9 +110,11 @@
     <div id="loadingOverlay" style="display:none;">
         <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" id="metaRedditDialog">
           <div class="portlet-header ui-widget-header ui-corner-all">
+            <!-- TODO: remove this onclick -->
             <span class="ui-icon ui-icon-closethick" onClick="$(this).parent().parent().parent().hide()"></span>
             <a>Add New Section</a>
             <input type="Text" name="feedName" size="30" class="ui-state-defalt">
+            <!-- TODO: remove this onclick -->
             <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="mra.locationPicker.show(this,$('input[name=feedName]').val())" width="16" height="16">
           </div>
           <div class="portlet-content">
@@ -135,9 +138,11 @@
 
       <h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
         <span class="cufonize">Live Dangerously?</span>
+        <!-- TODO: remove this onclick -->
         <a onclick="jQuery('#customizeDialog').fadeIn(); return false;" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
         <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
           <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.getFrontPage() }"></span>
+          <!-- TODO: remove this onclick -->
           <button class="changePic fg-button ui-corner-right" onclick="$('#loadingOverlay').toggle()">Meta</button>
           <button data-bind="click: imageBar.showMenu, visible: imageBar.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
           <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.getMenu() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
@@ -150,6 +155,7 @@
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="popupAdd">
       <div class="portlet-header ui-widget-header ui-corner-all">
+        <!-- TODO: remove this onclick -->
         <span class="ui-icon ui-icon-closethick" onClick="$('#popupAdd').fadeOut()" style="margin-top:2px;"></span>
         <a style="font-size:16px;">Add To Column or Image Bar</a>
       </div>
@@ -163,6 +169,7 @@
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="customizeDialog">
       <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
+        <!-- TODO: remove this onclick -->
         <span class="ui-icon ui-icon-closethick" onClick="mra.customize.closeDialog()"></span>
         <a>Customize MyRedditAll</a>
       </div>
@@ -171,7 +178,9 @@
           <tr>
             <td class="cufonize">Pick Wallpaper </td>
             <td colspan="3" style="text-align:left;">
+              <!-- TODO: remove this onclick -->
               <input type="button" value="Previous" class="ui-state-default" onClick="mra.customize.prevWallpaper()">
+              <!-- TODO: remove this onclick -->
               <input type="button" value="Next" class="ui-state-default" onClick="mra.customize.nextWallpaper()">
             </td>
             <td class="cufonize">Color </td>
