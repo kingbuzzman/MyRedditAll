@@ -339,12 +339,12 @@ var settings = new (function(){
              */
             var load = function(){
                 var url = this.requestURL();
-                
+				
                 // load the complete feed
                 loader.call(url, function(data){
                     for(var index in data)
                         newsItems.push(new NewsItem(data[index]));
-                    
+						
                     this.last(newsItems()[newsItems().length-1]);
                 }.bind(this));
             }.bind(this);
@@ -464,6 +464,7 @@ var settings = new (function(){
              * Populates the portlet with 10 more items
              */
             this.populateNext = function(){
+				this.amountVisible(this.amountVisible()+10);
                 load();
             };
             
@@ -888,9 +889,14 @@ var mra = {
             );
         },
         viewComments: function(){
-            mra.imageBar.popupWindow(
+            /*mra.imageBar.popupWindow(
                 $("a[rel^='prettyPhoto'] img[src='" + $("img.cboxPhoto").attr('src') + "']").parent().attr("commentLink")
-            );
+            );*/
+			//TODO improve once the imageBar gets knocked out
+			theImg =  $("img.cboxPhoto").attr('src');
+			$.each(settings.images(), function(i,o){
+				if (theImg == o.url) mra.imageBar.popupWindow(o.permalink)
+			});
         },
         changePic: function(evt){
             $(".ad-gallery").hide();
@@ -1007,13 +1013,14 @@ var mra = {
         /* This is the main module that inits the image overlay for the imageBar*/
         applyLightBox: function(){
             $("#container div.ad-gallery a").colorbox({ 
+				//href: function(){ return this.href },
                 maxHeight: function(){ return (window.innerHeight * 0.9) }, 
                 maxWidth: function(){ return (window.innerWidth * 0.9) },
                 onComplete:function(){ 
-                    var largeMode = $("img.cboxPhoto").width() > 420;
+                    var largeMode = $("img.cboxPhoto").width() > 430;
                     $("#cboxCurrent span").toggle(largeMode);
                     if (!largeMode){
-                        $.colorbox.resize({ width: 420 })
+                        $.colorbox.resize({ width: 430 })
                     }
                     $("#cboxTitle").show();
                     mra.imageBar.clipboard.addCopy(document.getElementById('copyLink2'));
@@ -1114,7 +1121,7 @@ var mra = {
                 $.colorbox.resize({ innerWidth: this.width, innerHeight: this.height });
                 $(".cboxPhoto").css({ 'width': this.width, 'height': this.height })
             };
-            i.src = $.colorbox.element().children().attr('src')
+            i.src = $.colorbox.element()[0].href;
         },
         processItems: function(pics, subReddit){ 
             var sImageBar = "";  
