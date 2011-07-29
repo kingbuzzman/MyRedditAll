@@ -10,7 +10,7 @@ var settings = {
     // note: this gets overwritten when load() is ran with the current cookie settings
     activeSettings: {
         background: {
-            color: ko.observable("red"),
+            color: ko.observable("black"),
             image: ko.observable(null)
         },
         subreddits: ko.observableArray([
@@ -23,11 +23,6 @@ var settings = {
     
     init: function(){
         this.load();
-        
-        if(this.getBackgroundColor() != null)
-            this.setBackgroundColor(this.getBackgroundColor());
-        else
-            this.setBackgroundImage(this.getBackgroundImage());
     },
     
     // getters

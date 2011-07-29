@@ -53,7 +53,7 @@
         <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
     </head>
     
-    <body data-bind="style: { backgroundColor: getBackgroundColor() ? getBackgroundColor() : '', backgroundImage: getBackgroundImage() ? 'url(' + getBackgroundImage() + ')' : '' }">
+    <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
         <div id="container">
             <div class="ad-gallery-loading" style="display:none">
                 <div style="height:150px; line-height:150px;" class="portlet-content"><img src="/images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
