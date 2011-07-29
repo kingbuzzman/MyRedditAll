@@ -1,0 +1,27 @@
+.jcarousel-skin-reddit .jcarousel-clip-horizontal {
+    height: 150px;
+}
+
+.jcarousel-skin-reddit .jcarousel-item {
+    height: 150px;
+}
+
+.jcarousel-skin-reddit .jcarousel-next-horizontal {
+    position: absolute;
+    top: 43px;
+    right: 5px;
+    width: 32px;
+    height: 46px;
+    cursor: pointer;
+    background: transparent url(/css2/jcarousel/reddit/right-arrow.png) no-repeat 0 0;
+}
+
+.jcarousel-skin-reddit .jcarousel-prev-horizontal {
+    position: absolute;
+    top: 43px;
+    left: 5px;
+    width: 32px;
+    height: 46px;
+    cursor: pointer;
+    background: transparent url(/css2/jcarousel/reddit/left-arrow.png) no-repeat 0 0;
+}
