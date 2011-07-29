@@ -18,9 +18,8 @@
             div.portlet-header a, .cufonize { font-family: 'ParmaPetitRegular', Arial, sans-serif; font-weight:normal; }
         </style>
         
-        <!-- TODO: need the $item.key to work :( -->
         <script id="imageButtonTemplate" type="text/html">
-            <button class="changePic fg-button {{if $item.key == 1}}ui-corner-left ui-state-active{{/if}}" onclick="mra.imageBar.changePic(event)" id="${ $data }">${ $data }</button>
+            <button class="changePic fg-button {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, $data) == 0}}ui-corner-left ui-state-active{{/if}}" onclick="mra.imageBar.changePic(event)" id="${ $data }">${ $data }</button>
         </script>
         
         <script id="columnTemplate" type="text/html">
