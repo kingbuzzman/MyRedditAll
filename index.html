@@ -18,6 +18,11 @@
             div.portlet-header a, .cufonize { font-family: 'ParmaPetitRegular', Arial, sans-serif; font-weight:normal; }
         </style>
         
+        <!-- TODO: need the $item.key to work :( -->
+        <script id="imageButtonTemplate" type="text/html">
+            <button class="changePic fg-button {{if $item.key == 1}}ui-corner-left ui-state-active{{/if}}" onclick="mra.imageBar.changePic(event)" id="${ $data }">${ $data }</button>
+        </script>
+        
         <script id="columnTemplate" type="text/html">
             <div class="column" data-bind="template: { name: 'subredditTemplate', foreach: $data }"></div>
         </script>
@@ -69,14 +74,8 @@
             <h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
                 <span class="cufonize">Live Dangerously?</span>
                 <a onclick="customizeLayout()" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize This</a>
-                <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:2px; margin-right:1px">
-                    <button style="display:" class="changePic fg-button ui-corner-left ui-state-active" onclick="mra.imageBar.changePic(event)" id="pics">Pics</button>
-                    <button style="display:" class="changePic fg-button" onclick="mra.imageBar.changePic(event)" id="WTF">WTF</button>
-                    <button style="display:" class="changePic fg-button" onclick="mra.imageBar.changePic(event)" id="NSFW">NSFW</button>
-                    <button style="display:" class="changePic fg-button" onclick="mra.imageBar.changePic(event)" id="Funny">Funny</button>
-                    <button style="display:none" class="changePic fg-button  ui-corner-right" onclick="mra.imageBar.changePic(event)" id="bacon">bacon</button>
-                    <button class="fg-button changePic" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
-                    <button id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()" style="height:31px; display:"><span class="ui-icon ui-icon-heart" style="left:0; top:0;">&nbsp;</span></button>
+                <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px" data-bind="template: { name: 'imageButtonTemplate', foreach: activeSettings.imageBar }">
+                    <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
                    </div>
                  <div class="ad-controls"> </div>
             </h2>
