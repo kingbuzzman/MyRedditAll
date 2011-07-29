@@ -98,16 +98,14 @@ var settings = {
         
         if(cookie){
             settings = JSON.parse(cookie);
-            settings['background']['color'] = ko.observable(settings['background']['color']);
-            settings['background']['image'] = ko.observable(settings['background']['image']);
+            this.activeSettings['background']['color'](settings['background']['color']);
+            this.activeSettings['background']['image'](settings['background']['image']);
             
-            for(var i in settings['subreddits'])
-                settings['subreddits'][i] = ko.observableArray(settings['subreddits'][i]);
+            // for(var i in settings['subreddits'])
+            //     settings['subreddits'][i] = ko.observableArray(settings['subreddits'][i]);
+            // this.activeSettings['subreddits'](settings['subreddits']);
             
-            settings['subreddits'] = ko.observable(settings['subreddits']);
-            settings['imageBar'] = ko.observable(settings['imageBar']);
-            
-            this.activeSettings = settings;
+            this.activeSettings['imageBar'](settings['imageBar']);
         } else
             // there was no cookie set, save it.
             this.save();
