@@ -20,8 +20,8 @@ var settings = {
         ]),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
     },
-    
-    init: function(){
+    arrMetaReddits: ko.observableArray([]),
+    init: function(){	
 		ko.applyBindings(settings);
         settings.load();
     },
@@ -318,7 +318,7 @@ var baseurl = "http://www.reddit.com";
 var mra = {
     init: function(){
 		Cufon.replace('div.portlet-header a, .cufonize');
-		
+		settings.saveBackgroundImage("images/spacestorm.jpg")	
         mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
         //mra.debug.init();
 
@@ -564,7 +564,9 @@ var mra = {
             );
         },
         showMetaList: function(arrItems){ 
-            var template = $("#metaTemplate").clone();
+			// This observable array initially contains three objects 
+			settings.arrMetaReddits(arrItems) 
+            /*var template = $("#metaSection").clone();
             jQuery("#metaRedditList").html("");
             jQuery.each(arrItems,function(i,o){
                 if (i > 3){
@@ -575,7 +577,7 @@ var mra = {
                     content.find(".metaText").bind('click',function(){ mra.imageBar.popupWindow(baseurl + "/r/" + o.SECTION) }).html( o.NAME )
                     jQuery("#metaRedditList").append(content);
                 }
-            }); 
+            }); */
         },
         showMore: function(){
             //$("#showMore").remove()

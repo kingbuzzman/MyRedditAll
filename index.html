@@ -48,12 +48,20 @@
 
 				</div>
                 <div class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
-            </div>
+            </div>no
         </script>
         
+		<script type="text/html" id="metaTemplate">
+            <li id="metaSection">
+                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16">
+                <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16">
+                <span class="metaText">${$data.NAME}</span>
+            </li>
+        </script>
+    
     </head>
     
-    <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
+   <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
         <div id="container">
             <div class="ad-gallery-loading" style="display:none">
                 <div style="height:150px; line-height:150px;" class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
@@ -81,12 +89,7 @@
             <div id="newsSection" data-bind="template: { name: 'columnTemplate', foreach: activeSettings.subreddits }"></div>
         </div>
         
-        <!-- <li id="metaTemplate" style="display:none;">
-            <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16">
-            <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16">
-            <span class="metaText"></span>
-        </li>
-        
+        <!-- 
         <li id="moreTemplate" style="display:none;" class="ui-state-default">
             <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16">
             <span class="moreText"></span>
@@ -134,11 +137,16 @@
             
         
     </div>
+    
+	
 
     <div style="clear:both">&nbsp;</div>
-    <ul id="metaRedditList"></ul>
+    
+    <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: arrMetaReddits }"></ul>	
+    
 </div>
 
+    
 <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="" id="newsTemplate" style="display:none;">
     <div class="portlet-header ui-widget-header ui-corner-all">
         <span class="ui-icon ui-icon-closethick ui-close-display"></span>
