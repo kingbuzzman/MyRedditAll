@@ -22,7 +22,8 @@ var settings = {
     },
     
     init: function(){
-        this.load();
+		ko.applyBindings(settings);
+        settings.load();
     },
     
     // getters
@@ -75,6 +76,9 @@ var settings = {
         this.save();
     },
     saveBackgroundImage: function(image){
+		console.log(image);
+		//cannot fix
+		//settings.saveBackgroundImage("images/spacestorm.jpg")
         this.setBackgroundImage(image);
         this.save();
     },
@@ -121,39 +125,37 @@ var settings = {
     }
 };
 
-$(document).ready(function(){
-    settings.init();
-    ko.applyBindings(settings);
-});
+$(document).ready(settings.init);
 
-// function createCookie(name,value,days) {
-//     if (days) {
-//         var date = new Date();
-//         date.setTime(date.getTime()+(days*24*60*60*1000));
-//         var expires = "; expires="+date.toGMTString();
-//         document.cookie = name+"="+value+expires+"; path=/";
-//     }
-//     else { 
-//     var expires = "";
-//     document.cookie = name+"="+value+expires+"; path=/";
-//     }
-// }
-// function readCookie(name) {
-//     var nameEQ = name + "=";
-//     var ca = document.cookie.split(';');
-//     for(var i=0;i < ca.length;i++) {
-//         var c = ca[i];
-//         while (c.charAt(0)==' ') c = c.substring(1,c.length);
-//         if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-//     }
-//     return null;
-// }
-// function eraseCookie(name) {
-//     createCookie(name,"",-1);
-// }
-
+//// Cookies ////
+function createCookie(name,value,days) {
+	if (days) {
+		var date = new Date();
+		date.setTime(date.getTime()+(days*24*60*60*1000));
+		var expires = "; expires="+date.toGMTString();
+		document.cookie = name+"="+value+expires+"; path=/";
+	}
+	else { 
+	var expires = "";
+	document.cookie = name+"="+value+expires+"; path=/";
+	}
+}
+function readCookie(name) {
+	var nameEQ = name + "=";
+	var ca = document.cookie.split(';');
+	for(var i=0;i < ca.length;i++) {
+		var c = ca[i];
+		while (c.charAt(0)==' ') c = c.substring(1,c.length);
+		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+	}
+	return null;
+}
+function eraseCookie(name) {
+	createCookie(name,"",-1);
+}
+	
 arrWallpapers = [
-    "/images/spacestorm.jpg",
+    "images/spacestorm.jpg",
     "http://www.dinpattern.com/tiles/prestige-COD.gif",
     "http://www.dinpattern.com/tiles/bones-leather.gif",
     "http://i.imgur.com/GNUvG.jpg",
@@ -170,7 +172,8 @@ arrWallpapers = [
 ]; 
 wallpaperIndex = 0;
 function saveWallpaper(wallpaperURL){
-    // $("body").css({"background-image": "url(" + wallpaperURL + ")"});
+    $("body").css({"background-image": "url(" + wallpaperURL + ")"});
+	settings.saveBackgroundImage(wallpaperURL);
     createCookie("WALLPAPER",wallpaperURL,999);    
     eraseCookie("COLOR");
     showWallpaper();
@@ -314,7 +317,9 @@ function copyToShare(el){
 var baseurl = "http://www.reddit.com";
 var mra = {
     init: function(){
-        mra.loaderImage = $("<img src='/images/ajaxLoader.gif' width='126' height='22' align='middle'>");
+		Cufon.replace('div.portlet-header a, .cufonize');
+		
+        mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
         //mra.debug.init();
 
         mra.news.init();
@@ -418,7 +423,7 @@ var mra = {
                         });
                     });
                     currentLayout = arrColumns;
-                    createCookie('LAYOUT',encodeURIComponent(JSON.stringify(arrColumns)),999);
+                    settings('LAYOUT',encodeURIComponent(JSON.stringify(arrColumns)),999);
                 }
             });                
             $("div.column").delegate("div.ui-icon-more","click",mra.news.loadMore);
@@ -479,7 +484,7 @@ var mra = {
             newsTemplate = $("#newsTemplate").clone();
             newsTemplate.attr("title",curReddit).attr("id","").show().prependTo("div.column:eq(" + column + ")");
             newsTemplate.find(".portlet-header a").attr('href',function(){ this.href + curReddit }).html(curReddit);
-            //Cufon.refresh();
+            Cufon.refresh();
             mra.news.portlets = $("#newsSection .portlet");
             mra.fetchContentFromRemote(function(arrItems){
                 mra.news.addItemsToView(arrItems,curReddit);
@@ -727,21 +732,21 @@ var mra = {
     
             // oCustomContextMenu = new CustomContextMenu(Arguments); 
             // 
-            // oCustomContextMenu.AddItem('/images/fileTypes/comments.png', 'View Comments', false, 'comments');
+            // oCustomContextMenu.AddItem('images/fileTypes/comments.png', 'View Comments', false, 'comments');
             // oCustomContextMenu.AddSeparatorItem();
-            // oCustomContextMenu.AddItem('/images/fileTypes/image_link.png', 'View Image', false, 'image');
+            // oCustomContextMenu.AddItem('images/fileTypes/image_link.png', 'View Image', false, 'image');
             // oCustomContextMenu.AddSeparatorItem();
-            // oCustomContextMenu.AddItem('/images/fileTypes/link.png', 'Find Source', false, 'source');
+            // oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Find Source', false, 'source');
             // oCustomContextMenu.AddSeparatorItem();
-            // oCustomContextMenu.AddItem('/images/fileTypes/link.png', 'Error Analyze', false, 'analyze');
+            // oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Error Analyze', false, 'analyze');
             // oCustomContextMenu.AddSeparatorItem();
-            // oCustomContextMenu.AddItem('/images/fileTypes/link.png', 'Copy To Share', false, 'copy');
+            // oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Copy To Share', false, 'copy');
     
             $("#imagebar_pics li").bind('contextmenu',function(e){
                 mra.imageBar.currentImageContext = e;
                 return oCustomContextMenu.Display(e);
             });    
-            // Cufon.refresh();
+            Cufon.refresh();
             /*(function(){
                 $("a[rel^='prettyPhoto']").contextMenu({
                    menu: 'imageMenu'
@@ -769,7 +774,7 @@ var mra = {
                 maxHeight: function(){ return (window.innerHeight * 0.9) }, 
                 maxWidth: function(){ return (window.innerWidth * 0.9) },
                 onComplete:function(){ 
-                    //Cufon.refresh() 
+                    Cufon.refresh() 
                     var largeMode = $("img.cboxPhoto").width() > 400;
                     $("#cboxCurrent span").toggle(largeMode);
                     if (!largeMode){
@@ -791,9 +796,9 @@ var mra = {
                 opacity: 0.7,
                 preloading: true,
                 current: function(){ 
-                    var comment = '<img src="/images/fileTypes/comments.png" align="absmiddle" width="16" height="16"><span>View Comments</span>';    
-                    var image = '<img src="/images/fileTypes/image_link.png" align="absmiddle" width="16" height="16"><span>New Tab</span>';
-                    var cts = '<img src="/images/fileTypes/link.png" align="absmiddle" width="16" height="16"><span>Copy To Share</span>';
+                    var comment = '<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16"><span>View Comments</span>';    
+                    var image = '<img src="images/fileTypes/image_link.png" align="absmiddle" width="16" height="16"><span>New Tab</span>';
+                    var cts = '<img src="images/fileTypes/link.png" align="absmiddle" width="16" height="16"><span>Copy To Share</span>';
                     var markup = '<a href="'+ $(this).attr('commentLink') + '" onclick="mra.imageBar.viewComments(); return false;" class="cufonize">' + comment + '</a>\
                     | <a href="' + this.href + '" onclick="mra.imageBar.popupWindow($(\'img.cboxPhoto\').attr(\'src\')); return false;" class="cufonize">' + image + '</a>\
                     | <a id="copyLink2" title="' + this.title + '" href="' + this.href + '" onclick="return false;" class="cufonize copyLink2">' + cts + '</a>'; /**/
@@ -819,7 +824,6 @@ var mra = {
                     if (isLoading == false){
                         adGallery.findImages()
                         mra.imageBar.applyLightBox();
-                        console.log("loading more images");
                     }
                     isLoading = true;
                 },1000);                    
@@ -837,7 +841,7 @@ var mra = {
                     $("#cboxTitle").stop(true).fadeTo("normal",0.85); 
                 }
             );
-            $("#cboxTopRight").html('<img src="/images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
+            $("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
             mra.imageBar.lbHasInit = 1;    
     
             ZeroClipboard.setMoviePath( '/ZeroClipboard.swf' );
@@ -879,7 +883,7 @@ var mra = {
             window.adGallery = $("div.ad-gallery")    
                 .attr("id", "imagebar_" + mra.imageBar.currentImageBar)
                 .adGallery({
-                  loader_image: '/images/ajax-loader_images.gif',
+                  loader_image: 'images/ajax-loader_images.gif',
                   width: false, // Width of the image, set to false and it will read the CSS width
                   height: 150, // Height of the image, set to false and it will read the CSS height
                   thumb_opacity: 0.7, // Opacity that the thumbs fades to/from, (1 removes fade effect)
@@ -929,7 +933,7 @@ var mra = {
                             //console.log(a-b);
                             //if (a-b < 600){
                                 //console.log('fire the loading');    
-                                //jQuery(".ad-thumb-list ul").append('<li class="imgLoader"><a><img src="/images/ajax-loader_images.gif"></a></li>');
+                                //jQuery(".ad-thumb-list ul").append('<li class="imgLoader"><a><img src="images/ajax-loader_images.gif"></a></li>');
                                 //adGallery.findImages();
                         
                                 mra.imageBar.loadMoreImages();

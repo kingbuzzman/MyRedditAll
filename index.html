@@ -4,19 +4,29 @@
         <title>RedittAll</title>
         <meta charset="UTF-8" />
         <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-        <link href="css2/autocomplete/autocomplete.css" type="text/css" rel="stylesheet" media="screen" />
-        <link href="css/styles.css" type="text/css" rel="stylesheet" media="screen" />
-        <link href="css2/jquery.contextMenu.css" type="text/css" rel="stylesheet" media="screen" />
         <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/dot-luv/jquery-ui.css" type="text/css" rel="stylesheet" media="screen" />
+        <link href="css/autocomplete.css" type="text/css" rel="stylesheet" media="screen" />
+        <link href="css/styles.css" type="text/css" rel="stylesheet" media="screen" />
+        <link href="css/jquery.contextMenu.css" type="text/css" rel="stylesheet" media="screen" />
         <link href="css/jquery.ad.gallery.css" type="text/css" rel="stylesheet" media="screen" />
         <link href="css/prettyPhoto.css" type="text/css" rel="stylesheet" media="screen" />
         <link href="css/colorpicker.css" type="text/css" rel="stylesheet" media="screen" />
         <link href="css/colorbox.css" type="text/css" rel="stylesheet" media="screen" />
-        <link href="parma/stylesheet.css" type="text/css" rel="stylesheet" media="screen" />
         
-        <style>
-            div.portlet-header a, .cufonize { font-family: 'ParmaPetitRegular', Arial, sans-serif; font-weight:normal; }
-        </style>
+        
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="https://raw.github.com/jquery/jquery-tmpl/master/jquery.tmpl.min.js" type="text/javascript"></script>
+        <script src="js/knockout-1.2.1.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="js/autocomplete.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="js/ZeroClipboard.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="js/jquery.topzindex.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="js/jquery.ad.gallery.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script> 
+        <script src="js/jquery.colorbox.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="js/cufon.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="js/font_ParmaPetit.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
         
         <script id="imageButtonTemplate" type="text/html">
             <button class="changePic fg-button {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, $data) == 0}}ui-corner-left ui-state-active{{/if}}" onclick="mra.imageBar.changePic(event)" id="${ $data }">${ $data }</button>
@@ -32,35 +42,21 @@
                     <span class="ui-icon ui-icon-closethick ui-close-display"></span>
                     <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
                     <a href="http://www.reddit.com/r/${ $data }" target="_blank">${ $data }</a>
-                    <span class="ui-icon toggleView ui-icon-bullet" rel="hot" title="View hot articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">hot</span>
-                    <span class="ui-icon toggleView ui-icon-radio-on" rel="new" title="View new articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">new</span>
-                    <span class="ui-icon toggleView ui-icon-radio-on" rel="controversial" title="View controversial articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">controversial</span>
-                    <span class="ui-icon toggleView ui-icon-radio-on" rel="top" title="View top articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">top</span>
-                </div>
-                <div class="portlet-content"><img src="/images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
+					{{each ['hot','new','controversial','top']}}
+						<span class="ui-icon toggleView {{if $index == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" rel="${$value}" title="View ${$value} articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">${$value}</span>
+					{{/each}}
+
+				</div>
+                <div class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
             </div>
         </script>
         
-        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <!-- <script src="scripts/font_ParmaPetit.js" type="text/javascript" charset="ISO-8859-1"></script> -->
-        <script src="https://raw.github.com/jquery/jquery-tmpl/master/jquery.tmpl.min.js" type="text/javascript"></script>
-        <script src="js/knockout-1.2.1.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <script src="js/autocomplete.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <script src="js/ZeroClipboard.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <script src="js/jquery.topzindex.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <script src="js/jquery.ad.gallery.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <!-- <script src="js/ContextMenu.js" type="text/javascript" charset="ISO-8859-1"></script> -->
-        <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <!-- <script src="http://richard.webtron.net/mram/js/time.js" type="text/javascript" charset="ISO-8859-1"></script> -->
-        <script src="js/jquery.colorbox.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
     </head>
     
     <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
         <div id="container">
             <div class="ad-gallery-loading" style="display:none">
-                <div style="height:150px; line-height:150px;" class="portlet-content"><img src="/images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
+                <div style="height:150px; line-height:150px;" class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
             </div>
             <div class="ad-gallery" id="">
                 <div class="ad-nav">
@@ -75,7 +71,10 @@
                 <a onclick="customizeLayout()" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize This</a>
                 <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px" data-bind="template: { name: 'imageButtonTemplate', foreach: activeSettings.imageBar }">
                     <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
-                   </div>
+	                <button id="showMore"
+                    class="changePic fg-button ui-corner-right" 
+                    onclick="mra.imageBar.showMore()" style="height:31px; display:"><span class="ui-icon ui-icon-heart" style="left:0; top:0;">&nbsp;</span></button>
+                 </div>   
                  <div class="ad-controls"> </div>
             </h2>
             
@@ -83,21 +82,21 @@
         </div>
         
         <!-- <li id="metaTemplate" style="display:none;">
-            <img class="metaAdd" src="/images/fileTypes/add.png" width="16" height="16">
-            <img class="metaView" src="/images/fileTypes/picture.png" width="16" height="16">
+            <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16">
+            <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16">
             <span class="metaText"></span>
         </li>
         
         <li id="moreTemplate" style="display:none;" class="ui-state-default">
-            <img class="moreView" src="/images/fileTypes/cross.png" width="16" height="16">
+            <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16">
             <span class="moreText"></span>
         </li> -->
 
 <div id="metaRedditDialog" title="MetaReddit Picker" style="display:none;">
 
     <p>
-        [<img class="metaAdd" src="/images/fileTypes/add.png" align="absmiddle" width="16" height="16"> Add  |
-        <img class="metaAdd" src="/images/fileTypes/picture.png" align="absmiddle" width="16" height="16"> View In Image Bar |
+        [<img class="metaAdd" src="images/fileTypes/add.png" align="absmiddle" width="16" height="16"> Add  |
+        <img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"> View In Image Bar |
         (Word) View In Reddit]
     </p>
     <div class="fg-buttonset fg-buttonset-single" style="width:100%;">
@@ -162,7 +161,7 @@
             
         <span class="ui-icon toggleView ui-icon-radio-on" rel="top" title="View top articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">top</span>
     </div>
-    <div class="portlet-content"><img src="/images/ajaxLoader.gif" width="126" height="22" align="middle"></div>
+    <div class="portlet-content"><img src="images/ajaxLoader.gif" width="126" height="22" align="middle"></div>
 </div>
 
 
@@ -175,7 +174,7 @@
         <button name="btnColumn" value="0" class="fg-button ui-state-default ui-priority-primary ui-corner-left" title="Add To The First Column News Blocks">1st</button>
         <button name="btnColumn" value="1" class="fg-button ui-state-default ui-priority-primary" title="Add To The Second Column News Blocks">2nd</button>
         <button name="btnColumn" value="2" class="fg-button ui-state-default ui-priority-primary" title="Add To The Third Column News Blocks">3rd</button>
-        <button name="btnColumn" value="3" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="/images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
+        <button name="btnColumn" value="3" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
     </div>
 </div>
 <SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
@@ -201,7 +200,7 @@ function saveSettings(){
         <a>Customize MyRedditAll</a>
         <a href="#" onClick="$('#saveSettingsForm').toggle(); return false;" class="cufonize" style="color:#3F0; font-size:14px;">Save Settings</a>
         <span id="saveSettingsForm" style="display:none;">
-            <input type="Text" name="saveName" size="30" class="ui-state-defalt" value="Save Name"> <img src="/images/fileTypes/disk.png" style="cursor:pointer;" onClick="saveSettings()" width="16" height="16">
+            <input type="Text" name="saveName" size="30" class="ui-state-defalt" value="Save Name"> <img src="images/fileTypes/disk.png" style="cursor:pointer;" onClick="saveSettings()" width="16" height="16">
         </span>
     </div>
     <div class="portlet-content">
@@ -215,7 +214,7 @@ function saveSettings(){
                     <span class="cufonize">
                         Custom:
                         <input type="hidden" value="" size="5" id="customWallpaper">
-                        <img src="/images/fileTypes/picture.png" onClick="saveWallpaper($('#customWallpaper').val());" width="16" height="16">
+                        <img src="images/fileTypes/picture.png" onClick="saveWallpaper($('#customWallpaper').val());" width="16" height="16">
                     </span>
                 </td>
                 <td class="cufonize">Color </td>
@@ -225,7 +224,7 @@ function saveSettings(){
                 <td class="cufonize">Search Sub Reddits</td>
                 <td>
                     <input type="Text" name="feedName" size="30" class="ui-state-defalt">
-                    <img src="/images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="popupAdd(this,$('input[name=feedName]').val())" width="16" height="16">
+                    <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="popupAdd(this,$('input[name=feedName]').val())" width="16" height="16">
                     <script type="text/javascript">
                         new Autocomplete("feedName", function() {
                             this.setValue = function( SubRedditTitle ) {
@@ -255,7 +254,7 @@ function saveSettings(){
     <input type="hidden" id="clipboardContents">
     <!-- <script type="text/javascript"> Cufon.now(); </script> -->
     <div style="position:absolute; left:-99999px; top:-99999px;"><img src="" id="background"></div>
-    
+        <script type="text/javascript"> Cufon.now(); </script>
 </body>
 
 </html>

@@ -1,9 +1,9 @@
 .search_field {
-	background: #FFF url(../autocomplete/search.gif) no-repeat right center;
+	background: #FFF url(../images/search.gif) no-repeat right center;
 }
 
 .search_field_spin {
-	background: #FFF url(../autocomplete/search_spin.gif) no-repeat right center;
+	background: #FFF url(../images/search_spin.gif) no-repeat right center;
 }
 
 .autocomplete_list * {

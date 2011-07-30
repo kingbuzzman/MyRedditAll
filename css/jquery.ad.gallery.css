@@ -120,7 +120,7 @@
 	.ad-gallery .ad-nav {
 		width: 100%;
 		position: relative;
-		background:url("images/trans_black.png") repeat scroll 50% top transparent;
+		background:url("../images/trans_black.png") repeat scroll 50% top transparent;
 		border:1px solid #000000;
 		color:#D9D9D9;
 	}
@@ -140,7 +140,7 @@
       width: 13px;
       display: block;
       background: url(ad/ad_scroll_back.png) 0px 22px no-repeat;*/
-		background:url("../css2/jcarousel/reddit/left-arrow.png") no-repeat scroll 0 0 transparent;
+		background:url("../images/left-arrow.png") no-repeat scroll 0 0 transparent;
 		cursor:pointer;
 		height:46px;
 		left:-4px;
@@ -155,7 +155,7 @@
       right: -20px;
       width: 13px;
       background: url(ad/ad_scroll_forward.png) 0px 22px no-repeat;*/
-		background:url("../css2/jcarousel/reddit/right-arrow.png") no-repeat scroll 0 0 transparent;
+		background:url("../images/right-arrow.png") no-repeat scroll 0 0 transparent;
 		cursor:pointer;
 		height:46px;
 		position:absolute;
