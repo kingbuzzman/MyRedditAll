@@ -21,9 +21,13 @@ var settings = {
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
     },
     arrMetaReddits: ko.observableArray([]),
-    init: function(){	
-		ko.applyBindings(settings);
-        settings.load();
+    
+    init: function(){
+        // initialize preferences's complex object
+        settings.preferences = settings.preferences()
+        
+        ko.applyBindings(settings);
+        settings.preferences.load();
     },
     
     // getters
@@ -58,7 +62,6 @@ var settings = {
         this.activeSettings['imageBar']().push(subreddit);
     },
     
-	
     // removers
     removeSubreddit: function(column, subreddit){
         this.activeSettings['subreddits']()[column].remove(subreddit);
@@ -77,14 +80,13 @@ var settings = {
     // shortcuts
     saveBackgroundColor: function(color){
         this.setBackgroundColor(color);
-        this.save();
+        this.preferences.save();
     },
     saveBackgroundImage: function(image){
         this.setBackgroundImage(image);
-        this.save();
+        this.preferences.save();
     },
     
-	
 	deleteSubReddit: function(SubRedditTitle){
 		for(i in settings.activeSettings.subreddits()) {
 			for(b in settings.activeSettings.subreddits()[i]()){ 
@@ -96,43 +98,73 @@ var settings = {
 		this.save();
 	},
 	
-    // internal functionality
-    allCookies: function(){
-        var rawCookies = document.cookie.split(";");
-        var rawCookieData = null;
-        var cookies = {};
+    preferences: function(){
+        /*
+         * Load all the current settings from the cookie
+         */
+        this.load = function(){
+            var cookie = getCookieValue(this.COOKIE_NAME);
+            var settings = {};
+            
+            if(cookie){
+                settings = JSON.parse(cookie);
+                this.activeSettings['background']['color'](settings['background']['color']);
+                this.activeSettings['background']['image'](settings['background']['image']);
+                
+                // TODO: a work around to this needs to be worked out... ASAP
+                // this.activeSettings['subreddits'] = ko.observableArray();
+                // for(var i in settings['subreddits']){
+                //     this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
+                // }
+                
+                this.activeSettings['imageBar'](settings['imageBar']);
+            } else
+                // there was no cookie set, save it.
+                this.preferences.save();
+        };
         
-        for(var i in rawCookies){
-            rawCookieData = rawCookies[i].split("=");
-            cookies[rawCookieData[0]] = unescape(rawCookieData[1]);
-        }
+        /*
+         * Erase the cookie cookie
+         * - TODO: redirect ?
+         */
+        this.erase = function(){
+            document.cookie = this.COOKIE_NAME + "=; expires=Sun, 02 Nov 2008 04:36:49 GMT; path=/";
+        };
         
-        return cookies;
-    },
-    load: function(){
-        var cookie = this.allCookies()[this.COOKIE_NAME];
-        var settings = {}; 
-		
-        if(cookie){
-            settings = JSON.parse(cookie);
-            this.activeSettings['background']['color'](settings['background']['color']);
-            this.activeSettings['background']['image'](settings['background']['image']);
-             
-			this.activeSettings['subreddits'] = ko.observableArray();
-			for(var i in settings['subreddits']){
-				this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
-			}
-			
-            this.activeSettings['imageBar'](settings['imageBar']);
-        } else
-            // there was no cookie set, save it.
-            this.save();
-    },
-    erase: function(){
-        document.cookie = this.COOKIE_NAME + "=; expires=Sun, 02 Nov 2008 04:36:49 GMT; path=/";
-    },
-    save: function(){
-        document.cookie = this.COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + this.COOKEY_EXPIRATION + "; path=/";
+        /*
+         * Save all the current settings into the cookie
+         */
+        this.save = function(){
+            document.cookie = this.COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + this.COOKEY_EXPIRATION + "; path=/";
+        };
+        
+        /*
+         * Get cookie value (private function)
+         * - loops over all the cookies and returns the one that maches
+         * @param cookie name of the cookie
+         * @return the content of the cookie [escaped]
+         */
+        var getCookieValue = function(cookie){
+            var rawCookies = document.cookie.split(";");
+            var rawCookieData = null;
+            
+            // leave if theres nothing worth searching for
+            if(cookie == undefined || cookie == "") return;
+            
+            // loop over all the cookies
+            for(var i in rawCookies){
+                rawCookieData = rawCookies[i].split("=");
+                
+                // if the cookie name matches return the value of the cookie [escaped]
+                if(rawCookieData[0].replace(/(^\s+|\s+$)/g, "") == cookie)
+                    return unescape(rawCookieData[1]);
+            }
+            
+            // nothing found
+            return;
+        };
+        
+        return this;
     },
     toString: function(){
         return ko.toJSON(this.activeSettings);
@@ -332,7 +364,6 @@ var baseurl = "http://www.reddit.com";
 var mra = {
     init: function(){
 		Cufon.replace('div.portlet-header a, .cufonize');
-		settings.saveBackgroundImage("images/spacestorm.jpg")	
         mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
         //mra.debug.init();
 
