@@ -140,7 +140,7 @@ var settings = {
                 rawCookieData = rawCookies[i].split("=");
                 
                 // if the cookie name matches return the value of the cookie [escaped]
-                if(rawCookieData[0] == cookie)
+                if(rawCookieData[0].replace(/(^\s+|\s+$)/g, "") == cookie)
                     return unescape(rawCookieData[1]);
             }
             
