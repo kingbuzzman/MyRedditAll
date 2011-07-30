@@ -40,7 +40,7 @@
 			{{each(index, imageSection) activeSettings.imageBar}}
 			   {{if index > 3 }}
 					<li class="ui-state-default">
-						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" onclick="deleteImageBar(${ imageSection }); $(this).parent().fadeOut()">
+						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" onclick="deleteImageBar('${ imageSection }'); $(this).parent().fadeOut()">
 						<span class="moreText" onclick="mra.imageBar.changePic(event)" id="${ imageSection }">${ imageSection }</span>
 					</li>
 				{{/if}}
@@ -100,7 +100,7 @@
                 <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
                 	<span data-bind="template: { name: 'imageButtonTemplate' }"></span>
                     <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
-	                <button data-bind="visible: settings.activeSettings.imageBar().length > 4" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" style="text-align:center; vertical-align:middle;">&nbsp;</span></button>
+	                <button data-bind="visible: showMoreMode" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" style="text-align:center; vertical-align:middle;">&nbsp;</span></button>
                     <ul data-bind="template: { name: 'moreImageButtonTemplate' }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
                  </div>   
                  <div class="ad-controls"> </div>

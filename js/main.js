@@ -15,11 +15,12 @@ var settings = {
         },
         subreddits: ko.observableArray([
             ko.observableArray(["Gadgets","Funny"]),
-            ko.observableArray(["Atheism","Javascript"]),
+            ko.observableArray(["WTF","Javascript"]),
             ko.observableArray(["WTF","Programming"])
         ]),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
     },
+
     arrMetaReddits: ko.observableArray([]),
     
     init: function(){
@@ -66,6 +67,13 @@ var settings = {
     removeSubreddit: function(column, subreddit){
         this.activeSettings['subreddits']()[column].remove(subreddit);
     },
+	
+	removeImageBar: function(subreddit){
+		console.dir(this);
+		console.log(subreddit);
+		console.dir(this.activeSettings['imageBar']());
+		this.activeSettings['imageBar'].remove(subreddit);	 
+	},
     
     // setters
     setBackgroundColor: function(color){
@@ -76,7 +84,7 @@ var settings = {
         this.activeSettings['background']['color'](null);
         this.activeSettings['background']['image'](image);
     },
-    
+	
     // shortcuts
     saveBackgroundColor: function(color){
         this.setBackgroundColor(color);
@@ -95,7 +103,7 @@ var settings = {
 				} 
 			}
 		}
-		this.save();
+		this.preferences.save();
 	},
 	
     preferences: function(){
@@ -112,10 +120,10 @@ var settings = {
                 this.activeSettings['background']['image'](settings['background']['image']);
                 
                 // TODO: a work around to this needs to be worked out... ASAP
-                // this.activeSettings['subreddits'] = ko.observableArray();
-                // for(var i in settings['subreddits']){
-                //     this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
-                // }
+				this.activeSettings['subreddits'] = ko.observableArray();
+				for(var i in settings['subreddits']){
+					this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
+				}
                 
                 this.activeSettings['imageBar'](settings['imageBar']);
             } else
@@ -170,6 +178,10 @@ var settings = {
         return ko.toJSON(this.activeSettings);
     }
 };
+
+settings.showMoreMode= ko.dependentObservable(function(){
+	return this.activeSettings.imageBar().length > 4;	
+},settings);
 
 $(document).ready(settings.init);
 
@@ -253,12 +265,10 @@ function addImageBar(SubRedditTitle){
     displayInImageBar();
 }
 function deleteImageBar(SubRedditTitle){
-    for(i in currentImageBar) {
-        if(currentImageBar[i].SECTION.toUpperCase() == SubRedditTitle.toUpperCase())
-            currentImageBar.splice(i,1);
-    }
-    createCookie('IMAGEBAR',encodeURIComponent(JSON.stringify(currentImageBar)),999);
+	settings.removeImageBar(SubRedditTitle);
+    //createCookie('IMAGEBAR',encodeURIComponent(JSON.stringify(currentImageBar)),999);
     displayInImageBar();
+	settings.preferences.save();
 }
 function displayInImageBar(){
     (currentImageBar.length > 4) ? $("#showMore").fadeIn() : $("#showMore").fadeOut();
@@ -488,6 +498,7 @@ var mra = {
                          $(this).parent().remove();
                      }); 
                      settings.deleteSubReddit($(this).parent().parent().attr('title'));
+					 settings.preferences.save();
                  }    
             });    
 
