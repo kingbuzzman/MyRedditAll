@@ -53,9 +53,9 @@
         
 		<script type="text/html" id="metaTemplate">
             <li id="metaSection">
-                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16">
-                <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16">
-                <span class="metaText">${$data.NAME}</span>
+                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" onclick="popupAdd(this,${$data.SECTION})">
+                <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" onclick="mra.imageBar.changePic(this.event)" id="${$data.SECTION}">
+                <span class="metaText" onclick="mra.imageBar.popupWindow( baseurl + '/r/${$data.SECTION}' )">${$data.NAME}</span>
             </li>
         </script>
     
