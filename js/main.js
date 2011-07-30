@@ -557,16 +557,16 @@ var mra = {
             } 
         },
         processMeta: function(data){ 
-            mra.imageBar.showMetaList(
+            settings.arrMetaReddit(
                 jQuery.map(data.query.results.a,function(o,i){
                     return { NAME: o.content, SECTION: o.href.split('/')[2] };
                 })
             );
         },
-        showMetaList: function(arrItems){ 
+        /*showMetaList: function(arrItems){ 
 			// This observable array initially contains three objects 
 			settings.arrMetaReddits(arrItems) 
-            /*var template = $("#metaSection").clone();
+            var template = $("#metaSection").clone();
             jQuery("#metaRedditList").html("");
             jQuery.each(arrItems,function(i,o){
                 if (i > 3){
@@ -577,8 +577,8 @@ var mra = {
                     content.find(".metaText").bind('click',function(){ mra.imageBar.popupWindow(baseurl + "/r/" + o.SECTION) }).html( o.NAME )
                     jQuery("#metaRedditList").append(content);
                 }
-            }); */
-        },
+            }); 
+        },*/
         showMore: function(){
             //$("#showMore").remove()
             //$("button.changePic").show()
