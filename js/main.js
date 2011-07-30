@@ -87,6 +87,19 @@ var settings = {
         this.save();
     },
     
+	
+	deleteSubReddit: function(SubRedditTitle){
+		for(i in settings.activeSettings.subreddits()) {
+			for(b in settings.activeSettings.subreddits()[i]()){ 
+				console.log(settings.activeSettings.subreddits()[i]()[b].toUpperCase());
+				if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
+					settings.activeSettings.subreddits()[i]().splice(b,1);   
+				} 
+			}
+		}
+		this.save();
+	},
+	
     // internal functionality
     allCookies: function(){
         var rawCookies = document.cookie.split(";");
@@ -108,11 +121,11 @@ var settings = {
             settings = JSON.parse(cookie);
             this.activeSettings['background']['color'](settings['background']['color']);
             this.activeSettings['background']['image'](settings['background']['image']);
-            
-            // for(var i in settings['subreddits'])
-            //     settings['subreddits'][i] = ko.observableArray(settings['subreddits'][i]);
-            // this.activeSettings['subreddits'](settings['subreddits']);
-            
+             
+			for(var i in settings['subreddits']){
+				this.activeSettings['subreddits']()[i](ko.observableArray(settings['subreddits'][i])); 
+			}
+			
             this.activeSettings['imageBar'](settings['imageBar']);
         } else
             // there was no cookie set, save it.
@@ -444,27 +457,28 @@ var mra = {
                 $(this).parents(".portlet:first").find(".portlet-content").toggle();
             });
     
-            // $("div.column").delegate(".portlet-header .ui-close-display","click",function() {
-            //     if (confirm("Are you sure you want to delete this section?")){
-            //         $(this).parent().hide(1000, function(){
-            //             $(this).parent().remove();
-            //         }); 
-            //         mra.news.deleteSubReddit($(this).parent().parent().attr('title'));
-            //     }    
-            // });    
+             $("div.column").delegate(".portlet-header .ui-close-display","click",function() {
+                 if (confirm("Are you sure you want to delete this section?")){
+                     $(this).parent().hide(1000, function(){
+                         $(this).parent().remove();
+                     }); 
+                     settings.deleteSubReddit($(this).parent().parent().attr('title'));
+                 }    
+            });    
 
             $(".column").disableSelection();
     
             mra.news.loadNextFeed();
         },
-        deleteSubReddit: function(SubRedditTitle){
+        /* deprecated now settings.deleteSubReddit
+		deleteSubReddit: function(SubRedditTitle){
             for(i in currentLayout) {
                 for(b in currentLayout[i])
                     if(currentLayout[i][b].toUpperCase() == SubRedditTitle.toUpperCase())
                         currentLayout[i].splice(b,1);
             }
             createCookie('LAYOUT',encodeURIComponent(JSON.stringify(currentLayout)),999);
-        },
+        },*/
         addCount: function(){
             mra.news.totalIndex = mra.news.totalIndex + 1;
             if (mra.news.totalIndex <= (mra.news.portlets.length - 1))
