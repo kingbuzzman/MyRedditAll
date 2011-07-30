@@ -214,12 +214,10 @@ var redditURL = "http://www.reddit.com";
 function addSubbReddit(SubRedditTitle, column){
     mra.news.loadNewSection(SubRedditTitle, column);
     currentColumnSelected = (typeof column == "undefined") ? $("[name=btnColumn].ui-state-active").val() : column;
-    currentLayout[currentColumnSelected].push(SubRedditTitle);
-    createCookie('LAYOUT',encodeURIComponent(JSON.stringify(currentLayout)),999); 
+	settings.addSubreddit(SubRedditTitle,selectedReddit);
 }
 function addImageBar(SubRedditTitle){
-    currentImageBar.push({ SECTION:SubRedditTitle,NAME:SubRedditTitle });
-    createCookie('IMAGEBAR',encodeURIComponent(JSON.stringify(currentImageBar)),999); 
+	settings.addImageBar(selectedReddit);
     displayInImageBar();
 }
 function deleteImageBar(SubRedditTitle){
@@ -341,8 +339,7 @@ var mra = {
         mra.timer.init(); 
 
         $("button[name=btnColumn]").bind("click",function(){
-            //(this.value == 3) ? addImageBar(selectedReddit) : addSubbReddit(selectedReddit,this.value);
-			(this.value == 3) ? settings.addImageBar(selectedReddit) : settings.addSubreddit(this.value,selectedReddit);
+            (this.value == 3) ? addImageBar(selectedReddit) : addSubbReddit(selectedReddit,this.value);
 			settings.save();
             closePopupAdd();
         });
