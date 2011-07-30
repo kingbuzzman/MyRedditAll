@@ -80,9 +80,6 @@ var settings = {
         this.save();
     },
     saveBackgroundImage: function(image){
-		console.log(image);
-		//cannot fix
-		//settings.saveBackgroundImage("images/spacestorm.jpg")
         this.setBackgroundImage(image);
         this.save();
     },
@@ -114,8 +111,8 @@ var settings = {
     },
     load: function(){
         var cookie = this.allCookies()[this.COOKIE_NAME];
-        var settings = {};
-        console.log(cookie)
+        var settings = {}; 
+		
         if(cookie){
             settings = JSON.parse(cookie);
             this.activeSettings['background']['color'](settings['background']['color']);
