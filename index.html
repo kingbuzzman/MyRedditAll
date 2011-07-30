@@ -29,7 +29,22 @@
         <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
         
         <script id="imageButtonTemplate" type="text/html">
-            <button class="changePic fg-button {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, $data) == 0}}ui-corner-left ui-state-active{{/if}}" onclick="mra.imageBar.changePic(event)" id="${ $data }">${ $data }</button>
+			{{each(index, imageSection) activeSettings.imageBar}}
+			   {{if index < 4 }}
+					<button class="changePic fg-button {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, imageSection) == 0}}ui-corner-left ui-state-active{{/if}}" onclick="mra.imageBar.changePic(event)" id="${ imageSection }">${ imageSection }</button>
+				{{/if}}
+			{{/each}}
+        </script>
+        
+        <script id="moreImageButtonTemplate" type="text/html">
+			{{each(index, imageSection) activeSettings.imageBar}}
+			   {{if index > 3 }}
+					<li class="ui-state-default">
+						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" onclick="deleteImageBar(${ imageSection }); $(this).parent().fadeOut()">
+						<span class="moreText" onclick="mra.imageBar.changePic(event)" id="${ imageSection }">${ imageSection }</span>
+					</li>
+				{{/if}}
+			{{/each}}
         </script>
         
         <script id="columnTemplate" type="text/html">
@@ -53,8 +68,8 @@
         
 		<script type="text/html" id="metaTemplate">
             <li id="metaSection">
-                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" onclick="popupAdd(this,${$data.SECTION})">
-                <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" onclick="mra.imageBar.changePic(this.event)" id="${$data.SECTION}">
+                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" onclick="popupAdd(this,'${$data.SECTION}')">
+                <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" onclick="mra.imageBar.changePic('${$data.SECTION}')">
                 <span class="metaText" onclick="mra.imageBar.popupWindow( baseurl + '/r/${$data.SECTION}' )">${$data.NAME}</span>
             </li>
         </script>
@@ -77,23 +92,17 @@
             <h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
                 <span class="cufonize">Live Dangerously?</span>
                 <a onclick="customizeLayout()" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize This</a>
-                <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px" data-bind="template: { name: 'imageButtonTemplate', foreach: activeSettings.imageBar }">
+                <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
+                	<span data-bind="template: { name: 'imageButtonTemplate' }"></span>
                     <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
-	                <button id="showMore"
-                    class="changePic fg-button ui-corner-right" 
-                    onclick="mra.imageBar.showMore()" style="height:31px; display:"><span class="ui-icon ui-icon-heart" style="left:0; top:0;">&nbsp;</span></button>
+	                <button data-bind="visible: settings.activeSettings.imageBar().length > 4" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" style="text-align:center; vertical-align:middle;">&nbsp;</span></button>
+                    <ul data-bind="template: { name: 'moreImageButtonTemplate' }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
                  </div>   
                  <div class="ad-controls"> </div>
             </h2>
             
             <div id="newsSection" data-bind="template: { name: 'columnTemplate', foreach: activeSettings.subreddits }"></div>
         </div>
-        
-        <!-- 
-        <li id="moreTemplate" style="display:none;" class="ui-state-default">
-            <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16">
-            <span class="moreText"></span>
-        </li> -->
 
 <div id="metaRedditDialog" title="MetaReddit Picker" style="display:none;">
 

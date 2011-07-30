@@ -54,7 +54,11 @@ var settings = {
     addSubreddit: function(column, subreddit){
         this.activeSettings['subreddits']()[column].push(subreddit);
     },
+    addImageBar: function(subreddit){
+        this.activeSettings['imageBar']().push(subreddit);
+    },
     
+	
     // removers
     removeSubreddit: function(column, subreddit){
         this.activeSettings['subreddits']()[column].remove(subreddit);
@@ -174,7 +178,7 @@ wallpaperIndex = 0;
 function saveWallpaper(wallpaperURL){
     $("body").css({"background-image": "url(" + wallpaperURL + ")"});
 	settings.saveBackgroundImage(wallpaperURL);
-    createCookie("WALLPAPER",wallpaperURL,999);    
+    //createCookie("WALLPAPER",wallpaperURL,999);    
     eraseCookie("COLOR");
     showWallpaper();
 }
@@ -327,7 +331,9 @@ var mra = {
         mra.timer.init(); 
 
         $("button[name=btnColumn]").bind("click",function(){
-            (this.value == 3) ? addImageBar(selectedReddit) : addSubbReddit(selectedReddit,this.value);
+            //(this.value == 3) ? addImageBar(selectedReddit) : addSubbReddit(selectedReddit,this.value);
+			(this.value == 3) ? settings.addImageBar(selectedReddit) : settings.addSubreddit(this.value,selectedReddit);
+			settings.save();
             closePopupAdd();
         });
         //if ($("#background").length)
@@ -548,7 +554,7 @@ var mra = {
         },
         loadMeta: function(metaSection){
             if (metaSection == 'Favorites'){
-                mra.imageBar.showMetaList(currentImageBar);
+                settings.arrMetaReddits(currentImageBar);
             }
             else {
                 sql = "select * from html where url=\"http://metareddit.com/reddits/" + metaSection + "/list\" and xpath='//*[@class=\"subreddit\"]'";
@@ -557,7 +563,7 @@ var mra = {
             } 
         },
         processMeta: function(data){ 
-            settings.arrMetaReddit(
+            settings.arrMetaReddits(
                 jQuery.map(data.query.results.a,function(o,i){
                     return { NAME: o.content, SECTION: o.href.split('/')[2] };
                 })
@@ -580,9 +586,15 @@ var mra = {
             }); 
         },*/
         showMore: function(){
+			morePos = jQuery("#showMore").position(); 
+			$("#showMoreList")
+				.css({ "position": "absolute", "top": (morePos.top + 31) })
+				.css({ left: (morePos.left + 32) - $("#showMoreList").width() })
+				.fadeIn();
             //$("#showMore").remove()
             //$("button.changePic").show()
-            if (jQuery("#showMoreList").length){
+            
+			/*if (jQuery("#showMoreList").length){
                 jQuery("#showMoreList").remove()
                 jQuery("#showMore").removeClass('ui-state-active');
             }
@@ -602,7 +614,7 @@ var mra = {
                 }); 
         
                 oShowMoreList.css({ left: (morePos.left + 32) - oShowMoreList.width() })                        
-            } 
+            } */
         },
         viewComments: function(){
             mra.imageBar.popupWindow(
@@ -610,6 +622,7 @@ var mra = {
             );
         },
         changePic: function(evt){
+			console.log(evt);
             $(".ad-gallery").hide();
             $(".ad-gallery-loading").show();
             $(".ad-controls").html(""); 
