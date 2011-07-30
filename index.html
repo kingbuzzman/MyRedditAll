@@ -46,11 +46,11 @@
 				{{/if}}
 			{{/each}}
         </script>
-        
+
         <script id="columnTemplate" type="text/html">
             <div class="column" data-bind="template: { name: 'subredditTemplate', foreach: $data }"></div>
         </script>
-        
+
         <script id="subredditTemplate" type="text/html">
             <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="${ $data }">
                 <div class="portlet-header ui-widget-header ui-corner-all">
@@ -65,7 +65,7 @@
                 <div class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
             </div>
         </script>
-        
+
 		<script type="text/html" id="metaTemplate">
             <li id="metaSection">
                 <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" onclick="popupAdd(this,'${$data.SECTION}')">
@@ -73,7 +73,12 @@
                 <span class="metaText" onclick="mra.imageBar.popupWindow( baseurl + '/r/${$data.SECTION}' )">${$data.NAME}</span>
             </li>
         </script>
-    
+
+		<script id="loadMetaButtonTemplate" type="text/html">
+            {{each ['active','over18','new','self','media','Favorites']}}
+                <button id="${$value}" class="fg-button ui-state-default ui-priority-primary " onclick="mra.imageBar.loadMeta(this.id);">${$value}</button>
+            {{/each}} 
+        </script>
     </head>
     
    <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
@@ -111,43 +116,8 @@
         <img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"> View In Image Bar |
         (Word) View In Reddit]
     </p>
-    <div class="fg-buttonset fg-buttonset-single" style="width:100%;">
-       
-        
-            
-                <button id="biggest"
-                    class="fg-button ui-state-default ui-priority-primary " 
-                    onclick="mra.imageBar.loadMeta(this.id);">biggest</button>
-            
-                <button id="active"
-                    class="fg-button ui-state-default ui-priority-primary " 
-                    onclick="mra.imageBar.loadMeta(this.id);">active</button>
 
-            
-                <button id="over18"
-                    class="fg-button ui-state-default ui-priority-primary " 
-                    onclick="mra.imageBar.loadMeta(this.id);">over18</button>
-            
-                <button id="new"
-                    class="fg-button ui-state-default ui-priority-primary " 
-                    onclick="mra.imageBar.loadMeta(this.id);">new</button>
-            
-                <button id="self"
-                    class="fg-button ui-state-default ui-priority-primary " 
-                    onclick="mra.imageBar.loadMeta(this.id);">self</button>
-            
-                <button id="media"
-                    class="fg-button ui-state-default ui-priority-primary " 
-                    onclick="mra.imageBar.loadMeta(this.id);">media</button>
-            
-                <button id="Favorites"
-                    class="fg-button ui-state-default ui-priority-primary ui-state-active" 
-                    onclick="mra.imageBar.loadMeta(this.id);">Favorites</button>
-            
-        
-    </div>
-    
-	
+    <div class="fg-buttonset fg-buttonset-single" style="width:100%;" data-bind="template: { name: 'loadMetaButtonTemplate' }"></div>
 
     <div style="clear:both">&nbsp;</div>
     
