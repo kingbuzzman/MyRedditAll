@@ -20,8 +20,8 @@ var settings = {
         ]),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
     },
-    
-    init: function(){
+    arrMetaReddits: ko.observableArray([]),
+    init: function(){	
 		ko.applyBindings(settings);
         settings.load();
     },
@@ -54,7 +54,11 @@ var settings = {
     addSubreddit: function(column, subreddit){
         this.activeSettings['subreddits']()[column].push(subreddit);
     },
+    addImageBar: function(subreddit){
+        this.activeSettings['imageBar']().push(subreddit);
+    },
     
+	
     // removers
     removeSubreddit: function(column, subreddit){
         this.activeSettings['subreddits']()[column].remove(subreddit);
@@ -76,13 +80,22 @@ var settings = {
         this.save();
     },
     saveBackgroundImage: function(image){
-		console.log(image);
-		//cannot fix
-		//settings.saveBackgroundImage("images/spacestorm.jpg")
         this.setBackgroundImage(image);
         this.save();
     },
     
+	
+	deleteSubReddit: function(SubRedditTitle){
+		for(i in settings.activeSettings.subreddits()) {
+			for(b in settings.activeSettings.subreddits()[i]()){ 
+				if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
+					settings.activeSettings.subreddits()[i]().splice(b,1);   
+				} 
+			}
+		}
+		this.save();
+	},
+	
     // internal functionality
     allCookies: function(){
         var rawCookies = document.cookie.split(";");
@@ -98,17 +111,18 @@ var settings = {
     },
     load: function(){
         var cookie = this.allCookies()[this.COOKIE_NAME];
-        var settings = {};
-        
+        var settings = {}; 
+		
         if(cookie){
             settings = JSON.parse(cookie);
             this.activeSettings['background']['color'](settings['background']['color']);
             this.activeSettings['background']['image'](settings['background']['image']);
-            
-            // for(var i in settings['subreddits'])
-            //     settings['subreddits'][i] = ko.observableArray(settings['subreddits'][i]);
-            // this.activeSettings['subreddits'](settings['subreddits']);
-            
+             
+			this.activeSettings['subreddits'] = ko.observableArray();
+			for(var i in settings['subreddits']){
+				this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
+			}
+			
             this.activeSettings['imageBar'](settings['imageBar']);
         } else
             // there was no cookie set, save it.
@@ -174,7 +188,7 @@ wallpaperIndex = 0;
 function saveWallpaper(wallpaperURL){
     $("body").css({"background-image": "url(" + wallpaperURL + ")"});
 	settings.saveBackgroundImage(wallpaperURL);
-    createCookie("WALLPAPER",wallpaperURL,999);    
+    //createCookie("WALLPAPER",wallpaperURL,999);    
     eraseCookie("COLOR");
     showWallpaper();
 }
@@ -318,7 +332,7 @@ var baseurl = "http://www.reddit.com";
 var mra = {
     init: function(){
 		Cufon.replace('div.portlet-header a, .cufonize');
-		
+		settings.saveBackgroundImage("images/spacestorm.jpg")	
         mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
         //mra.debug.init();
 
@@ -327,7 +341,9 @@ var mra = {
         mra.timer.init(); 
 
         $("button[name=btnColumn]").bind("click",function(){
-            (this.value == 3) ? addImageBar(selectedReddit) : addSubbReddit(selectedReddit,this.value);
+            //(this.value == 3) ? addImageBar(selectedReddit) : addSubbReddit(selectedReddit,this.value);
+			(this.value == 3) ? settings.addImageBar(selectedReddit) : settings.addSubreddit(this.value,selectedReddit);
+			settings.save();
             closePopupAdd();
         });
         //if ($("#background").length)
@@ -423,7 +439,7 @@ var mra = {
                         });
                     });
                     currentLayout = arrColumns;
-                    settings('LAYOUT',encodeURIComponent(JSON.stringify(arrColumns)),999);
+                    //settings('LAYOUT',encodeURIComponent(JSON.stringify(arrColumns)),999);
                 }
             });                
             $("div.column").delegate("div.ui-icon-more","click",mra.news.loadMore);
@@ -438,27 +454,28 @@ var mra = {
                 $(this).parents(".portlet:first").find(".portlet-content").toggle();
             });
     
-            // $("div.column").delegate(".portlet-header .ui-close-display","click",function() {
-            //     if (confirm("Are you sure you want to delete this section?")){
-            //         $(this).parent().hide(1000, function(){
-            //             $(this).parent().remove();
-            //         }); 
-            //         mra.news.deleteSubReddit($(this).parent().parent().attr('title'));
-            //     }    
-            // });    
+             $("div.column").delegate(".portlet-header .ui-close-display","click",function() {
+                 if (confirm("Are you sure you want to delete this section?")){
+                     $(this).parent().hide(1000, function(){
+                         $(this).parent().remove();
+                     }); 
+                     settings.deleteSubReddit($(this).parent().parent().attr('title'));
+                 }    
+            });    
 
             $(".column").disableSelection();
     
             mra.news.loadNextFeed();
         },
-        deleteSubReddit: function(SubRedditTitle){
+        /* deprecated now settings.deleteSubReddit
+		deleteSubReddit: function(SubRedditTitle){
             for(i in currentLayout) {
                 for(b in currentLayout[i])
                     if(currentLayout[i][b].toUpperCase() == SubRedditTitle.toUpperCase())
                         currentLayout[i].splice(b,1);
             }
             createCookie('LAYOUT',encodeURIComponent(JSON.stringify(currentLayout)),999);
-        },
+        },*/
         addCount: function(){
             mra.news.totalIndex = mra.news.totalIndex + 1;
             if (mra.news.totalIndex <= (mra.news.portlets.length - 1))
@@ -548,7 +565,7 @@ var mra = {
         },
         loadMeta: function(metaSection){
             if (metaSection == 'Favorites'){
-                mra.imageBar.showMetaList(currentImageBar);
+                settings.arrMetaReddits(currentImageBar);
             }
             else {
                 sql = "select * from html where url=\"http://metareddit.com/reddits/" + metaSection + "/list\" and xpath='//*[@class=\"subreddit\"]'";
@@ -557,14 +574,16 @@ var mra = {
             } 
         },
         processMeta: function(data){ 
-            mra.imageBar.showMetaList(
+            settings.arrMetaReddits(
                 jQuery.map(data.query.results.a,function(o,i){
                     return { NAME: o.content, SECTION: o.href.split('/')[2] };
                 })
             );
         },
-        showMetaList: function(arrItems){ 
-            var template = $("#metaTemplate").clone();
+        /*showMetaList: function(arrItems){ 
+			// This observable array initially contains three objects 
+			settings.arrMetaReddits(arrItems) 
+            var template = $("#metaSection").clone();
             jQuery("#metaRedditList").html("");
             jQuery.each(arrItems,function(i,o){
                 if (i > 3){
@@ -576,11 +595,17 @@ var mra = {
                     jQuery("#metaRedditList").append(content);
                 }
             }); 
-        },
+        },*/
         showMore: function(){
+			morePos = jQuery("#showMore").position(); 
+			$("#showMoreList")
+				.css({ "position": "absolute", "top": (morePos.top + 31) })
+				.css({ left: (morePos.left + 32) - $("#showMoreList").width() })
+				.fadeIn();
             //$("#showMore").remove()
             //$("button.changePic").show()
-            if (jQuery("#showMoreList").length){
+            
+			/*if (jQuery("#showMoreList").length){
                 jQuery("#showMoreList").remove()
                 jQuery("#showMore").removeClass('ui-state-active');
             }
@@ -600,7 +625,7 @@ var mra = {
                 }); 
         
                 oShowMoreList.css({ left: (morePos.left + 32) - oShowMoreList.width() })                        
-            } 
+            } */
         },
         viewComments: function(){
             mra.imageBar.popupWindow(
@@ -608,6 +633,7 @@ var mra = {
             );
         },
         changePic: function(evt){
+			console.log(evt);
             $(".ad-gallery").hide();
             $(".ad-gallery-loading").show();
             $(".ad-controls").html(""); 

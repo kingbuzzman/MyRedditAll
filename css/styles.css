@@ -106,3 +106,5 @@ width:200px; }
 #customizeHeader { cursor:move; }
 
 .ad-preloads { display:none; }
+#showMore { height:31px; display:block; width:31px; margin:0; padding:0; }
+.moreText { font-size:11px; }
