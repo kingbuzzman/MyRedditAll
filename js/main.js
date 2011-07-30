@@ -91,7 +91,6 @@ var settings = {
 	deleteSubReddit: function(SubRedditTitle){
 		for(i in settings.activeSettings.subreddits()) {
 			for(b in settings.activeSettings.subreddits()[i]()){ 
-				console.log(settings.activeSettings.subreddits()[i]()[b].toUpperCase());
 				if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
 					settings.activeSettings.subreddits()[i]().splice(b,1);   
 				} 
@@ -116,14 +115,15 @@ var settings = {
     load: function(){
         var cookie = this.allCookies()[this.COOKIE_NAME];
         var settings = {};
-        
+        console.log(cookie)
         if(cookie){
             settings = JSON.parse(cookie);
             this.activeSettings['background']['color'](settings['background']['color']);
             this.activeSettings['background']['image'](settings['background']['image']);
              
+			this.activeSettings['subreddits'] = ko.observableArray();
 			for(var i in settings['subreddits']){
-				this.activeSettings['subreddits']()[i](ko.observableArray(settings['subreddits'][i])); 
+				this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
 			}
 			
             this.activeSettings['imageBar'](settings['imageBar']);
@@ -442,7 +442,7 @@ var mra = {
                         });
                     });
                     currentLayout = arrColumns;
-                    settings('LAYOUT',encodeURIComponent(JSON.stringify(arrColumns)),999);
+                    //settings('LAYOUT',encodeURIComponent(JSON.stringify(arrColumns)),999);
                 }
             });                
             $("div.column").delegate("div.ui-icon-more","click",mra.news.loadMore);
