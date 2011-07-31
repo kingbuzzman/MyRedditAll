@@ -83,6 +83,14 @@
                 <button id="${$value}" class="fg-button ui-state-default ui-priority-primary " onclick="mra.imageBar.loadMeta(this.id);">${$value}</button>
             {{/each}} 
         </script>
+		
+		<script type="text/html" id="imageBarTemplate">
+            <li>
+				<a id="${$data.id}" rel="prettyPhoto[reddit]" target="_blank" commentLink="${baseurl+$data.permalink}" title="${$data.title}" href="${$data.url}">
+					<img height="150" src="${$data.url}" onerror="$(this).parent().parent().remove()">
+				</a>
+			</li>
+        </script>
     </head>
     
    <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
@@ -93,7 +101,7 @@
             <div class="ad-gallery" id="">
                 <div class="ad-nav">
                     <div class="ad-thumbs">
-                        <ul class="ad-thumb-list"></ul>
+                        <ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: images }"></ul>
                     </div>
                 </div>
             </div>

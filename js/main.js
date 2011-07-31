@@ -21,7 +21,8 @@ var settings = {
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
     },
 
-    arrMetaReddits: ko.observableArray([]),
+	images: ko.observableArray(),
+    arrMetaReddits: ko.observableArray(),
     
     init: function(){
         // initialize preferences's complex object
@@ -115,8 +116,7 @@ var settings = {
                 settings = JSON.parse(cookie);
                 this.activeSettings['background']['color'](settings['background']['color']);
                 this.activeSettings['background']['image'](settings['background']['image']);
-                
-                // TODO: a work around to this needs to be worked out... ASAP
+				
 				this.activeSettings['subreddits'].removeAll(); 
 				for(var i in settings['subreddits']){ 
 					this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
@@ -684,24 +684,28 @@ var mra = {
         popupWindow: function(href){
              window.open(href, '_blank');
         },
-        createElements: function(arrElems){
+        filterElements: function(arrElems){
             var regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif)$");
             var sElements = "";
+			var filtered = [];
             for (i in arrElems){
-                pic = arrElems[i];
+                var pic = arrElems[i];
                 if (pic.url != ''){
                     if (  pic.url.indexOf("http://imgur.com/") >= 0 ){
-                                pic.url = pic.url + ".jpg";
+                         pic.url = pic.url + ".jpg";
                     }
                     if (regex.exec( pic.url )){
-                        sElements += mra.imageBar.makeHTML(pic);
+						settings.images.push(pic);
+						//filtered.push(pic);	
+                        //sElements += mra.imageBar.makeHTML(pic);
                     }
                     else {
+						//TODO at this point is just append it to the observ array
                         mra.imageBar.getHeaders(pic);
                     }
                 }
             }
-            return sElements;
+            //return filtered;
         },
         getHeaders: function(a){
             var curPic = a;
@@ -716,22 +720,23 @@ var mra = {
                         try {
                             if (data.query.results.result['content-type'].indexOf("image") >= 0){
                                 //console.log("adding " + curPic.url);
-                                jQuery(".ad-thumb-list ul").append(mra.imageBar.makeHTML(curPic));
-                                adGallery.findImages();
+                                //jQuery(".ad-thumb-list ul").append(mra.imageBar.makeHTML(curPic));
+                                //adGallery.findImages();
                                 //mra.imageBar.applyContextMenu();                            
+								settings.images.push(curPic);
                             } 
                         }catch(e){}    
                     }
                 }
             );
         },
-        makeHTML: function(pic){
+        /*makeHTML: function(pic){
             return '<li>\
                         <a id="'+pic.id+'" rel="prettyPhoto[reddit]" target="_blank" commentLink="'+ baseurl + pic.permalink +'" title="'+ pic.title.replace(/"/g,"'") +'" href="'+ pic.url +'">\
                             <img height="150" src="'+ pic.url +'" onerror="$(this).parent().parent().remove()">\
                         </a>\
                     </li>';    
-        },
+        },*/
         contextOnClick: function(Sender, EventArgs){
                 /*switch(EventArgs.CommandName)
                 {
@@ -870,14 +875,11 @@ var mra = {
         },
         loadMoreImages: function(){
             if (arrPics.length > 0){
-                var newSet = $.map(arrPics.splice(0,10),function(o,i){
-                            if ($("#" + o.id).length == 0)
-                    return o;
+                $.each(arrPics.splice(0,10),function(i,o){
+					if ($("#" + o.id).length == 0)
+                    settings.images.push(o)	
                 });
-                if (doAppend == true)
-                    jQuery(".ad-thumb-list ul").append(mra.imageBar.createElements(newSet));
-                else 
-                    jQuery(".ad-thumb-list ul").prepend(mra.imageBar.createElements(newSet));
+				
                 isLoading = false;
                 setTimeout(function(){
                     if (isLoading == false){
@@ -928,15 +930,20 @@ var mra = {
             i.src = $.colorbox.element().children().attr('src')
         },
         processItems: function(pics, subReddit){ 
-            var sImageBar = "<ul>";  
-            window.arrPics = pics;
-            sImageBar = sImageBar + mra.imageBar.createElements(arrPics.splice(0,15)); 
-            sImageBar += "</ul>";
+			var sImageBar = "";  
+
+			window.arrPics = pics;
+            /*sImageBar = sImageBar + mra.imageBar.createElements(arrPics.splice(0,15)); 
             $("ul.ad-thumb-list").html(sImageBar);
     
             $(".ad-gallery").show();
             $(".ad-gallery-loading").hide();
-    
+    		*/
+			
+			settings.images.removeAll(); 
+			mra.imageBar.filterElements(pics);
+					
+			
             //var catOnDom  = ($("div.ad-gallery").attr('id') != '') ? $("div.ad-gallery").attr('id').split('_')[1] : "";
             //var curPos = (catOnDom == "") ? 0 : adGallery.thumbs_wrapper.scrollLeft();    
             window.adGallery = $("div.ad-gallery")    
@@ -969,48 +976,14 @@ var mra = {
                   },
                   effect: 'slide-hori', // or 'slide-vert', 'resize', 'fade', 'none' or false
                   enable_keyboard_move: false, // Move to next/previous image with keyboard arrows?
-                  cycle: true, // If set to false, you can't go from the last image to the first, and vice versa,
-                  callbacks: {
-                    // Executes right after the internal init, can be used to choose which images
-                    // you want to preload
-                    init: function() {
-                      // Or, just preload the first three
-                      this.preloadAll();
-                      setTimeout(function(){
-                          window.imageLoader = setInterval(mra.imageBar.loadMoreImages,1000 * 10);  
-                      },1000 * 10)
-                      //this.preloadImage(2);
-                    },
-                    scrollingStopped: function(){
-                        if (arrPics.length > 0){
-                            //var context = this;
-                            //adGallery = context;
-                            //constant the large number
-                            //var a = adGallery.thumbs_wrapper.children().width(); 
-                            //variable the number that changes
-                            //var b = (adGallery.thumbs_wrapper.scrollLeft() + adGallery.thumbs_wrapper.width());
-                            //console.log(a-b);
-                            //if (a-b < 600){
-                                //console.log('fire the loading');    
-                                //jQuery(".ad-thumb-list ul").append('<li class="imgLoader"><a><img src="images/ajax-loader_images.gif"></a></li>');
-                                //adGallery.findImages();
-                        
-                                mra.imageBar.loadMoreImages();
-                                //mra.imageBar.applyContextMenu();
-                        
-                                //$("#container .imgLoader").remove();
-                                //console.log("images left in the array " + arrPics.length);
-                            //} 
-                        }
-                    }
-                  }        
+                  cycle: true // If set to false, you can't go from the last image to the first, and vice versa,
                 });
             window.adGallery = window.adGallery[0];    
     
             mra.imageBar.applyLightBox();
             mra.imageBar.applyContextMenu();
             //adGallery.thumbs_wrapper.scrollLeft(curPos);
-    
+
         }
     }
 }
