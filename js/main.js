@@ -25,7 +25,7 @@ var settings = {
     },
 
 	images: ko.observableArray(),
-    arrMetaReddits: ko.observableArray(),
+    metaReddits: ko.observableArray(),
     
     init: function(){
         // initialize preferences's complex object
@@ -240,25 +240,9 @@ function customizeLayout(){
 
 function closeCustomize(){
     jQuery('#customizeDialog').fadeOut();
-    closePopupAdd()
+    mra.locationPicker.hide()()
 }
-
-function popupAdd(curObj, curReddit){
-    selectedReddit = curReddit;
-    if (curReddit != ''){   
-        $("#popupAdd").fadeIn().position({
-            of: $( curObj ),
-            my: "right top",
-            at: "left bottom",
-            offset: 0, 
-            collision: "flip flip"
-        });
-    }
-}
-function closePopupAdd(){
-    $("#popupAdd").fadeOut();
-    selectedReddit = "";
-}    
+ 
 
 function afterCopy(btn){
     $("#"+clip_curr).html('copied');
@@ -313,7 +297,7 @@ var mra = {
         $("button[name=btnColumn]").bind("click",function(){
             (this.value == 3) ? settings.addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
 			settings.preferences.save();
-            closePopupAdd();
+            mra.locationPicker.hide();
         }); 
 		
 		$('#colorSelector').ColorPicker({
@@ -387,21 +371,33 @@ var mra = {
         addTime: function(){ 
             mra.timer.countMins = mra.timer.countMins + 1;
             if (mra.timer.countMins % 15 == 0){ 
-                mra.news.totalIndex = mra.news.totalIndex + 1;
-                if (mra.news.totalIndex <= (mra.news.portlets.length - 1)){ 
-                    mra.news.loadNextFeed(); 
-                    mra.fetchContentFromRemote(function(arrItems){
-                        arrPics = arrItems;
-                        doAppend = false;
-                        setInterval(mra.imageBar.loadMoreImages,5000);  
-                    }, mra.imageBar.currentImageBar, 100);
-                }
-                else {
-                    mra.news.totalIndex = 0;    
-                }
+				mra.news.loadNextFeed(); 
+				mra.fetchContentFromRemote(function(arrItems){
+					arrPics = arrItems;
+					mra.imageBar.loadMoreImages();
+				}, mra.imageBar.currentImageBar, 100);
             }
         }
     },
+	locationPicker: {
+		show: function(evt){
+			var curObj = $(evt.target); 
+			selectedReddit = curObj.attr("id").split("_")[1];
+			if (selectedReddit != ''){   
+				$("#popupAdd").fadeIn().position({
+					of: curObj,
+					my: "right top",
+					at: "left bottom",
+					offset: 0, 
+					collision: "flip flip"
+				});
+			}	
+		},
+		hide: function(){
+		    $("#popupAdd").fadeOut();
+		    selectedReddit = "";
+		}
+	},
     news: {
         totalIndex: 0,
         totalItems: 10,
@@ -448,9 +444,13 @@ var mra = {
             mra.news.loadNextFeed();
         }, 
         addCount: function(){
-            mra.news.totalIndex = mra.news.totalIndex + 1;
-            if (mra.news.totalIndex <= (mra.news.portlets.length - 1))
-                mra.news.loadNextFeed();
+			mra.news.totalIndex += 1;
+			if (mra.news.totalIndex <= (mra.news.portlets.length - 1)){ 
+			   mra.news.loadNextFeed();
+			}
+			else {
+				mra.news.totalIndex = 0;    
+			}   
         },
         loadMore: function(evt){
             currentCount = $(evt.currentTarget).prevAll().length;
@@ -535,7 +535,7 @@ var mra = {
         },
         loadMeta: function(metaSection){
             if (metaSection == 'Favorites'){
-                settings.arrMetaReddits(currentImageBar);
+                settings.metaReddits(currentImageBar);
             }
             else {
                 sql = "select * from html where url=\"http://metareddit.com/reddits/" + metaSection + "/list\" and xpath='//*[@class=\"subreddit\"]'";
@@ -544,7 +544,7 @@ var mra = {
             } 
         },
         processMeta: function(data){ 
-            settings.arrMetaReddits(
+            settings.metaReddits(
                 jQuery.map(data.query.results.a,function(o,i){
                     return { NAME: o.content, SECTION: o.href.split('/')[2] };
                 })
@@ -567,13 +567,17 @@ var mra = {
             $(".ad-gallery-loading").show();
             //$(".ad-controls").html(""); 
             if (typeof evt == "object" && typeof evt.currentTarget != "undefined")   
-                mra.imageBar.currentImageBar = evt.currentTarget.id; 
+                mra.imageBar.currentImageBar = (evt.currentTarget.id.split("_")[1] || evt.currentTarget.id);  
             else if (typeof evt == "string")
-                mra.imageBar.currentImageBar = evt;    
+                mra.imageBar.currentImageBar = evt;   
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
             }, mra.imageBar.currentImageBar, 100);
         },
+		removeImageBar: function(evt){
+			$(evt).parent().fadeOut()
+			settings.removeImageBar(evt.target.id); 
+		},
         killimage: function(curObj){
             $(curObj).parent().remove();        
         },
@@ -752,7 +756,7 @@ var mra = {
             if (arrPics.length > 0){
                 $.each(arrPics.splice(0,10),function(i,o){
 					if ($("#" + o.id).length == 0)
-                    settings.images.push(o)	
+                    settings.images.unshift(o)	
                 });
 				
                 isLoading = false;

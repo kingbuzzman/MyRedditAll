@@ -34,7 +34,7 @@
         <script id="imageButtonTemplate" type="text/html">
 			{{each(index, imageSection) activeSettings.imageBar}}
 			   {{if index < 4 }}
-					<button class="changePic fg-button {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, imageSection) == 0}}ui-corner-left ui-state-active{{/if}}" onclick="mra.imageBar.changePic(event)" id="${ imageSection }">${ imageSection }</button>
+					<button class="changePic fg-button {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, imageSection) == 0}}ui-corner-left ui-state-active{{/if}}" data-bind="click: mra.imageBar.changePic" id="${ imageSection }">${ imageSection }</button>
 				{{/if}}
 			{{/each}}
         </script>
@@ -43,8 +43,8 @@
 			{{each(index, imageSection) activeSettings.imageBar}}
 			   {{if index > 3 }}
 					<li class="ui-state-default">
-						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" onclick="settings.removeImageBar('${ imageSection }'); $(this).parent().fadeOut()">
-						<span class="moreText" onclick="mra.imageBar.changePic(event)" id="${ imageSection }">${ imageSection }</span>
+						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ imageSection }" data-bind="click: mra.imageBar.removeImageBar"> 
+						<span class="moreText" data-bind="click: mra.imageBar.changePic" id="${ imageSection }">${ imageSection }</span>
 					</li>
 				{{/if}}
 			{{/each}}
@@ -61,9 +61,8 @@
                     <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
                     <a href="http://www.reddit.com/r/${ $data }" target="_blank">${ $data }</a>
 					{{each ['hot','new','controversial','top']}}
-						<span class="ui-icon toggleView {{if $index == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" rel="${$value}" title="View ${$value} articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">${$value}</span>
+						<span class="ui-icon toggleView {{if $index == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" rel="${$value}" title="View ${$value} articles" data-bind="click: function(){ mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel')) }">${$value}</span>
 					{{/each}}
-
 				</div>
                 <div class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
             </div>
@@ -71,15 +70,15 @@
 
 		<script type="text/html" id="metaTemplate">
             <li id="metaSection">
-                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" onclick="popupAdd(this,'${$data.SECTION}')">
-                <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" onclick="mra.imageBar.changePic('${$data.SECTION}')">
-                <span class="metaText" onclick="mra.imageBar.popupWindow( baseurl + '/r/${$data.SECTION}' )">${$data.NAME}</span>
+                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: mra.locationPicker.show">
+                <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ $data.SECTION }" data-bind="click: mra.imageBar.changePic" >
+                <span class="metaText" data-bind="click: function(){ mra.imageBar.popupWindow( baseurl + '/r/$data.SECTION' ) }">${$data.NAME}</span>
             </li>
         </script>
 
 		<script id="loadMetaButtonTemplate" type="text/html">
             {{each ['active','over18','new','self','media','Favorites']}}
-                <button id="${$value}" class="fg-button ui-state-default ui-priority-primary " onclick="mra.imageBar.loadMeta(this.id);">${$value}</button>
+                <button id="${$value}" class="fg-button ui-state-default ui-priority-primary " data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
             {{/each}} 
         </script>
 		
@@ -132,7 +131,7 @@
 
     <div style="clear:both">&nbsp;</div>
     
-    <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: arrMetaReddits }"></ul>	
+    <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>	
     
 </div>
 
