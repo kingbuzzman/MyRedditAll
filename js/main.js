@@ -794,19 +794,19 @@ var mra = {
                 ClickEventListener: mra.imageBar.contextOnClick
             };
     
-            // oCustomContextMenu = new CustomContextMenu(Arguments); 
-            // 
-            // oCustomContextMenu.AddItem('images/fileTypes/comments.png', 'View Comments', false, 'comments');
-            // oCustomContextMenu.AddSeparatorItem();
-            // oCustomContextMenu.AddItem('images/fileTypes/image_link.png', 'View Image', false, 'image');
-            // oCustomContextMenu.AddSeparatorItem();
-            // oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Find Source', false, 'source');
-            // oCustomContextMenu.AddSeparatorItem();
-            // oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Error Analyze', false, 'analyze');
-            // oCustomContextMenu.AddSeparatorItem();
-            // oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Copy To Share', false, 'copy');
+             oCustomContextMenu = new CustomContextMenu(Arguments); 
+             
+             oCustomContextMenu.AddItem('images/fileTypes/comments.png', 'View Comments', false, 'comments');
+             oCustomContextMenu.AddSeparatorItem();
+             oCustomContextMenu.AddItem('images/fileTypes/image_link.png', 'View Image', false, 'image');
+             oCustomContextMenu.AddSeparatorItem();
+             oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Find Source', false, 'source');
+             oCustomContextMenu.AddSeparatorItem();
+             oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Error Analyze', false, 'analyze');
+             oCustomContextMenu.AddSeparatorItem();
+             oCustomContextMenu.AddItem('images/fileTypes/link.png', 'Copy To Share', false, 'copy');
     
-            $("#imagebar_pics li").bind('contextmenu',function(e){
+            $("ul.ad-thumb-list li").bind('contextmenu',function(e){
                 mra.imageBar.currentImageContext = e;
                 return oCustomContextMenu.Display(e);
             });    
@@ -888,10 +888,7 @@ var mra = {
                     }
                     isLoading = true;
                 },1000);                    
-            }
-            else {
-                 clearTimeout(window.imageLoader)
-            }
+            } 
         },
         initLightbox: function(){
             $("#cboxContent").hover(
@@ -965,7 +962,7 @@ var mra = {
                   display_back_and_forward: true, // Are you allowed to scroll the thumb list?
                   scroll_jump: (window.innerWidth / 2), // If 0, it jumps the width of the container
                   slideshow: {
-                    enable: true,
+                    enable: false,
                     autostart: false,
                     speed: 5000,
                     start_label: 'Start',
