@@ -10,8 +10,8 @@ var settings = {
     // note: this gets overwritten when load() is ran with the current cookie settings
     activeSettings: {
         background: {
-            color: ko.observable("black"),
-            image: ko.observable(null)
+            color: ko.observable(null),
+            image: ko.observable("images/spacestorm.jpg")
         },
         subreddits: ko.observableArray([
             ko.observableArray(["Gadgets","Funny"]),
@@ -852,7 +852,7 @@ var mra = {
                 },
                 transition: "elastic",
                 opacity: 0.7,
-                preloading: true,
+                preloading: false,
                 current: function(){ 
                     var comment = '<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16"><span>View Comments</span>';    
                     var image = '<img src="images/fileTypes/image_link.png" align="absmiddle" width="16" height="16"><span>New Tab</span>';
@@ -902,7 +902,7 @@ var mra = {
             $("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
             mra.imageBar.lbHasInit = 1;    
     
-            ZeroClipboard.setMoviePath( '/ZeroClipboard.swf' );
+            ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
             clip = new ZeroClipboard.Client();
             clip.setHandCursor( true );
             clip.addEventListener( 'onComplete', function() { afterCopy() } );
