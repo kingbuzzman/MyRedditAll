@@ -13,6 +13,10 @@
         <link href="css/colorpicker.css" type="text/css" rel="stylesheet" media="screen" />
         <link href="css/colorbox.css" type="text/css" rel="stylesheet" media="screen" />
         
+        <script src="js/cufon.js" type="text/javascript" charset="ISO-8859-1"></script>
+        <script type="text/javascript" charset="ISO-8859-1">
+        	Cufon.replace('div.portlet-header a, .cufonize');
+        </script>
         
         <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js" type="text/javascript" charset="ISO-8859-1"></script>
         <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/jquery-ui.js" type="text/javascript" charset="ISO-8859-1"></script>
@@ -24,7 +28,7 @@
         <script src="js/jquery.ad.gallery.js" type="text/javascript" charset="ISO-8859-1"></script>
         <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script> 
         <script src="js/jquery.colorbox.js" type="text/javascript" charset="ISO-8859-1"></script>
-        <script src="js/cufon.js" type="text/javascript" charset="ISO-8859-1"></script>
+        
         <script src="js/font_ParmaPetit.js" type="text/javascript" charset="ISO-8859-1"></script>
         <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
         
@@ -100,7 +104,7 @@
                 <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
                 	<span data-bind="template: { name: 'imageButtonTemplate' }"></span>
                     <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
-	                <button data-bind="visible: showMoreMode" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" style="text-align:center; vertical-align:middle;">&nbsp;</span></button>
+	                <button data-bind="visible: showMoreMode" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
                     <ul data-bind="template: { name: 'moreImageButtonTemplate' }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
                  </div>   
                  <div class="ad-controls"> </div>

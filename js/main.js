@@ -25,10 +25,10 @@ var settings = {
     
     init: function(){
         // initialize preferences's complex object
-        settings.preferences = settings.preferences()
-        
+        settings.preferences = settings.preferences();
         ko.applyBindings(settings);
         settings.preferences.load();
+		Cufon.refresh();
     },
     
     // getters
@@ -366,7 +366,6 @@ function copyToShare(el){
 var baseurl = "http://www.reddit.com";
 var mra = {
     init: function(){
-		Cufon.replace('div.portlet-header a, .cufonize');
         mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
         //mra.debug.init();
 

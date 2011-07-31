@@ -108,3 +108,12 @@ width:200px; }
 .ad-preloads { display:none; }
 #showMore { height:31px; display:block; width:31px; margin:0; padding:0; }
 .moreText { font-size:11px; }
+#heartIcon {     
+	left: 0;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    text-align: center;
+    top: -3px;
+    vertical-align: middle;
+}
