@@ -1,10 +1,10 @@
 body { font-size:0.8em; font-family:Verdana, Geneva, sans-serif; color:#9FA8A8; margin:2px; padding:0; }
 a { text-decoration:none; }
 h2 { padding:0px 5px; }
-#newsSection { display:table; width:100%; }
-#newsSection  > .column { display:table-cell; }
+#newsSection { display:table; width:100%; table-layout:initial; }
+#newsSection  > .column { display:table-cell; min-width:33%; }
 div.loader { text-align:center; }
-ul.portlet-content { list-style-type: none; padding:0; margin:0; }
+ul.portlet-content { list-style-type:none; padding:0; margin:0; }
 ul.portlet-content > li { overflow:auto; text-align:left; border-bottom:1px solid #3d3d3d; }
 ul.portlet-content > li > a.link { float:left; width:85%; padding-left:8px; }
 ul.portlet-content > li > a.comment { float:right; width:10%; }
