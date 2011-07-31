@@ -60,7 +60,7 @@ var settings = {
         this.activeSettings['subreddits']()[column].push(subreddit);
     },
     addImageBar: function(subreddit){
-        this.activeSettings['imageBar']().push(subreddit);
+        this.activeSettings['imageBar'].push(subreddit);
     },
     
     // removers
@@ -69,9 +69,6 @@ var settings = {
     },
 	
 	removeImageBar: function(subreddit){
-		console.dir(this);
-		console.log(subreddit);
-		console.dir(this.activeSettings['imageBar']());
 		this.activeSettings['imageBar'].remove(subreddit);	 
 	},
     
@@ -255,19 +252,6 @@ function prevWallpaper(){
 var currentLayout = settings.getSubreddits();
 var currentImageBar = settings.getImageBar();
 var redditURL = "http://www.reddit.com";
-function addImageBar(SubRedditTitle){
-	settings.addImageBar(selectedReddit);
-    displayInImageBar();
-}
-function deleteImageBar(SubRedditTitle){
-	settings.removeImageBar(SubRedditTitle);
-    //createCookie('IMAGEBAR',encodeURIComponent(JSON.stringify(currentImageBar)),999);
-    displayInImageBar();
-	settings.preferences.save();
-}
-function displayInImageBar(){
-    (currentImageBar.length > 4) ? $("#showMore").fadeIn() : $("#showMore").fadeOut();
-}                        
 
 function left(str,count){
     return String(str).substring(0,count);
@@ -374,8 +358,8 @@ var mra = {
         mra.timer.init(); 
 
         $("button[name=btnColumn]").bind("click",function(){
-            (this.value == 3) ? addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
-			settings.save();
+            (this.value == 3) ? settings.addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
+			settings.preferences.save();
             closePopupAdd();
         });
         //if ($("#background").length)
@@ -651,7 +635,7 @@ var mra = {
 			$("#showMoreList")
 				.css({ "position": "absolute", "top": (morePos.top + 31) })
 				.css({ left: (morePos.left + 32) - $("#showMoreList").width() })
-				.fadeIn();
+				.toggle();
             //$("#showMore").remove()
             //$("button.changePic").show()
             
@@ -683,7 +667,6 @@ var mra = {
             );
         },
         changePic: function(evt){
-			console.log(evt);
             $(".ad-gallery").hide();
             $(".ad-gallery-loading").show();
             $(".ad-controls").html(""); 

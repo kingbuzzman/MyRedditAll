@@ -44,7 +44,7 @@
 			{{each(index, imageSection) activeSettings.imageBar}}
 			   {{if index > 3 }}
 					<li class="ui-state-default">
-						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" onclick="deleteImageBar('${ imageSection }'); $(this).parent().fadeOut()">
+						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" onclick="settings.removeImageBar('${ imageSection }'); $(this).parent().fadeOut()">
 						<span class="moreText" onclick="mra.imageBar.changePic(event)" id="${ imageSection }">${ imageSection }</span>
 					</li>
 				{{/if}}
