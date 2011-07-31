@@ -6,9 +6,6 @@ if (typeof console == "undefined")
  * - handles all the that needs to persist
  */
 var settings = {
-    COOKIE_NAME: "settings",
-    COOKEY_EXPIRATION: (new Date((new Date()).getTime() + 999*24*60*60*1000)).toGMTString(),
-    
     // default cookie settings
     // note: this gets overwritten when load() is ran with the current cookie settings
     activeSettings: {
@@ -108,43 +105,9 @@ var settings = {
 	},
 	
     preferences: function(){
-        /*
-         * Load all the current settings from the cookie
-         */
-        this.load = function(){
-            var cookie = getCookieValue(this.COOKIE_NAME);
-            var settings = {};
-            
-            if(cookie){
-                settings = JSON.parse(cookie);
-                this.activeSettings['background']['color'](settings['background']['color']);
-                this.activeSettings['background']['image'](settings['background']['image']);
-				
-				this.activeSettings['subreddits'].removeAll(); 
-				for(var i in settings['subreddits']){ 
-					this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
-				}
-                
-                this.activeSettings['imageBar'](settings['imageBar']);
-            } else
-                // there was no cookie set, save it.
-                this.preferences.save();
-        };
-        
-        /*
-         * Erase the cookie cookie
-         */
-        this.erase = function(){
-            document.cookie = this.COOKIE_NAME + "=; expires=Sun, 02 Nov 2008 04:36:49 GMT; path=/";
-            document.location.href = document.location.href;
-        };
-        
-        /*
-         * Save all the current settings into the cookie
-         */
-        this.save = function(){
-            document.cookie = this.COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + this.COOKEY_EXPIRATION + "; path=/";
-        };
+        var COOKIE_NAME = "settings";
+        var COOKEY_EXPIRE_NOW = (new Date((new Date()).getTime() - 2*24*60*60*1000)).toGMTString(); // 2 days ago
+        var COOKEY_EXPIRATION = (new Date((new Date()).getTime() + 999*24*60*60*1000)).toGMTString(); // 999 days from now
         
         /*
          * Get cookie value (private function)
@@ -170,6 +133,44 @@ var settings = {
             
             // nothing found
             return;
+        };
+        
+        /*
+         * Load all the current settings from the cookie
+         */
+        this.load = function(){
+            var cookie = getCookieValue(COOKIE_NAME);
+            var settings = {};
+            
+            if(cookie){
+                settings = JSON.parse(cookie);
+                this.activeSettings['background']['color'](settings['background']['color']);
+                this.activeSettings['background']['image'](settings['background']['image']);
+				
+				this.activeSettings['subreddits'].removeAll(); 
+				for(var i in settings['subreddits']){ 
+					this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
+				}
+                
+                this.activeSettings['imageBar'](settings['imageBar']);
+            } else
+                // there was no cookie set, save it.
+                this.preferences.save();
+        };
+        
+        /*
+         * Erase the cookie cookie
+         */
+        this.erase = function(){
+            document.cookie = COOKIE_NAME + "=; expires=" + COOKEY_EXPIRE_NOW + "; path=/";
+            document.location.href = document.location.href;
+        };
+        
+        /*
+         * Save all the current settings into the cookie
+         */
+        this.save = function(){
+            document.cookie = COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + COOKEY_EXPIRATION + "; path=/";
         };
         
         return this;
