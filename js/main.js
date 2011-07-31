@@ -133,10 +133,10 @@ var settings = {
         
         /*
          * Erase the cookie cookie
-         * - TODO: redirect ?
          */
         this.erase = function(){
             document.cookie = this.COOKIE_NAME + "=; expires=Sun, 02 Nov 2008 04:36:49 GMT; path=/";
+            document.location.href = document.location.href;
         };
         
         /*
