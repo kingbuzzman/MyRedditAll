@@ -106,8 +106,8 @@ var settings = {
 	
     preferences: function(){
         var COOKIE_NAME = "settings";
-        var COOKEY_EXPIRE_NOW = (new Date((new Date()).getTime() - 2*24*60*60*1000)).toGMTString(); // 2 days ago
-        var COOKEY_EXPIRATION = (new Date((new Date()).getTime() + 999*24*60*60*1000)).toGMTString(); // 999 days from now
+        var COOKIE_EXPIRE_NOW = (new Date((new Date()).getTime() - 2*24*60*60*1000)).toGMTString(); // 2 days ago
+        var COOKIE_EXPIRATION = (new Date((new Date()).getTime() + 999*24*60*60*1000)).toGMTString(); // 999 days from now
         
         /*
          * Get cookie value (private function)
@@ -162,7 +162,7 @@ var settings = {
          * Erase the cookie cookie
          */
         this.erase = function(){
-            document.cookie = COOKIE_NAME + "=; expires=" + COOKEY_EXPIRE_NOW + "; path=/";
+            document.cookie = COOKIE_NAME + "=; expires=" + COOKIE_EXPIRE_NOW + "; path=/";
             document.location.href = document.location.href;
         };
         
@@ -170,7 +170,7 @@ var settings = {
          * Save all the current settings into the cookie
          */
         this.save = function(){
-            document.cookie = COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + COOKEY_EXPIRATION + "; path=/";
+            document.cookie = COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + COOKIE_EXPIRATION + "; path=/";
         };
         
         return this;
@@ -456,6 +456,7 @@ var mra = {
         loadMore: function(evt){
             currentCount = $(evt.currentTarget).prevAll().length;
             subReddit = $(evt.currentTarget).parent().parent().attr("Title");
+            $('#newsSection .portlet[title=' + subReddit + '] div.loader').show();
             $('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html("");
             mra.fetchContentFromRemote(function(arrItems){
                 mra.news.addItemsToView(arrItems,subReddit);
@@ -486,7 +487,8 @@ var mra = {
             }, curTitle, mra.news.totalItems);
         },
         addItemsToView: function(arrItems, sectionName){
-            var curNewsColumn = mra.news.portlets.filter('.portlet[title=' + sectionName + ']').find('.portlet-content'); 
+            var curNewsColumn = mra.news.portlets.filter('.portlet[title=' + sectionName + ']').find('ul.portlet-content');
+            curNewsColumn.parent().find("div.loader").hide();
             curNewsColumn.html("");
             if (arrItems.length == 0){
                 curNewsColumn.html('<div class="ui-state-default">Nothing here to see</div>');
@@ -495,23 +497,15 @@ var mra = {
             -    $.each(arrItems,function(i, obj){
                     var title = left(obj.title,100);
                     var score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100);
-            
-                    var itemLICenter = $(document.createElement("div"))
-                        .addClass("itemLICenter")
-                        .html('<a target="_blank" href="' + obj.url + '" class="newsItem">' + title + '</a>');
-            
-                    var itemLIRight = $(document.createElement("div"))
-                        .addClass("itemLIRight")
-                        .html('<a target="_blank" href="' +  redditURL + obj.permalink + '" class="newsItem commentURL" title="' + (title + "% of People Like It") + '">' + score + '%</a>');
-            
-                    itemUL = $(document.createElement("div"))
-                        .addClass("itemUL");
-                
-                    itemUL.append(itemLICenter);
-                    itemUL.append(itemLIRight);
-            
-                    curNewsColumn.append(itemUL);
-                });        
+                    
+                    curNewsColumn.append(
+                        $("<li>").append(
+                            $("<a>").attr({ target: "_blank", href: obj.url }).addClass("link").html(title)
+                        ).append(
+                            $("<a>").attr({ target: "_blank", href: redditURL + obj.permalink, title: title + " % of People Like It" }).addClass("comment").html(score + '%')
+                        )
+                    );
+                });
                 curNewsColumn.append('<div class="ui-icon-more"><span class="ui-icon ui-icon-carat-1-s" style="float:left"></span><span class="text" style="display:none; float:right;">Read More</span></div>');
             }
             return true;

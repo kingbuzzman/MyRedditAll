@@ -64,7 +64,8 @@
 						<span class="ui-icon toggleView {{if $index == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" rel="${$value}" title="View ${$value} articles" data-bind="click: function(){ mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel')) }">${$value}</span>
 					{{/each}}
 				</div>
-                <div class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
+				<div class="loader"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
+                <ul class="portlet-content"></ul>
             </div>
         </script>
 
