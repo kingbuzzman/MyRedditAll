@@ -1,3 +1,6 @@
+if (typeof console == "undefined")
+    console = { log: function(){} };
+	
 /*
  * Setting wrapper
  * - handles all the that needs to persist
@@ -181,35 +184,16 @@ settings.showMoreMode= ko.dependentObservable(function(){
 },settings);
 
 $(document).ready(settings.init);
-
-//// Cookies ////
-function createCookie(name,value,days) {
-	if (days) {
-		var date = new Date();
-		date.setTime(date.getTime()+(days*24*60*60*1000));
-		var expires = "; expires="+date.toGMTString();
-		document.cookie = name+"="+value+expires+"; path=/";
-	}
-	else { 
-	var expires = "";
-	document.cookie = name+"="+value+expires+"; path=/";
-	}
-}
-function readCookie(name) {
-	var nameEQ = name + "=";
-	var ca = document.cookie.split(';');
-	for(var i=0;i < ca.length;i++) {
-		var c = ca[i];
-		while (c.charAt(0)==' ') c = c.substring(1,c.length);
-		if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
-	}
-	return null;
-}
-function eraseCookie(name) {
-	createCookie(name,"",-1);
-}
 	
-arrWallpapers = [
+var wallpaperIndex = 0;
+var currentLayout = settings.getSubreddits();
+var currentImageBar = settings.getImageBar();
+var redditURL = "http://www.reddit.com";
+var oCustomContextMenu = null;
+var oBase = null; 
+var doAppend = true;
+var baseurl = "http://www.reddit.com";	
+var arrWallpapers = [
     "images/spacestorm.jpg",
     "http://www.dinpattern.com/tiles/prestige-COD.gif",
     "http://www.dinpattern.com/tiles/bones-leather.gif",
@@ -225,61 +209,24 @@ arrWallpapers = [
     "http://i.imgur.com/n8bZ8.jpg",
     "http://i.imgur.com/4zX8q.jpg"
 ]; 
-wallpaperIndex = 0;
-function saveWallpaper(wallpaperURL){
-    $("body").css({"background-image": "url(" + wallpaperURL + ")"});
-	settings.saveBackgroundImage(wallpaperURL);
-    //createCookie("WALLPAPER",wallpaperURL,999);    
-    eraseCookie("COLOR");
-    showWallpaper();
-}
-function showWallpaper(){
-    //$("#currentWallpaper").html($("body").css("background-image").split('"')[1]);    
-}
+
 function nextWallpaper(){ 
     wallpaperIndex++
     if (wallpaperIndex > (arrWallpapers.length - 1))
         wallpaperIndex = 0;  
-    saveWallpaper(arrWallpapers[wallpaperIndex]); 
+    settings.saveBackgroundImage(arrWallpapers[wallpaperIndex]); 
 }
 function prevWallpaper(){ 
     wallpaperIndex--
     if (wallpaperIndex < 0)
         wallpaperIndex = (arrWallpapers.length - 1);
-    saveWallpaper(arrWallpapers[wallpaperIndex]); 
+    settings.saveBackgroundImage(arrWallpapers[wallpaperIndex]); 
 }
-
-var currentLayout = settings.getSubreddits();
-var currentImageBar = settings.getImageBar();
-var redditURL = "http://www.reddit.com";
 
 function left(str,count){
     return String(str).substring(0,count);
 }
-
-$(function(){
-    //all hover and click logic for buttons
-    $(".fg-button:not(.ui-state-disabled)")
-    .hover(
-        function(){ 
-            $(this).addClass("ui-state-hover"); 
-        },
-        function(){ 
-            $(this).removeClass("ui-state-hover"); 
-        }
-    )
-    .mousedown(function(){
-            $(this).parents('.fg-buttonset-single:first').find(".fg-button.ui-state-active").removeClass("ui-state-active");
-            if( $(this).is('.ui-state-active.fg-button-toggleable, .fg-buttonset-multi .ui-state-active') ){ $(this).removeClass("ui-state-active"); }
-            else { $(this).addClass("ui-state-active"); }    
-    })
-    .mouseup(function(){
-        if(! $(this).is('.fg-button-toggleable, .fg-buttonset-single .fg-button,  .fg-buttonset-multi .fg-button') ){
-            $(this).removeClass("ui-state-active");
-        }
-    });
-});
-
+ 
 function customizeLayout(){
      jQuery('#customizeDialog').fadeIn();
       if (document.images)
@@ -298,9 +245,7 @@ function closeCustomize(){
 
 function popupAdd(curObj, curReddit){
     selectedReddit = curReddit;
-    if (curReddit != ''){
-        //parentPos = $(curObj).position();
-        //$("#popupAdd").css({ top: parentPos.top + 11, left: (parentPos.left) - $("#popupAdd").width() - 4}).fadeIn();    
+    if (curReddit != ''){   
         $("#popupAdd").fadeIn().position({
             of: $( curObj ),
             my: "right top",
@@ -315,17 +260,10 @@ function closePopupAdd(){
     selectedReddit = "";
 }    
 
-var oCustomContextMenu = null;
-var oBase = null; 
-
-if (typeof console == "undefined")
-    console = { log: function(){} };
-
 function afterCopy(btn){
     $("#"+clip_curr).html('copied');
 }
 function repositionCopy(elem){ 
-    console.log(clip);
     clip.setText( elem.title + ": " + elem.href );
     jQuery(clip.div).topZIndex();
     clip.receiveEvent('mouseout', null);
@@ -333,26 +271,41 @@ function repositionCopy(elem){
 }
 
 function copyToShare(el){
-    //console.log("showing element");
-    //console.log(el);
     mra.currentComment = el.title + ": " + el.href;
-    //if ($(".zclip").length < 1){
-        $("#copyLink2").zclip({
-            path:'/ZeroClipboard.swf',
-            copy:function(){
-                return mra.currentComment;
-            }
-        });
-        $("#imageMenu").destroyContextMenu()
-//    }
+	$("#copyLink2").zclip({
+		path:'/ZeroClipboard.swf',
+		copy:function(){
+			return mra.currentComment;
+		}
+	});
+	$("#imageMenu").destroyContextMenu()
 }
-                doAppend = true;
-var baseurl = "http://www.reddit.com";
+
 var mra = {
     init: function(){
+		
+		//all hover and click logic for buttons
+		$(".fg-button:not(.ui-state-disabled)")
+		.hover(
+			function(){ 
+				$(this).addClass("ui-state-hover"); 
+			},
+			function(){ 
+				$(this).removeClass("ui-state-hover"); 
+			}
+		)
+		.mousedown(function(){
+				$(this).parents('.fg-buttonset-single:first').find(".fg-button.ui-state-active").removeClass("ui-state-active");
+				if( $(this).is('.ui-state-active.fg-button-toggleable, .fg-buttonset-multi .ui-state-active') ){ $(this).removeClass("ui-state-active"); }
+				else { $(this).addClass("ui-state-active"); }    
+		})
+		.mouseup(function(){
+			if(! $(this).is('.fg-button-toggleable, .fg-buttonset-single .fg-button,  .fg-buttonset-multi .fg-button') ){
+				$(this).removeClass("ui-state-active");
+			}
+		});
+			
         mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
-        //mra.debug.init();
-
         mra.news.init();
         mra.imageBar.init();
         mra.timer.init(); 
@@ -361,10 +314,9 @@ var mra = {
             (this.value == 3) ? settings.addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
 			settings.preferences.save();
             closePopupAdd();
-        });
-        //if ($("#background").length)
-        //   $("body").css({ "background": "url("+$("#background").attr('src')+")" });
-          $('#colorSelector').ColorPicker({
+        }); 
+		
+		$('#colorSelector').ColorPicker({
 			color: '#0000ff',
 			onShow: function (colpkr) {
 				$(colpkr).fadeIn(500);
@@ -372,8 +324,6 @@ var mra = {
 			},
 			onHide: function (colpkr) {
 				$(colpkr).fadeOut(500);
-				//createCookie("COLOR",jQuery('#colorSelector div').css('backgroundColor'),999)							
-				//eraseCookie("WALLPAPER");
 				settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
 				settings.preferences.save();
 				return false;
@@ -434,16 +384,12 @@ var mra = {
             mra.timer.countMins = 0;
             setInterval(mra.timer.addTime,1000 * 60); 
         }, 
-        addTime: function(){
-            //console.log("adding time " + mra.timer.countMins + " at " + (new Date()));
+        addTime: function(){ 
             mra.timer.countMins = mra.timer.countMins + 1;
-            if (mra.timer.countMins % 15 == 0){
-                //console.log("mod " + mra.timer.countMins + " at " + (new Date()));
+            if (mra.timer.countMins % 15 == 0){ 
                 mra.news.totalIndex = mra.news.totalIndex + 1;
-                if (mra.news.totalIndex <= (mra.news.portlets.length - 1)){
-                    //console.log("loading " + mra.timer.countMins + " at " + (new Date()));
-                    mra.news.loadNextFeed();
-                    //mra.imageBar.changePic();
+                if (mra.news.totalIndex <= (mra.news.portlets.length - 1)){ 
+                    mra.news.loadNextFeed(); 
                     mra.fetchContentFromRemote(function(arrItems){
                         arrPics = arrItems;
                         doAppend = false;
@@ -472,8 +418,7 @@ var mra = {
                             arrColumns[i][ii] = oo.title;
                         });
                     });
-                    currentLayout = arrColumns;
-                    //settings('LAYOUT',encodeURIComponent(JSON.stringify(arrColumns)),999);
+                    currentLayout = arrColumns; 
                 }
             });                
             $("div.column").delegate("div.ui-icon-more","click",mra.news.loadMore);
@@ -501,16 +446,7 @@ var mra = {
             $(".column").disableSelection();
     
             mra.news.loadNextFeed();
-        },
-        /* deprecated now settings.deleteSubReddit
-		deleteSubReddit: function(SubRedditTitle){
-            for(i in currentLayout) {
-                for(b in currentLayout[i])
-                    if(currentLayout[i][b].toUpperCase() == SubRedditTitle.toUpperCase())
-                        currentLayout[i].splice(b,1);
-            }
-            createCookie('LAYOUT',encodeURIComponent(JSON.stringify(currentLayout)),999);
-        },*/
+        }, 
         addCount: function(){
             mra.news.totalIndex = mra.news.totalIndex + 1;
             if (mra.news.totalIndex <= (mra.news.portlets.length - 1))
@@ -614,52 +550,12 @@ var mra = {
                 })
             );
         },
-        /*showMetaList: function(arrItems){ 
-			// This observable array initially contains three objects 
-			settings.arrMetaReddits(arrItems) 
-            var template = $("#metaSection").clone();
-            jQuery("#metaRedditList").html("");
-            jQuery.each(arrItems,function(i,o){
-                if (i > 3){
-                    var content = template.clone().show();
-                    var curMeta = o.SECTION;
-                    content.find(".metaAdd").bind('click',function(){ popupAdd(this,curMeta) });
-                    content.find(".metaView").bind('click',mra.imageBar.changePic ).attr({ id:curMeta });
-                    content.find(".metaText").bind('click',function(){ mra.imageBar.popupWindow(baseurl + "/r/" + o.SECTION) }).html( o.NAME )
-                    jQuery("#metaRedditList").append(content);
-                }
-            }); 
-        },*/
         showMore: function(){
 			morePos = jQuery("#showMore").position(); 
 			$("#showMoreList")
 				.css({ "position": "absolute", "top": (morePos.top + 31) })
 				.css({ left: (morePos.left + 32) - $("#showMoreList").width() })
 				.toggle();
-            //$("#showMore").remove()
-            //$("button.changePic").show()
-            
-			/*if (jQuery("#showMoreList").length){
-                jQuery("#showMoreList").remove()
-                jQuery("#showMore").removeClass('ui-state-active');
-            }
-            else {
-                morePos = jQuery("#showMore").position(); 
-                oShowMoreList = jQuery("<ul></ul>").attr({ "id": "showMoreList", "class": "ui-state-default" }).css({ "position": "absolute", "top": (morePos.top + 31) }).appendTo("body");
-        
-                var template = jQuery("#moreTemplate").clone();
-                jQuery.each(currentImageBar,function(i,o){
-                    if (i > 3){
-                        var content = template.clone().show();
-                        var curMeta = o.SECTION; 
-                        content.find(".moreView").bind('click',function(){ deleteImageBar(curMeta); $(this).parent().fadeOut(); });
-                        content.find(".moreText").html( o.NAME ).bind('click',mra.imageBar.changePic ).attr({ id:curMeta });
-                        oShowMoreList.append(content);
-                    }
-                }); 
-        
-                oShowMoreList.css({ left: (morePos.left + 32) - oShowMoreList.width() })                        
-            } */
         },
         viewComments: function(){
             mra.imageBar.popupWindow(
@@ -669,7 +565,7 @@ var mra = {
         changePic: function(evt){
             $(".ad-gallery").hide();
             $(".ad-gallery-loading").show();
-            $(".ad-controls").html(""); 
+            //$(".ad-controls").html(""); 
             if (typeof evt == "object" && typeof evt.currentTarget != "undefined")   
                 mra.imageBar.currentImageBar = evt.currentTarget.id; 
             else if (typeof evt == "string")
@@ -810,28 +706,8 @@ var mra = {
                 mra.imageBar.currentImageContext = e;
                 return oCustomContextMenu.Display(e);
             });    
+			
             Cufon.refresh();
-            /*(function(){
-                $("a[rel^='prettyPhoto']").contextMenu({
-                   menu: 'imageMenu'
-                },
-                   function(action, el, pos) {
-                    if (action == 'comments'){
-                        mra.imageBar.popupWindow($(el).attr('commentlink'));
-                    }
-                    if (action == 'image'){
-                        mra.imageBar.popupWindow($(el).attr('href'));
-                    }
-                    if (action == 'source'){
-                        mra.imageBar.popupWindow("http://www.tineye.com/search/?url=" + $(el).attr('href'));
-                    }
-                    if (action == 'analyze'){
-                        mra.imageBar.popupWindow("analyze.cfm?imgURL=" + $(el).attr('href'));
-                    }
-                    if (action == 'copy'){
-                    }
-                })    
-            })(); */
         },
         applyLightBox: function(){
             $("#container div.ad-gallery a").colorbox({ 
@@ -850,7 +726,6 @@ var mra = {
                         mra.imageBar.initLightbox();
                     repositionCopy(document.getElementById('copyLink2'));
                     $("<iframe>").attr("src",$("img.cboxPhoto").attr("src")).appendTo("body").bind("load", function(){ $(this).remove() });
-                    //adGallery.showImage($('a img[src="' + $("img.cboxPhoto").attr("src") + '"]').parent().parent().index());
                 }, 
                 onLoad: function(){
                     mra.imageBar.loadMoreImages();
@@ -930,11 +805,13 @@ var mra = {
 			var sImageBar = "";  
 
 			window.arrPics = pics;
+			$(".ad-gallery").show();
+            $(".ad-gallery-loading").hide();
+			
             /*sImageBar = sImageBar + mra.imageBar.createElements(arrPics.splice(0,15)); 
             $("ul.ad-thumb-list").html(sImageBar);
     
-            $(".ad-gallery").show();
-            $(".ad-gallery-loading").hide();
+            
     		*/
 			
 			settings.images.removeAll(); 
