@@ -120,8 +120,8 @@ var settings = {
                 this.activeSettings['background']['image'](settings['background']['image']);
                 
                 // TODO: a work around to this needs to be worked out... ASAP
-				this.activeSettings['subreddits'] = ko.observableArray();
-				for(var i in settings['subreddits']){
+				this.activeSettings['subreddits'].removeAll(); 
+				for(var i in settings['subreddits']){ 
 					this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
 				}
                 
@@ -255,11 +255,6 @@ function prevWallpaper(){
 var currentLayout = settings.getSubreddits();
 var currentImageBar = settings.getImageBar();
 var redditURL = "http://www.reddit.com";
-function addSubbReddit(SubRedditTitle, column){
-    mra.news.loadNewSection(SubRedditTitle, column);
-    currentColumnSelected = (typeof column == "undefined") ? $("[name=btnColumn].ui-state-active").val() : column;
-	settings.addSubreddit(SubRedditTitle,selectedReddit);
-}
 function addImageBar(SubRedditTitle){
 	settings.addImageBar(selectedReddit);
     displayInImageBar();
@@ -380,7 +375,7 @@ var mra = {
         mra.timer.init(); 
 
         $("button[name=btnColumn]").bind("click",function(){
-            (this.value == 3) ? addImageBar(selectedReddit) : addSubbReddit(selectedReddit,this.value);
+            (this.value == 3) ? addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
 			settings.save();
             closePopupAdd();
         });
@@ -537,9 +532,8 @@ var mra = {
             $('#newsSection .portlet[title=' + subReddit + '] .portlet-header .toggleView[rel=' + section + ']').removeClass('ui-icon-radio-on').addClass('ui-icon-bullet');
         },
         loadNewSection: function(curReddit, column){
-            newsTemplate = $("#newsTemplate").clone();
-            newsTemplate.attr("title",curReddit).attr("id","").show().prependTo("div.column:eq(" + column + ")");
-            newsTemplate.find(".portlet-header a").attr('href',function(){ this.href + curReddit }).html(curReddit);
+		    currentColumnSelected = (typeof column == "undefined") ? $("[name=btnColumn].ui-state-active").val() : column;
+			settings.addSubreddit(column,curReddit);
             Cufon.refresh();
             mra.news.portlets = $("#newsSection .portlet");
             mra.fetchContentFromRemote(function(arrItems){
