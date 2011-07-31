@@ -15,7 +15,7 @@ var settings = {
         },
         subreddits: ko.observableArray([
             ko.observableArray(["Gadgets","Funny"]),
-            ko.observableArray(["WTF","Javascript"]),
+            ko.observableArray(["Atheism","Javascript"]),
             ko.observableArray(["WTF","Programming"])
         ]),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
@@ -380,7 +380,25 @@ var mra = {
         });
         //if ($("#background").length)
         //   $("body").css({ "background": "url("+$("#background").attr('src')+")" });
-    
+          $('#colorSelector').ColorPicker({
+			color: '#0000ff',
+			onShow: function (colpkr) {
+				$(colpkr).fadeIn(500);
+				return false;
+			},
+			onHide: function (colpkr) {
+				$(colpkr).fadeOut(500);
+				//createCookie("COLOR",jQuery('#colorSelector div').css('backgroundColor'),999)							
+				//eraseCookie("WALLPAPER");
+				settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
+				settings.preferences.save();
+				return false;
+			},
+			onChange: function (hsb, hex, rgb) {
+				$('#colorSelector div').css('backgroundColor', '#' + hex);								
+				$('body').css({"background-color":'#' + hex, "background-image":"none" });
+			}
+		});
         $( "#customizeDialog" ).draggable({ handle: "#customizeHeader" })    
     },
     debug: {

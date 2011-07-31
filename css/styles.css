@@ -2,7 +2,12 @@ body { font-size:0.8em; font-family:Verdana, Geneva, sans-serif; color:#9FA8A8; 
 a { text-decoration:none; }
 h2 { padding:0px 5px; }
 .column { width: 33%; float: left; }
-.portlet { margin: 6px; } /*0 1em 1em 0*/
+.portlet { 
+	margin: 6px; 
+	-moz-box-shadow: 3px 2px 1px #111;
+	-webkit-box-shadow: 3px 2px 1px #111;
+	box-shadow: 3px 2px 1px #111;
+}
 .portlet-header { margin: 0 0.2em 0.2em 0.2em; }
 .portlet-header .ui-icon { float: right; }
 .portlet-content {  text-align:center; border-top:1px solid #3D3D3D; }
@@ -48,12 +53,15 @@ a { border:0; }
 	border-bottom:1px solid #3d3d3d; 
 	display:table-cell;
 	vertical-align:middle;
+	text-shadow:rgba(0,0,0,0.01) 0 0 0;
 }
 .itemLICenter {
 	width:100%;
 }
 .itemLIRight {
 	width:auto;	
+	font-size:14px;
+	text-shadow: 0 0 10px #999,  0 0 40px #555, 0 0 70px #555, 0 0 80px #555, 0 0 100px #555;
 }
 a.newsItem  { text-align:left; margin:2px; color: #D9D9D9; opacity:0.7; padding:0px 5px;  }
 a.newsItem:hover {opacity:1; color:#FFF; }
@@ -108,12 +116,3 @@ width:200px; }
 .ad-preloads { display:none; }
 #showMore { height:31px; display:block; width:31px; margin:0; padding:0; }
 .moreText { font-size:11px; }
-#heartIcon {     
-	left: 0;
-    margin: 0;
-    padding: 0;
-    position: relative;
-    text-align: center;
-    top: -3px;
-    vertical-align: middle;
-}
