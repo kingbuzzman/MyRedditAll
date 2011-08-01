@@ -21,8 +21,13 @@ ul.portlet-content > li > a.comment { float:right; width:10%; }
 .ui-sortable-placeholder * { visibility: hidden; }
 .srItems img { cursor:pointer; vertical-align:middle; }
 .portlet.ui-widget-content { background:url(../images/trans_black.png) repeat scroll 50% top transparent; border:1px solid #3D3D3D; color:#D9D9D9; }
+
 .newsItem:visited { color: #666; }
 .newsItem { display:block; width:100%; }
+a.newsItem, a.link, a.comment  { color: #D9D9D9; opacity:0.7; }
+a.comment { font-size:14px; text-align:center; }
+a.newsItem:hover {opacity:1; color:#FFF; }
+
 .fg-button { outline: 0; margin:0 4px 0 0; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
 .fg-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
 .portlet-header .ui-icon { margin-top:9px; float:right; cursor:pointer; }
@@ -69,8 +74,7 @@ a { border:0; }
 	font-size:14px;
 	text-shadow: 0 0 10px #999,  0 0 40px #555, 0 0 70px #555, 0 0 80px #555, 0 0 100px #555;
 }
-a.newsItem  { text-align:left; margin:2px; color: #D9D9D9; opacity:0.7; padding:0px 5px;  }
-a.newsItem:hover {opacity:1; color:#FFF; }
+
 .itemUL:hover { background-color:#333; opacity:1; }
 .ui-icon { display:inline-block; }
 .ui-icon-more { width:100%; cursor:pointer; height:16px; font-size:13px; }
