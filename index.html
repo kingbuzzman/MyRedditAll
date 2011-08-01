@@ -56,8 +56,7 @@
 
 
 		 <script type="text/html" id="newsItemTemplate">
-		 	${debugEach($data)}
-          		<li>
+          	<li>
 				<a href="${ $data.url }" target="_blank" class="link">${ $data.title }</a>
 				<a href="${ redditURL + $data.permalink }" target="_blank" title="${ $data.title } % of People Like It" class="comment">${ $data.score }%</a>
 			</li>
@@ -80,7 +79,7 @@
 					{{/each}}
 				</div>
 				<div class="loader"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
-                <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: settings.news()['Gadgets']() }"></ul>
+                <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: settings.news()[$data](), templateOptions: { data: $data } }"></ul>
 				<div class="ui-icon-more"><span class="ui-icon ui-icon-carat-1-s" style="float:left"></span><span class="text" style="display:none; float:right;">Read More</span></div>
             </div>
         </script>
