@@ -22,6 +22,7 @@ var settings = {
     },
 
 	images: ko.observableArray(),
+	news: ko.observable({}),
     metaReddits: ko.observableArray(),
     
     init: function(){
@@ -93,6 +94,15 @@ var settings = {
         this.preferences.save();
     },
     
+	
+	//sorters
+	sortImagesByDate: function(){
+		settings.images(settings.images().sort(function(a,b){
+			return b.created - a.created;
+		}));
+	},
+	
+	
 	deleteSubReddit: function(SubRedditTitle){
 		for(i in settings.activeSettings.subreddits()) {
 			for(b in settings.activeSettings.subreddits()[i]()){ 
@@ -149,7 +159,12 @@ var settings = {
 				
 				this.activeSettings['subreddits'].removeAll(); 
 				for(var i in settings['subreddits']){ 
-					this.activeSettings['subreddits'].push(ko.observableArray(settings['subreddits'][i]));
+					var column = ko.observableArray(settings['subreddits'][i]);
+					this.activeSettings['subreddits'].push(column);
+					$.each(column(), function(i,o){						
+						window.settings.news()[o] = ko.observableArray();
+						console.dir(window.settings.news());
+					});
 				}
                 
                 this.activeSettings['imageBar'](settings['imageBar']);
@@ -183,6 +198,7 @@ var settings = {
 settings.showMoreMode= ko.dependentObservable(function(){
 	return this.activeSettings.imageBar().length > 4;	
 },settings);
+
 
 $(document).ready(settings.init);
 	
@@ -457,13 +473,13 @@ var mra = {
             currentCount = $(evt.currentTarget).prevAll().length;
             subReddit = $(evt.currentTarget).parent().parent().attr("Title");
             $('#newsSection .portlet[title=' + subReddit + '] div.loader').show();
-            $('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html("");
+            //$('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html("");
             mra.fetchContentFromRemote(function(arrItems){
                 mra.news.addItemsToView(arrItems,subReddit);
             }, subReddit, mra.news.totalItems + currentCount);
         },
         reloadSection: function(subReddit, section){
-            $('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html(mra.loaderImage);
+            //$('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html(mra.loaderImage);
             mra.fetchContentFromRemote(function(arrItems){
                 mra.news.addItemsToView(arrItems,subReddit);
             }, subReddit + "/" + section, mra.news.totalItems);
@@ -489,24 +505,16 @@ var mra = {
         addItemsToView: function(arrItems, sectionName){
             var curNewsColumn = mra.news.portlets.filter('.portlet[title=' + sectionName + ']').find('ul.portlet-content');
             curNewsColumn.parent().find("div.loader").hide();
-            curNewsColumn.html("");
             if (arrItems.length == 0){
                 curNewsColumn.html('<div class="ui-state-default">Nothing here to see</div>');
             }
             else {
-            -    $.each(arrItems,function(i, obj){
-                    var title = left(obj.title,100);
-                    var score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100);
-                    
-                    curNewsColumn.append(
-                        $("<li>").append(
-                            $("<a>").attr({ target: "_blank", href: obj.url }).addClass("link").html(title)
-                        ).append(
-                            $("<a>").attr({ target: "_blank", href: redditURL + obj.permalink, title: title + " % of People Like It" }).addClass("comment").html(score + '%')
-                        )
-                    );
-                });
-                curNewsColumn.append('<div class="ui-icon-more"><span class="ui-icon ui-icon-carat-1-s" style="float:left"></span><span class="text" style="display:none; float:right;">Read More</span></div>');
+				console.log(sectionName);
+				settings.news[sectionName]($.map(arrItems,function(obj,i){
+					obj.title = left(obj.title,100);
+					obj.score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100);
+					return obj;
+				}));
             }
             return true;
         }
@@ -613,49 +621,16 @@ var mra = {
                     dataType: 'jsonp',
                     success: function(data){
                         try {
-                            if (data.query.results.result['content-type'].indexOf("image") >= 0){
-                                //console.log("adding " + curPic.url);
-                                //jQuery(".ad-thumb-list ul").append(mra.imageBar.makeHTML(curPic));
-                                //adGallery.findImages();
-                                //mra.imageBar.applyContextMenu();                            
+                            if (data.query.results.result['content-type'].indexOf("image") >= 0){                         
 								settings.images.push(curPic);
+								settings.sortImagesByDate();
                             } 
                         }catch(e){}    
                     }
                 }
             );
         },
-        /*makeHTML: function(pic){
-            return '<li>\
-                        <a id="'+pic.id+'" rel="prettyPhoto[reddit]" target="_blank" commentLink="'+ baseurl + pic.permalink +'" title="'+ pic.title.replace(/"/g,"'") +'" href="'+ pic.url +'">\
-                            <img height="150" src="'+ pic.url +'" onerror="$(this).parent().parent().remove()">\
-                        </a>\
-                    </li>';    
-        },*/
         contextOnClick: function(Sender, EventArgs){
-                /*switch(EventArgs.CommandName)
-                {
-                    case 'Add':
-                        alert('Text: ' + EventArgs.Text);
-                        alert('IsDisabled: ' + EventArgs.IsDisabled);
-                        alert('ImageUrl: ' + EventArgs.ImageUrl);
-                        break;
-                    case 'Save':
-                        alert('Text: ' + EventArgs.Text);
-                        alert('IsDisabled: ' + EventArgs.IsDisabled);
-                        alert('ImageUrl: ' + EventArgs.ImageUrl);
-                        break;
-                    case 'Update':
-                        alert('Text: ' + EventArgs.Text);
-                        alert('IsDisabled: ' + EventArgs.IsDisabled);
-                        alert('ImageUrl: ' + EventArgs.ImageUrl);
-                        break;
-                    case 'Cancel':
-                       alert('Text: ' + EventArgs.Text);
-                       alert('IsDisabled: ' + EventArgs.IsDisabled);
-                       alert('ImageUrl: ' + EventArgs.ImageUrl);
-                       break;
-                }*/
                 el = mra.imageBar.currentImageContext.currentTarget.childNodes[1];
                 var action = EventArgs.CommandName;
                 if (action == 'comments'){
