@@ -1839,6 +1839,10 @@ ko.exportSymbol('ko.templateRewriting.applyMemoizedBindingsToNextSibling', ko.te
     };
 
     ko.renderTemplateForEach = function (template, arrayOrObservableArray, options, targetNode) {
+		/*if (template == "newsItemTemplate" && options.templateOptions.section == "Gadgets"){
+			console.log(arrayOrObservableArray);
+			window.obsarr = arrayOrObservableArray;
+		}*/
         return new ko.dependentObservable(function () {
             var unwrappedArray = ko.utils.unwrapObservable(arrayOrObservableArray) || [];
             if (typeof unwrappedArray.length == "undefined") // Coerce single value into array

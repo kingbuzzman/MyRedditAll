@@ -58,7 +58,7 @@
 		<script type="text/html" id="newsItemTemplate">
            		<li>
 					<a href="${ $data.url }" target="_blank" class="link">${ $data.title }</a>
-					<a href="${ redditURL + $data.permalink }" target="_blank" title="${ $data.title } % of People Like It" class="link">${ $data.title }</a>
+					<a href="${ redditURL + $data.permalink }" target="_blank" title="${ $data.title } % of People Like It" class="link">${ $data.score }%</a>
 				</li>
         </script>
         

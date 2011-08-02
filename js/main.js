@@ -22,14 +22,22 @@ var settings = {
     },
 
 	images: ko.observableArray(),
-	news: ko.observable({}),
+	news: ko.observable({
+		/* Representation of what it looks like on prefrences.load
+		"Gadgets" : ko.observableArray(),
+		"Funny" : ko.observableArray(),
+		"Atheism" : ko.observableArray(),
+		"Javascript" : ko.observableArray(),
+		"WTF" : ko.observableArray(),
+		"Programming" : ko.observableArray()*/
+	}),
     metaReddits: ko.observableArray(),
     
     init: function(){
         // initialize preferences's complex object
         settings.preferences = settings.preferences();
-        ko.applyBindings(settings);
         settings.preferences.load();
+		ko.applyBindings(settings);
 		Cufon.refresh();
     },
     
@@ -163,7 +171,6 @@ var settings = {
 					this.activeSettings['subreddits'].push(column);
 					$.each(column(), function(i,o){						
 						window.settings.news()[o] = ko.observableArray();
-						console.dir(window.settings.news());
 					});
 				}
                 
@@ -342,7 +349,6 @@ var mra = {
             time.setLineReportMethod(mra.debug.report);
         },
         report: function(s){
-            console.log(s);
         }
     },
     jsonpRequest: function(url){
@@ -509,12 +515,11 @@ var mra = {
                 curNewsColumn.html('<div class="ui-state-default">Nothing here to see</div>');
             }
             else {
-				console.log(sectionName);
-				settings.news[sectionName]($.map(arrItems,function(obj,i){
+				$.map(arrItems,function(obj,i){
 					obj.title = left(obj.title,100);
 					obj.score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100);
-					return obj;
-				}));
+					settings.news()[sectionName].push(obj);
+				});
             }
             return true;
         }
