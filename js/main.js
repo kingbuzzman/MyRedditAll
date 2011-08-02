@@ -15,7 +15,7 @@ var settings = {
         },
         subreddits: ko.observableArray([
             ko.observableArray(["Gadgets","Funny"]),
-            ko.observableArray(["Atheism","Javascript"]),
+            ko.observableArray(["Reddit","Javascript"]),
             ko.observableArray(["WTF","Programming"])
         ]),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
@@ -104,11 +104,12 @@ var settings = {
     
 	
 	//sorters
-	sortImagesByDate: function(){
+	sortImagesByDate: function(desc){
 		settings.images(settings.images().sort(function(a,b){
-			return b.created - a.created;
+			return (desc || true) ? b.created - a.created : b.created - a.created;
 		}));
 	},
+	
 	
 	
 	deleteSubReddit: function(SubRedditTitle){
@@ -217,6 +218,7 @@ var oCustomContextMenu = null;
 var oBase = null; 
 var doAppend = true;
 var baseurl = "http://www.reddit.com";	
+var weburl = "http://myredditall.com/";
 var arrWallpapers = [
     "images/spacestorm.jpg",
     "http://www.dinpattern.com/tiles/prestige-COD.gif",
@@ -281,7 +283,7 @@ function repositionCopy(elem){
 function copyToShare(el){
     mra.currentComment = el.title + ": " + el.href;
 	$("#copyLink2").zclip({
-		path:'/ZeroClipboard.swf',
+		path:'ZeroClipboard.swf',
 		copy:function(){
 			return mra.currentComment;
 		}
@@ -359,9 +361,9 @@ var mra = {
     },
     fetchContentFromRemote: function(callback, subReddit, limit, start, useBackup){
         if (typeof start == "undefined") start = 0;
-        /*if (typeof useBackup == "undefined")
-            reqURL = "/fetchContent.cfm?r=" + decodeURIComponent(subReddit) + "&limit=" + parseInt(limit + start);
-        else*/     
+        if (typeof useBackup == "undefined")
+            reqURL = weburl + "fetchContent.cfm?r=" + decodeURIComponent(subReddit) + "&limit=" + parseInt(limit + start);
+        else     
             reqURL = baseurl + "/r/" + decodeURIComponent(subReddit) + "/.json?&limit=" + parseInt(limit + start);    
         $.ajax({
                 type: 'GET',
