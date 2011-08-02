@@ -20,15 +20,7 @@ var settings = {
         ]),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
     },
-
 	
-	//observeables
-	/*defaultNewsArray: function(data){
-		console.log(settings.news()[data]().length <= 10);
-		if (data && settings.news()[data]().length <= 10)
-		return settings.news()[data];	
-	},*/
-	loaded_images: ko.observableArray(),
 	images: ko.observableArray(),
 	news: ko.observable({
 		/* Representation of what it looks like on prefrences.load
@@ -39,6 +31,10 @@ var settings = {
 		"WTF" : ko.observableArray(),
 		"Programming" : ko.observableArray()*/
 	}),
+		
+	getFilteredData: function(data){
+		return settings.news()[data].slice(0,9);
+	},
     metaReddits: ko.observableArray(),
     
     init: function(){
@@ -206,12 +202,10 @@ var settings = {
         
         return this;
     },
-	
     toString: function(){
         return ko.toJSON(this.activeSettings);
     }
-	
-}; 
+};
 
 settings.showMoreMode= ko.dependentObservable(function(){
 	return this.activeSettings.imageBar().length > 4;	
@@ -435,7 +429,7 @@ var mra = {
 	},
     news: {
         totalIndex: 0,
-        totalItems: 100, //maximum limit imposed by reddit
+        totalItems: 100, //limit imposed by reddit
         init: function(){
             mra.news.portlets = $("#newsSection .portlet");    
     
