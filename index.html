@@ -56,8 +56,8 @@
 
 
 		<script type="text/html" id="newsItemTemplate">
-           		<li>
-					<a href="${ $data.url }" target="_blank" class="link">${ $data.title }</a>
+           		<li data-bind="visible: !$data.hidden() "> 
+					<a href="${ $data.url }" target="_blank" class="link" data-bind="click: settings.visitPage ">${ $data.title }</a>
 					<a href="${ redditURL + $data.permalink }" target="_blank" title="${ $data.title } % of People Like It" class="comment">${ $data.score }%</a>
 				</li>
         </script>
@@ -69,12 +69,12 @@
                     <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
                     <a href="http://www.reddit.com/r/${ $data }" target="_blank">${ $data }</a>
 					{{each ['hot','new','controversial','top']}}
-						<span class="ui-icon toggleView {{if $index == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" rel="${$value}" title="View ${$value} articles" data-bind="click: function(){ mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel')) }">${$value}</span>
+						<span class="ui-icon toggleView {{if $index == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" rel="${$value}" title="View ${$value} articles" data-bind="click: mra.news.reloadSection ">${$value}</span>
 					{{/each}}
 				</div>
-				<div class="loader"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
+				<div class="loader" data-bind="visible: settings.getFilteredData($data).length == 0"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
                 <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: settings.getFilteredData($data) }"></ul>
-				<div class="ui-icon-more"><span class="ui-icon ui-icon-carat-1-s" style="float:left"></span><span class="text" style="display:none; float:right;">Read More</span></div>
+				<div class="ui-icon-more" data-bind="click: mra.news.loadMore"><span class="ui-icon ui-icon-carat-1-s" style="float:left"></span><span class="text" style="display:none; float:right;">Read More</span></div>
             </div>
         </script>
 
@@ -224,6 +224,7 @@ function saveSettings(){
                         <img src="images/fileTypes/picture.png" onClick="saveWallpaper($('#customWallpaper').val());" width="16" height="16">
                     </span>
                 </td>
+                <td><span class="cufonize">Hide Viewed</span> <input type="checkbox" data-bind="checked: settings.isNewsItemVisible, attr: { checked: settings.isNewsItemVisible }"></td>
                 <td class="cufonize">Color </td>
                 <td>
                     <div id="colorSelector"><div></div></div>

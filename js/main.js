@@ -5,6 +5,7 @@ if (typeof console == "undefined")
  * Setting wrapper
  * - handles all the that needs to persist
  */
+myVar = true;
 var settings = {
     // default cookie settings
     // note: this gets overwritten when load() is ran with the current cookie settings
@@ -18,25 +19,18 @@ var settings = {
             ko.observableArray(["Reddit","Javascript"]),
             ko.observableArray(["WTF","Programming"])
         ]),
-        imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"])
+        imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"]),
+		visited_news: ko.observableArray(),
     },
-	
+ 
+	loaded_images: ko.observableArray(),
 	images: ko.observableArray(),
-	news: ko.observable({
-		/* Representation of what it looks like on prefrences.load
-		"Gadgets" : ko.observableArray(),
-		"Funny" : ko.observableArray(),
-		"Atheism" : ko.observableArray(),
-		"Javascript" : ko.observableArray(),
-		"WTF" : ko.observableArray(),
-		"Programming" : ko.observableArray()*/
-	}),
-		
-	getFilteredData: function(data){
-		return settings.news()[data].slice(0,9);
-	},
+	news: ko.observable({}),
+	defaultVisibleItems: 10,
+	newsItemsVisible: ko.observable({}),
+	isNewsItemVisible: ko.observable(myVar),
     metaReddits: ko.observableArray(),
-    
+     
     init: function(){
         // initialize preferences's complex object
         settings.preferences = settings.preferences();
@@ -44,6 +38,18 @@ var settings = {
 		ko.applyBindings(settings);
 		Cufon.refresh();
     },
+	
+	visitPage: function(evt){
+		settings.activeSettings.visited_news.push($(evt.target).parent().data('tmplItem').data.id);
+		settings.preferences.save();
+		return true;
+	}, 
+	getFilteredData: function(data){
+		//return settings.news()[data].slice(0,settings.newsItemsVisible()[data]());
+		return ko.utils.arrayFilter(settings.news()[data](), function(item) {
+			return item.hidden() ? null : item;
+		}).slice(0,settings.newsItemsVisible()[data]());
+	},
     
     // getters
     getBackgroundColor: function(color){
@@ -163,19 +169,22 @@ var settings = {
          */
         this.load = function(){
             var cookie = getCookieValue(COOKIE_NAME);
+			var context = window;
             var settings = {};
             
             if(cookie){
                 settings = JSON.parse(cookie);
                 this.activeSettings['background']['color'](settings['background']['color']);
                 this.activeSettings['background']['image'](settings['background']['image']);
+				this.activeSettings['visited_news'](settings['visited_news']);
 				
 				this.activeSettings['subreddits'].removeAll(); 
 				for(var i in settings['subreddits']){ 
 					var column = ko.observableArray(settings['subreddits'][i]);
 					this.activeSettings['subreddits'].push(column);
 					$.each(column(), function(i,o){						
-						window.settings.news()[o] = ko.observableArray();
+						context.settings.news()[o] = ko.observableArray();
+						context.settings.newsItemsVisible()[o] = ko.observable(context.settings.defaultVisibleItems);
 					});
 				}
                 
@@ -202,10 +211,12 @@ var settings = {
         
         return this;
     },
+	
     toString: function(){
         return ko.toJSON(this.activeSettings);
     }
-};
+	
+}; 
 
 settings.showMoreMode= ko.dependentObservable(function(){
 	return this.activeSettings.imageBar().length > 4;	
@@ -319,7 +330,7 @@ var mra = {
 			}
 		});
 			
-        mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
+        //mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
         mra.news.init();
         mra.imageBar.init();
         mra.timer.init(); 
@@ -365,9 +376,9 @@ var mra = {
     },
     fetchContentFromRemote: function(callback, subReddit, limit, start, useBackup){
         if (typeof start == "undefined") start = 0;
-        if (typeof useBackup == "undefined")
+        /*if (typeof useBackup == "undefined")
             reqURL = weburl + "fetchContent.cfm?r=" + decodeURIComponent(subReddit) + "&limit=" + parseInt(limit + start);
-        else     
+        else*/     
             reqURL = baseurl + "/r/" + decodeURIComponent(subReddit) + "/.json?&limit=" + parseInt(limit + start);    
         $.ajax({
                 type: 'GET',
@@ -429,46 +440,46 @@ var mra = {
 	},
     news: {
         totalIndex: 0,
-        totalItems: 100, //limit imposed by reddit
+        totalItems: 100, //maximum limit imposed by reddit
         init: function(){
             mra.news.portlets = $("#newsSection .portlet");    
-    
-            $(".column").sortable({
-                connectWith: '.column',
-                stop: function(event, ui) { 
-                    var arrColumns = new Array(1);
-                    $(".column").each(function(i, o){
-                        arrColumns[i] = new Array(1);
-                        $(o).find('.portlet').each(function(ii, oo){
-                            arrColumns[i][ii] = oo.title;
-                        });
-                    });
-                    currentLayout = arrColumns; 
-                }
-            });                
-            $("div.column").delegate("div.ui-icon-more","click",mra.news.loadMore);
-            $("div.column").delegate("div.ui-icon-more","mouseover", function(evt){
-                $(evt.currentTarget).find(".text").stop(true).fadeIn();
-            });
-            $("div.column").delegate("div.ui-icon-more","mouseout", function(evt){
-                $(evt.currentTarget).find(".text").stop(true).fadeOut();
-            });
-            $("div.column").delegate(".portlet-header .ui-toggle-display","click",function() {
-                $(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
-                $(this).parents(".portlet:first").find(".portlet-content").toggle();
-            });
-    
-             $("div.column").delegate(".portlet-header .ui-close-display","click",function() {
-                 if (confirm("Are you sure you want to delete this section?")){
-                     $(this).parent().hide(1000, function(){
-                         $(this).parent().remove();
-                     }); 
-                     settings.deleteSubReddit($(this).parent().parent().attr('title'));
-					 settings.preferences.save();
-                 }    
-            });    
-
-            $(".column").disableSelection();
+    		mra.news.columns = $("div.column");
+			
+			mra.news.columns
+				.sortable({
+					connectWith: '.column',
+					stop: function(event, ui) { 
+						var arrColumns = [];
+						$(".column").each(function(i, o){
+							arrColumns[i] = [];
+							$(o).find('.portlet').each(function(ii, oo){
+								arrColumns[i][ii] = oo.title;
+							});
+							settings.activeSettings.subreddits()[i](arrColumns[i])
+						});
+						settings.preferences.save();
+					}
+				})
+            	.delegate("div.ui-icon-more","mouseover", function(evt){
+					$(evt.currentTarget).find(".text").stop(true).fadeIn();
+				})
+            	.delegate("div.ui-icon-more","mouseout", function(evt){
+					$(evt.currentTarget).find(".text").stop(true).fadeOut();
+				})
+				.delegate(".portlet-header .ui-toggle-display","click",function() {
+					$(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
+					$(this).parents(".portlet:first").find(".portlet-content").toggle();
+				})
+				.delegate(".portlet-header .ui-close-display","click",function() {
+					 if (confirm("Are you sure you want to delete this section?")){
+						 $(this).parent().hide(1000, function(){
+							 $(this).parent().remove();
+						 }); 
+						 settings.deleteSubReddit($(this).parent().parent().attr('title'));
+						 settings.preferences.save();
+					 }    
+				})
+				.disableSelection();
     
             mra.news.loadNextFeed();
         }, 
@@ -482,16 +493,16 @@ var mra = {
 			}   
         },
         loadMore: function(evt){
-            currentCount = $(evt.currentTarget).prevAll().length;
-            subReddit = $(evt.currentTarget).parent().parent().attr("Title");
-            $('#newsSection .portlet[title=' + subReddit + '] div.loader').show();
-            //$('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html("");
-            mra.fetchContentFromRemote(function(arrItems){
-                mra.news.addItemsToView(arrItems,subReddit);
-            }, subReddit, mra.news.totalItems + currentCount);
+			var subReddit = $(evt.target).parent().attr("Title");
+			var newLength = settings.newsItemsVisible()[subReddit]() + settings.defaultVisibleItems;
+			settings.newsItemsVisible()[subReddit](newLength);
         },
-        reloadSection: function(subReddit, section){
+        reloadSection: function(evt){
             //$('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html(mra.loaderImage);
+			var curObj = $(evt.target);
+			var subReddit = curObj.parent().parent().attr('title');
+			var section = curObj.attr('rel');
+			settings.news()[subReddit](ko.observableArray());
             mra.fetchContentFromRemote(function(arrItems){
                 mra.news.addItemsToView(arrItems,subReddit);
             }, subReddit + "/" + section, mra.news.totalItems);
@@ -515,15 +526,18 @@ var mra = {
             }, curTitle, mra.news.totalItems);
         },
         addItemsToView: function(arrItems, sectionName){
-            var curNewsColumn = mra.news.portlets.filter('.portlet[title=' + sectionName + ']').find('ul.portlet-content');
-            curNewsColumn.parent().find("div.loader").hide();
             if (arrItems.length == 0){
+				var curNewsColumn = mra.news.portlets.filter('.portlet[title=' + sectionName + ']').find('ul.portlet-content');
                 curNewsColumn.html('<div class="ui-state-default">Nothing here to see</div>');
             }
             else {
-				$.map(arrItems,function(obj,i){
+				$.each(arrItems,function(i,obj){
 					obj.title = left(obj.title,100);
 					obj.score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100);
+					//obj.hidden = ko.observable(obj.hidden);
+					obj.hidden = ko.dependentObservable(function() {
+						return settings.activeSettings.visited_news.indexOf(obj.id) != -1 && settings.isNewsItemVisible() == true;
+					}, settings);
 					settings.news()[sectionName].push(obj);
 				});
             }
@@ -800,7 +814,7 @@ var mra = {
     		*/
 			
 			settings.images.removeAll(); 
-			mra.imageBar.filterElements(pics);
+			mra.imageBar.filterElements(pics.splice(0,20)); 
 					
 			
             //var catOnDom  = ($("div.ad-gallery").attr('id') != '') ? $("div.ad-gallery").attr('id').split('_')[1] : "";
