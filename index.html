@@ -54,33 +54,39 @@
             <div class="column" data-bind="template: { name: 'subredditTemplate', foreach: $data }"></div>
         </script>
 
-
+		<!--, beforeRemove: function(elem) { setTimeout(function(){ $(elem).fadeOut(), 5000}) } -->	
 		<script type="text/html" id="newsItemTemplate">
-           		<li data-bind="visible: !$data.hidden() "> 
-					<a href="${ $data.url }" target="_blank" class="link" data-bind="click: settings.visitPage ">${ $data.title }</a>
-					<a href="${ redditURL + $data.permalink }" target="_blank" title="${ $data.title } % of People Like It" class="comment">${ $data.score }%</a>
-				</li>
+			<li data-bind="visible: !$data.hidden()"> 
+				<a target="_blank" class="link" data-bind="click: settings.visitPage, attr: { href: $data.url }, text: $data.title"></a>
+				<a target="_blank" class="comment" data-bind="attr: { href: $data.permalink, title: $data.score_title }, text: $data.score"></a>
+			</li>
         </script>
         
+        <script type="text/html" id="newsButton">
+			<span class="ui-icon toggleView {{if settings.newsButtons.indexOf($data) == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: mra.news.reloadSection, text: $data, attr: { title: $data, rel: $data }"></span>
+        </script>
+        
+        <!-- href="http://www.reddit.com/r/${ $data }" -->
         <script id="subredditTemplate" type="text/html">
-            <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="${ $data }">
+            <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" data-bind="attr: {title: $data}">
                 <div class="portlet-header ui-widget-header ui-corner-all">
-                    <span class="ui-icon ui-icon-closethick ui-close-display"></span>
-                    <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
-                    <a href="http://www.reddit.com/r/${ $data }" target="_blank">${ $data }</a>
-					{{each ['hot','new','controversial','top']}}
-						<span class="ui-icon toggleView {{if $index == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" rel="${$value}" title="View ${$value} articles" data-bind="click: mra.news.reloadSection ">${$value}</span>
-					{{/each}}
+                    <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: mra.news.deleteButton"></span>
+                    <span class="ui-icon ui-icon-minusthick ui-toggle-display" data-bind="click: mra.news.togglePortlet "></span>
+                    <a target="_blank" data-bind="text: $data, attr: { href: $data }"></a>
+					<span data-bind="template: { name: 'newsButton', foreach: settings.newsButtons }"></span>
 				</div>
 				<div class="loader" data-bind="visible: settings.getFilteredData($data).length == 0"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
                 <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: settings.getFilteredData($data) }"></ul>
-				<div class="ui-icon-more" data-bind="click: mra.news.loadMore"><span class="ui-icon ui-icon-carat-1-s" style="float:left"></span><span class="text" style="display:none; float:right;">Read More</span></div>
+				<div class="ui-icon-more" data-bind="event: { click: mra.news.loadMore, mouseover: function(evt){ $(evt.target).find('.text').stop(true).fadeIn(); }, mouseout: function(evt){ $(evt.target).find('.text').stop(true).fadeOut(); } }">
+					<span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
+					<span class="text" style="display:none; float:right;">Read More</span>
+				</div>
             </div>
         </script>
 
 		<script type="text/html" id="metaTemplate">
             <li id="metaSection">
-                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: mra.locationPicker.show">
+                <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: mra.locationPicker.passEvent ">
                 <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ $data.SECTION }" data-bind="click: mra.imageBar.changePic" >
                 <span class="metaText" data-bind="click: function(){ mra.imageBar.popupWindow( baseurl + '/r/$data.SECTION' ) }">${$data.NAME}</span>
             </li>
@@ -232,7 +238,7 @@ function saveSettings(){
                 <td class="cufonize">Search Sub Reddits</td>
                 <td>
                     <input type="Text" name="feedName" size="30" class="ui-state-defalt">
-                    <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="popupAdd(this,$('input[name=feedName]').val())" width="16" height="16">
+                    <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="mra.locationPicker.show(this,$('input[name=feedName]').val())" width="16" height="16">
                     <script type="text/javascript">
                         new Autocomplete("feedName", function() {
                             this.setValue = function( SubRedditTitle ) {

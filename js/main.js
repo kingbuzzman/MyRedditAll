@@ -15,15 +15,16 @@ var settings = {
             image: ko.observable("images/spacestorm.jpg")
         },
         subreddits: ko.observableArray([
+			//TODO: Make sure page continues to load if an invalid one is entered
             ko.observableArray(["Gadgets","Funny"]),
-            ko.observableArray(["Reddit","Javascript"]),
+            ko.observableArray(["Reddit.com","Javascript"]),
             ko.observableArray(["WTF","Programming"])
         ]),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"]),
 		visited_news: ko.observableArray(),
     },
  
-	loaded_images: ko.observableArray(),
+	newsButtons: ['hot','new','controversial','top'],
 	images: ko.observableArray(),
 	news: ko.observable({}),
 	defaultVisibleItems: 10,
@@ -77,6 +78,8 @@ var settings = {
     
     // adders
     addSubreddit: function(column, subreddit){
+		this.newsItemsVisible()[subreddit] = ko.observable(this.defaultVisibleItems);
+		this.news()[subreddit] = ko.observableArray();
         this.activeSettings['subreddits']()[column].push(subreddit);
     },
     addImageBar: function(subreddit){
@@ -123,13 +126,15 @@ var settings = {
 	
 	
 	deleteSubReddit: function(SubRedditTitle){
-		for(i in settings.activeSettings.subreddits()) {
-			for(b in settings.activeSettings.subreddits()[i]()){ 
-				if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
-					settings.activeSettings.subreddits()[i]().splice(b,1);   
-				} 
-			}
-		}
+for(i in settings.activeSettings.subreddits()) {
+	for(b in settings.activeSettings.subreddits()[i]()){ 
+		if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
+			settings.activeSettings.subreddits()[i]().splice(b,1);   
+		} 
+	}
+}
+		delete settings.news()[SubRedditTitle];
+		delete settings.newsItemsVisible()[SubRedditTitle];
 		this.preferences.save();
 	},
 	
@@ -281,7 +286,7 @@ function customizeLayout(){
 
 function closeCustomize(){
     jQuery('#customizeDialog').fadeOut();
-    mra.locationPicker.hide()()
+    mra.locationPicker.hide();
 }
  
 
@@ -380,15 +385,30 @@ var mra = {
             reqURL = weburl + "fetchContent.cfm?r=" + decodeURIComponent(subReddit) + "&limit=" + parseInt(limit + start);
         else*/     
             reqURL = baseurl + "/r/" + decodeURIComponent(subReddit) + "/.json?&limit=" + parseInt(limit + start);    
+		
         $.ajax({
                 type: 'GET',
                 url: reqURL, 
                 dataType: 'jsonp',
                 jsonp: 'jsonp',
+				timeout: 10000, // 2 seconds timeout
                 success: function(data){
                     arrData = mra.cleanData(data);
-                    (arrData.length == 0) ? mra.fetchContentFromRemote(callback,subReddit,limit,start, 1) : callback(arrData);
-                }
+                    if (arrData.length == 0){
+						(subReddit in mra.news) ? mra.news[subReddit]++ : mra.news[subReddit] = 0;
+						(mra.news[subReddit] < 5) ? mra.fetchContentFromRemote(callback,subReddit,limit,start, 1) : callback([]);
+					} else {
+						callback(arrData);
+					}
+                },
+				error: function(){
+					var $portlet = $("div.portlet[title="+subReddit+"]");
+					$portlet.find("div.loader").hide()
+					callback([]);
+					if (confirm(subReddit + " appears not to be loading, would you like to delete it?")){
+						mra.news.deleteReddit($portlet);
+					}
+				}
             }
         );
     },        
@@ -420,12 +440,15 @@ var mra = {
         }
     },
 	locationPicker: {
-		show: function(evt){
+		passEvent: function(evt){
 			var curObj = $(evt.target); 
-			selectedReddit = curObj.attr("id").split("_")[1];
-			if (selectedReddit != ''){   
+			mra.locationPicker.show( curObj, curObj.attr("id").split("_")[1] );
+		},
+		show: function(obj, sectionName){
+			if (sectionName != ''){  
+				selectedReddit = sectionName; 
 				$("#popupAdd").fadeIn().position({
-					of: curObj,
+					of: obj,
 					my: "right top",
 					at: "left bottom",
 					offset: 0, 
@@ -457,32 +480,30 @@ var mra = {
 							});
 							settings.activeSettings.subreddits()[i](arrColumns[i])
 						});
+						Cufon.refresh();
 						settings.preferences.save();
 					}
-				})
-            	.delegate("div.ui-icon-more","mouseover", function(evt){
-					$(evt.currentTarget).find(".text").stop(true).fadeIn();
-				})
-            	.delegate("div.ui-icon-more","mouseout", function(evt){
-					$(evt.currentTarget).find(".text").stop(true).fadeOut();
-				})
-				.delegate(".portlet-header .ui-toggle-display","click",function() {
-					$(this).toggleClass("ui-icon-minusthick").toggleClass("ui-icon-plusthick");
-					$(this).parents(".portlet:first").find(".portlet-content").toggle();
-				})
-				.delegate(".portlet-header .ui-close-display","click",function() {
-					 if (confirm("Are you sure you want to delete this section?")){
-						 $(this).parent().hide(1000, function(){
-							 $(this).parent().remove();
-						 }); 
-						 settings.deleteSubReddit($(this).parent().parent().attr('title'));
-						 settings.preferences.save();
-					 }    
-				})
+				}) 
 				.disableSelection();
     
             mra.news.loadNextFeed();
         }, 
+		togglePortlet: function(evt){ 
+			$(evt.target).toggleClass('ui-icon-minusthick').toggleClass('ui-icon-plusthick'); 
+			$(evt.target).parents('.portlet:first').find('.portlet-content').toggle(); 
+		},
+		deleteButton: function(evt){
+			if (confirm("Are you sure you want to delete this section?")){
+				 mra.news.deleteReddit($(evt.target).parent().parent()); 
+			 }    
+		},
+		deleteReddit: function(obj){
+			 $(obj).parent().hide(1000, function(){
+				 $(obj).parent().remove();
+			 }); 
+			 settings.deleteSubReddit($(obj).attr('title'));
+			 settings.preferences.save();
+		},
         addCount: function(){
 			mra.news.totalIndex += 1;
 			if (mra.news.totalIndex <= (mra.news.portlets.length - 1)){ 
@@ -500,7 +521,7 @@ var mra = {
         reloadSection: function(evt){
             //$('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html(mra.loaderImage);
 			var curObj = $(evt.target);
-			var subReddit = curObj.parent().parent().attr('title');
+			var subReddit = curObj.parent().parent().parent().attr('title');
 			var section = curObj.attr('rel');
 			settings.news()[subReddit](ko.observableArray());
             mra.fetchContentFromRemote(function(arrItems){
@@ -533,8 +554,9 @@ var mra = {
             else {
 				$.each(arrItems,function(i,obj){
 					obj.title = left(obj.title,100);
-					obj.score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100);
-					//obj.hidden = ko.observable(obj.hidden);
+					obj.score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100) + "%";
+					obj.score_title = obj.score + "  of People Like It";
+					obj.permalink = redditURL + obj.permalink;
 					obj.hidden = ko.dependentObservable(function() {
 						return settings.activeSettings.visited_news.indexOf(obj.id) != -1 && settings.isNewsItemVisible() == true;
 					}, settings);
