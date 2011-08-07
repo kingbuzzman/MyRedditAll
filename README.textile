@@ -5,7 +5,6 @@ Write good code; fix bad code.
 h2. TODO list
 
 * zoom in image like imgur
-* improve percentage text size ratio with added shadow
-* later on add touchmove
+* later on add touchmove to the imagebar
 * dynamic loading script libraries to load things such as color picker later until its needed
 * new dialog to match look of the customize this
