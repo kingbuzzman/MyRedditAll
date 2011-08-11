@@ -2,12 +2,7 @@ body { font-size:0.8em; font-family:Verdana, Geneva, sans-serif; color:#9FA8A8; 
 a { text-decoration:none; }
 h2 { padding:0px 5px; }
 #newsSection { display:table; width:100%; table-layout:initial; }
-#newsSection  > .column { 
-    display: table-cell;
-    float: left;
-    min-width: 300px;
-	width:100%;
-}
+#newsSection  > .column { display: table-cell; float: left; min-width: 300px; width:100%; }
 @media screen and (min-width: 900px) {
 	#newsSection  > .column { 	
 		 width: 33%;
