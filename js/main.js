@@ -665,7 +665,7 @@ var mra = {
                         //sElements += mra.imageBar.makeHTML(pic);
                     }
                     else {
-                        //mra.imageBar.getHeaders(pic);
+                        mra.imageBar.getHeaders(pic);
                     }
                 }
             }
