@@ -3,6 +3,11 @@
     <head>
         <title>MyRedditAll</title>
         <meta charset="UTF-8" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="white" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+        
         <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
         <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/dot-luv/jquery-ui.css" type="text/css" rel="stylesheet" media="screen" />
         <link href="css/autocomplete.css" type="text/css" rel="stylesheet" media="screen" />
@@ -56,8 +61,8 @@
 
 		<!--, beforeRemove: function(elem) { setTimeout(function(){ $(elem).fadeOut(), 5000}) } -->	
 		<script type="text/html" id="newsItemTemplate">
-			<li data-bind="visible: !$data.hidden()"> 
-				<a target="_blank" class="link" data-bind="click: settings.visitPage, attr: { href: $data.url }, text: $data.title"></a>
+			<li data-bind="visible: !$data.hidden(), attr: { title: $data.title }"> 
+				<a target="_blank" class="link" data-bind="click: settings.visitPage, attr: { href: $data.url }, text: $data.text"></a>
 				<a target="_blank" class="comment" data-bind="attr: { href: $data.permalink, title: $data.score_title }, text: $data.score"></a>
 			</li>
         </script>
@@ -100,14 +105,15 @@
 		
 		<script type="text/html" id="imageBarTemplate">
             <li>
-				<a id="${$data.id}" rel="prettyPhoto[reddit]" target="_blank" commentLink="${baseurl+$data.permalink}" title="${$data.title}" href="${$data.url}">
-					<img height="150" src="${$data.url}" onerror="$(this).parent().parent().remove()">
+				<a data-bind="attr:{ id: $data.id, title: $data.title, href: $data.url, commentLink: $data.permalink }" rel="prettyPhoto[reddit]" target="_blank">
+					<img height="150" data-bind="attr: { src: $data.url }" onerror="$(this).parent().parent().remove()">
 				</a>
 			</li>
         </script>
     </head>
     
    <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
+        
         <div id="container">
             <div class="ad-gallery-loading" style="display:none">
                 <div style="height:150px; line-height:150px;" class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
@@ -122,140 +128,110 @@
             
             <h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
                 <span class="cufonize">Live Dangerously?</span>
-                <a onclick="customizeLayout()" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize This</a>
+                <a onclick="customizeLayout()" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
                 <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
                 	<span data-bind="template: { name: 'imageButtonTemplate' }"></span>
                     <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
 	                <button data-bind="visible: showMoreMode" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
                     <ul data-bind="template: { name: 'moreImageButtonTemplate' }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
                  </div>   
-                 <div class="ad-controls"> </div>
+                 <div class="ad-controls" style="display:none;"> </div>
             </h2>
             
             <div id="newsSection" data-bind="template: { name: 'columnTemplate', foreach: activeSettings.subreddits }"></div>
         </div>
 
-<div id="metaRedditDialog" title="MetaReddit Picker" style="display:none;">
+		<div id="metaRedditDialog" title="MetaReddit Picker" style="display:none;">
 
-    <p>
-        [<img class="metaAdd" src="images/fileTypes/add.png" align="absmiddle" width="16" height="16"> Add  |
-        <img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"> View In Image Bar |
-        (Word) View In Reddit]
-    </p>
+        <p>
+            [<img class="metaAdd" src="images/fileTypes/add.png" align="absmiddle" width="16" height="16"> Add  |
+            <img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"> View In Image Bar |
+            (Word) View In Reddit]
+        </p>
 
-    <div class="fg-buttonset fg-buttonset-single" style="width:100%;" data-bind="template: { name: 'loadMetaButtonTemplate' }"></div>
-
-    <div style="clear:both">&nbsp;</div>
+        <div class="fg-buttonset fg-buttonset-single" style="width:100%;" data-bind="template: { name: 'loadMetaButtonTemplate' }"></div>
+        
+        <div style="clear:both">&nbsp;</div>
+        
+        <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>	
     
-    <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>	
-    
-</div>
+	</div>
 
-    
-<div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="" id="newsTemplate" style="display:none;">
-    <div class="portlet-header ui-widget-header ui-corner-all">
-        <span class="ui-icon ui-icon-closethick ui-close-display"></span>
-        <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
-        <a href="http://www.reddit.com/r/" target="_blank">
-            
-        </a>
+    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="" id="newsTemplate" style="display:none;">
+        <div class="portlet-header ui-widget-header ui-corner-all">
+            <span class="ui-icon ui-icon-closethick ui-close-display"></span>
+            <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
+            <a href="http://www.reddit.com/r/" target="_blank"></a>
+            <span class="ui-icon toggleView ui-icon-bullet" rel="hot" title="View hot articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">hot</span>
+            <span class="ui-icon toggleView ui-icon-radio-on" rel="new" title="View new articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">new</span>
+            <span class="ui-icon toggleView ui-icon-radio-on" rel="controversial" title="View controversial articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">controversial</span>                        
+            <span class="ui-icon toggleView ui-icon-radio-on" rel="top" title="View top articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">top</span>
+        </div>
+        <div class="portlet-content"><img src="images/ajaxLoader.gif" width="126" height="22" align="middle"></div>
+    </div>
 
-                <span class="ui-icon toggleView ui-icon-bullet" 
-                    rel="hot" title="View hot articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">
-                                   hot</span>
-            
-                <span class="ui-icon toggleView ui-icon-radio-on" 
-                    rel="new" title="View new articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">
-                                   new</span>
-            
-                <span class="ui-icon toggleView ui-icon-radio-on" 
-                    rel="controversial" title="View controversial articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">
-                                   controversial</span>
-            
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="top" title="View top articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">top</span>
-    </div>
-    <div class="portlet-content"><img src="images/ajaxLoader.gif" width="126" height="22" align="middle"></div>
-</div>
+    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="popupAdd">
+        <div class="portlet-header ui-widget-header ui-corner-all">
+            <span class="ui-icon ui-icon-closethick" onClick="$('#popupAdd').fadeOut()" style="margin-top:2px;"></span>
+            <a style="font-size:16px;">Add To Column or Image Bar</a>
+        </div>
+        <div class="portlet-content" style="padding-top:2px;">
+            <button name="btnColumn" value="0" class="fg-button ui-state-default ui-priority-primary ui-corner-left" title="Add To The First Column News Blocks">1st</button>
+            <button name="btnColumn" value="1" class="fg-button ui-state-default ui-priority-primary" title="Add To The Second Column News Blocks">2nd</button>
+            <button name="btnColumn" value="2" class="fg-button ui-state-default ui-priority-primary" title="Add To The Third Column News Blocks">3rd</button>
+            <button name="btnColumn" value="3" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
+        </div>
+    </div> 
 
-
-<div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="popupAdd">
-    <div class="portlet-header ui-widget-header ui-corner-all">
-        <span class="ui-icon ui-icon-closethick" onClick="$('#popupAdd').fadeOut()" style="margin-top:2px;"></span>
-        <a style="font-size:16px;">Add To Column or Image Bar</a>
-    </div>
-    <div class="portlet-content" style="padding-top:2px;">
-        <button name="btnColumn" value="0" class="fg-button ui-state-default ui-priority-primary ui-corner-left" title="Add To The First Column News Blocks">1st</button>
-        <button name="btnColumn" value="1" class="fg-button ui-state-default ui-priority-primary" title="Add To The Second Column News Blocks">2nd</button>
-        <button name="btnColumn" value="2" class="fg-button ui-state-default ui-priority-primary" title="Add To The Third Column News Blocks">3rd</button>
-        <button name="btnColumn" value="3" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
-    </div>
-</div>
-<SCRIPT LANGUAGE="JavaScript" TYPE="text/javascript">
-<!--
-function saveSettings(){
-    $.ajax({
-        url: "/saveSettings.cfm",
-        data: {
-            layout: encodeURIComponent(JSON.stringify(currentLayout)),
-            imagebar: encodeURIComponent(JSON.stringify(currentImageBar)), 
-            saveName: $('input[name=saveName]').val()
-        },
-        success: function(response){
-            location.href = $.parseJSON(response).directory;
-        }
-    })
-}
-//-->
-</SCRIPT>
-<div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="left:8%; position:absolute; top:99px; width:80%; display:none; border:1px solid #ffdab9;" id="customizeDialog">
-    <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
-        <span class="ui-icon ui-icon-closethick" onClick="closeCustomize()"></span>
-        <a>Customize MyRedditAll</a>
-        <a href="#" onClick="$('#saveSettingsForm').toggle(); return false;" class="cufonize" style="color:#3F0; font-size:14px;">Save Settings</a>
-        <span id="saveSettingsForm" style="display:none;">
-            <input type="Text" name="saveName" size="30" class="ui-state-defalt" value="Save Name"> <img src="images/fileTypes/disk.png" style="cursor:pointer;" onClick="saveSettings()" width="16" height="16">
-        </span>
-    </div>
-    <div class="portlet-content">
-        <table border="0" cellpadding="0" cellspacing="3" width="100%">
-            <tr>
-                <td class="cufonize">Pick Wallpaper </td>
-                <td colspan="3" style="text-align:left;">
-                    <input type="button" value="Previous" class="ui-state-default" onClick="prevWallpaper()">
-                    <input type="button" value="Next" class="ui-state-default" onClick="nextWallpaper()">
-                   
-                    <span class="cufonize">
-                        Custom:
-                        <input type="hidden" value="" size="5" id="customWallpaper">
-                        <img src="images/fileTypes/picture.png" onClick="saveWallpaper($('#customWallpaper').val());" width="16" height="16">
-                    </span>
-                </td>
-                <td><span class="cufonize">Hide Viewed</span> <input type="checkbox" data-bind="checked: settings.isNewsItemVisible, attr: { checked: settings.isNewsItemVisible }"></td>
-                <td class="cufonize">Color </td>
-                <td>
-                    <div id="colorSelector"><div></div></div>
-                </td>
-                <td class="cufonize">Search Sub Reddits</td>
-                <td>
-                    <input type="Text" name="feedName" size="30" class="ui-state-defalt">
-                    <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="mra.locationPicker.show(this,$('input[name=feedName]').val())" width="16" height="16">
-                    <script type="text/javascript">
-                        new Autocomplete("feedName", function() {
-                            this.setValue = function( SubRedditTitle ) {
-                                if (SubRedditTitle != ''){ 
-                                    popupAdd($("#addSubIcon"),SubRedditTitle)
+    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="left:8%; position:absolute; top:99px; width:80%; display:none; border:1px solid #ffdab9;" id="customizeDialog">
+        <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
+            <span class="ui-icon ui-icon-closethick" onClick="closeCustomize()"></span>
+            <a>Customize MyRedditAll</a>
+            <a href="#" onClick="$('#saveSettingsForm').toggle(); return false;" class="cufonize" style="color:#3F0; font-size:14px;">Save Settings</a>
+            <span id="saveSettingsForm" style="display:none;">
+                <input type="Text" name="saveName" size="30" class="ui-state-defalt" value="Save Name"> <img src="images/fileTypes/disk.png" style="cursor:pointer;" onClick="saveSettings()" width="16" height="16">
+            </span>
+        </div>
+        <div class="portlet-content">
+            <table border="0" cellpadding="0" cellspacing="3" width="100%">
+                <tr>
+                    <td class="cufonize">Pick Wallpaper </td>
+                    <td colspan="3" style="text-align:left;">
+                        <input type="button" value="Previous" class="ui-state-default" onClick="prevWallpaper()">
+                        <input type="button" value="Next" class="ui-state-default" onClick="nextWallpaper()">
+                       
+                        <span class="cufonize">
+                            Custom:
+                            <input type="hidden" value="" size="5" id="customWallpaper">
+                            <img src="images/fileTypes/picture.png" onClick="saveWallpaper($('#customWallpaper').val());" width="16" height="16">
+                        </span>
+                    </td>
+                    <td><span class="cufonize">Hide Viewed</span> <input type="checkbox" data-bind="checked: settings.isNewsItemVisible, attr: { checked: settings.isNewsItemVisible }"></td>
+                    <td class="cufonize">Color </td>
+                    <td>
+                        <div id="colorSelector"><div></div></div>
+                    </td>
+                    <td class="cufonize">Search Sub Reddits</td>
+                    <td>
+                        <input type="Text" name="feedName" size="30" class="ui-state-defalt">
+                        <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="mra.locationPicker.show(this,$('input[name=feedName]').val())" width="16" height="16">
+                        <script type="text/javascript">
+                            new Autocomplete("feedName", function() {
+                                this.setValue = function( SubRedditTitle ) {
+                                    if (SubRedditTitle != ''){ 
+                                        popupAdd($("#addSubIcon"),SubRedditTitle)
+                                    }
                                 }
-                            }
-                            if (this.isModified) this.setValue("");
-                            return "findfeed.html?q=" + this.value;
-                        });
-                    </script>
-                </td>
-
-            </tr>
-        </table>
+                                if (this.isModified) this.setValue("");
+                                return "findfeed.html?q=" + this.value;
+                            });
+                        </script>
+                    </td>
+    
+                </tr>
+            </table>
+        </div>
     </div>
-</div>
 
     <ul id="imageMenu" class="contextMenu">
         <li class="comments"><a href="#comments">View Comments</a></li>
@@ -265,10 +241,8 @@ function saveSettings(){
         <li class="link separator" id="copyLink"><a href="#copy">Copy To Share</a></li>
     </ul>
     
-    <input type="hidden" id="clipboardContents">
-    <!-- <script type="text/javascript"> Cufon.now(); </script> -->
-    <div style="position:absolute; left:-99999px; top:-99999px;"><img src="" id="background"></div>
-        <script type="text/javascript"> Cufon.now(); </script>
+    <input type="hidden" id="clipboardContents"> 
+	<script type="text/javascript"> Cufon.now(); </script>
 </body>
 
 </html>

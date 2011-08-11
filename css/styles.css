@@ -2,12 +2,22 @@ body { font-size:0.8em; font-family:Verdana, Geneva, sans-serif; color:#9FA8A8; 
 a { text-decoration:none; }
 h2 { padding:0px 5px; }
 #newsSection { display:table; width:100%; table-layout:initial; }
-#newsSection  > .column { display:table-cell; min-width:33%; }
+#newsSection  > .column { 
+    display: table-cell;
+    float: left;
+    min-width: 300px;
+	width:100%;
+}
+@media screen and (min-width: 900px) {
+	#newsSection  > .column { 	
+		 width: 33%;
+    }
+}
 div.loader { text-align:center; }
 ul.portlet-content { list-style-type:none; padding:0; margin:0; }
-ul.portlet-content > li { overflow:auto; text-align:left; border-bottom:1px solid #3d3d3d; }
-ul.portlet-content > li > a.link { float:left; width:86%; margin: 2px; padding: 0 5px; }
-ul.portlet-content > li > a.comment { float:right; width:8%; }
+ul.portlet-content > li { overflow:hidden; text-align:left; border-bottom:1px solid #3d3d3d; }
+ul.portlet-content > li > a.link { float:left; width:86%; margin: 2px; padding: 0 0 0 5px; }
+ul.portlet-content > li > a.comment { float:right; width:8%; font-size: 12px; padding: 3px 8px 0 0; }
 ul.portlet-content > li > a.link:visited { color: #666; }
 ul.portlet-content > li > a.comment:visited { color: #666; }
 .portlet { margin: 6px;  }
@@ -22,10 +32,9 @@ ul.portlet-content > li > a.comment:visited { color: #666; }
 .newsItem:visited { color: #666; }
 .newsItem { display:block; width:100%; }
 a.newsItem, a.link, a.comment  { color: #D9D9D9; opacity:0.7; }
-a.comment { font-size:14px; text-align:center; padding:2px 3px 0px 0px; }
 a.newsItem:hover {opacity:1; color:#FFF; }
 
-.fg-button { outline: 0; margin:0 4px 0 0; padding: .4em 1em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1; }
+.fg-button { outline: 0; margin:0 4px 0 0; padding: .4em 0.8em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1;  font-size:14px; }
 .fg-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
 .portlet-header .ui-icon { margin-top:9px; float:right; cursor:pointer; }
 /* remove extra button width in IE */

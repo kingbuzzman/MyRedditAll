@@ -21,11 +21,15 @@ var settings = {
             ko.observableArray(["WTF","Programming"])
         ]),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"]),
-		visited_news: ko.observableArray(),
+		visited_news: ko.observableArray([]),
     },
  
 	newsButtons: ['hot','new','controversial','top'],
 	images: ko.observableArray(),
+	activeImage: function(){
+		return this.images()[this.activeImageIndex()];
+	},
+	activeImageIndex: ko.observable(0),	
 	news: ko.observable({}),
 	defaultVisibleItems: 10,
 	newsItemsVisible: ko.observable({}),
@@ -47,9 +51,11 @@ var settings = {
 	}, 
 	getFilteredData: function(data){
 		//return settings.news()[data].slice(0,settings.newsItemsVisible()[data]());
-		return ko.utils.arrayFilter(settings.news()[data](), function(item) {
-			return item.hidden() ? null : item;
-		}).slice(0,settings.newsItemsVisible()[data]());
+		if (data in settings.news())
+			return ko.utils.arrayFilter(settings.news()[data](), function(item) {
+				return item.hidden() ? null : item;
+			}).slice(0,settings.newsItemsVisible()[data]());
+		else return [];	
 	},
     
     // getters
@@ -126,13 +132,13 @@ var settings = {
 	
 	
 	deleteSubReddit: function(SubRedditTitle){
-for(i in settings.activeSettings.subreddits()) {
-	for(b in settings.activeSettings.subreddits()[i]()){ 
-		if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
-			settings.activeSettings.subreddits()[i]().splice(b,1);   
-		} 
-	}
-}
+		for(i in settings.activeSettings.subreddits()) {
+			for(b in settings.activeSettings.subreddits()[i]()){ 
+				if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
+					settings.activeSettings.subreddits()[i]().splice(b,1);   
+				} 
+			}
+		}
 		delete settings.news()[SubRedditTitle];
 		delete settings.newsItemsVisible()[SubRedditTitle];
 		this.preferences.save();
@@ -174,29 +180,37 @@ for(i in settings.activeSettings.subreddits()) {
          */
         this.load = function(){
             var cookie = getCookieValue(COOKIE_NAME);
-			var context = window;
+			var context = this;
             var settings = {};
             
             if(cookie){
                 settings = JSON.parse(cookie);
                 this.activeSettings['background']['color'](settings['background']['color']);
                 this.activeSettings['background']['image'](settings['background']['image']);
-				this.activeSettings['visited_news'](settings['visited_news']);
+				this.activeSettings['visited_news'](settings['visited_news'] || []);
 				
 				this.activeSettings['subreddits'].removeAll(); 
 				for(var i in settings['subreddits']){ 
 					var column = ko.observableArray(settings['subreddits'][i]);
 					this.activeSettings['subreddits'].push(column);
 					$.each(column(), function(i,o){						
-						context.settings.news()[o] = ko.observableArray();
-						context.settings.newsItemsVisible()[o] = ko.observable(context.settings.defaultVisibleItems);
+						context.news()[o] = ko.observableArray();
+						context.newsItemsVisible()[o] = ko.observable(context.defaultVisibleItems);
 					});
 				}
                 
                 this.activeSettings['imageBar'](settings['imageBar']);
-            } else
+            } else {
                 // there was no cookie set, save it.
                 this.preferences.save();
+				for(var i in context.activeSettings['subreddits']()){ 
+					var column = context.activeSettings['subreddits']()[i];
+					$.each(column(), function(i,o){						
+						context.news()[o] = ko.observableArray();
+						context.newsItemsVisible()[o] = ko.observable(context.defaultVisibleItems);
+					});
+				}
+			}
         };
         
         /*
@@ -391,7 +405,7 @@ var mra = {
                 url: reqURL, 
                 dataType: 'jsonp',
                 jsonp: 'jsonp',
-				timeout: 10000, // 2 seconds timeout
+				timeout: 20000, // 2 seconds timeout
                 success: function(data){
                     arrData = mra.cleanData(data);
                     if (arrData.length == 0){
@@ -553,7 +567,7 @@ var mra = {
             }
             else {
 				$.each(arrItems,function(i,obj){
-					obj.title = left(obj.title,100);
+					obj.text = left(obj.title,100);
 					obj.score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100) + "%";
 					obj.score_title = obj.score + "  of People Like It";
 					obj.permalink = redditURL + obj.permalink;
@@ -640,6 +654,7 @@ var mra = {
 			var filtered = [];
             for (i in arrElems){
                 var pic = arrElems[i];
+				pic.permalink = redditURL + pic.permalink;
                 if (pic.url != ''){
                     if (  pic.url.indexOf("http://imgur.com/") >= 0 ){
                          pic.url = pic.url + ".jpg";
@@ -650,8 +665,7 @@ var mra = {
                         //sElements += mra.imageBar.makeHTML(pic);
                     }
                     else {
-						//TODO at this point is just append it to the observ array
-                        mra.imageBar.getHeaders(pic);
+                        //mra.imageBar.getHeaders(pic);
                     }
                 }
             }
@@ -836,7 +850,7 @@ var mra = {
     		*/
 			
 			settings.images.removeAll(); 
-			mra.imageBar.filterElements(pics.splice(0,20)); 
+			mra.imageBar.filterElements(pics); 
 					
 			
             //var catOnDom  = ($("div.ad-gallery").attr('id') != '') ? $("div.ad-gallery").attr('id').split('_')[1] : "";
@@ -881,6 +895,20 @@ var mra = {
 
         }
     }
+}
+
+function saveSettings(){
+    $.ajax({
+        url: "/saveSettings.cfm",
+        data: {
+            layout: encodeURIComponent(JSON.stringify(currentLayout)),
+            imagebar: encodeURIComponent(JSON.stringify(currentImageBar)), 
+            saveName: $('input[name=saveName]').val()
+        },
+        success: function(response){
+            location.href = $.parseJSON(response).directory;
+        }
+    })
 }
 
 $(document).ready(mra.init);
