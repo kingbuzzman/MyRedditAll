@@ -45,9 +45,13 @@ var settings = {
     },
 	
 	visitPage: function(evt){
-		settings.activeSettings.visited_news.push($(evt.target).parent().data('tmplItem').data.id);
-		settings.preferences.save();
-		return true;
+		setTimeout(function(){
+			settings.activeSettings.visited_news.push($(evt.target).parent().data('tmplItem').data.id);
+			settings.preferences.save();
+		},5000);
+		$(evt.target).parent().fadeOut(2500);
+		mra.imageBar.popupWindow(evt.target.href);
+		//return true;
 	}, 
 	getFilteredData: function(data){
 		//return settings.news()[data].slice(0,settings.newsItemsVisible()[data]());
