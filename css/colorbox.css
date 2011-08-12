@@ -32,7 +32,7 @@
     #cboxContent{background:#fff; overflow:visible;}
         #cboxLoadedContent{margin-bottom:5px;}
         #cboxLoadingOverlay{background:url(../images/loading_background.png) no-repeat center center;}
-        #cboxLoadingGraphic{background:url(../images/loading.gif) no-repeat center center;}
+        #cboxLoadingGraphic{ background:url("../images/loading.gif") no-repeat scroll center center black; }
         #cboxTitle{
 			background:none repeat scroll 0 0 #000000;
 			bottom:0;

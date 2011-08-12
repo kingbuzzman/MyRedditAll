@@ -774,12 +774,11 @@
 				if (isIE) {
 					photo.style.msInterpolationMode = 'bicubic';
 				}
-				
 				setTimeout(function () { // A pause because Chrome will sometimes report a 0 by 0 size otherwise.
 					prep(photo);
 				}, 1);
 			});
-			
+				
 			setTimeout(function () { // A pause because Opera 10.6+ will sometimes not run the onload function otherwise.
 				photo.src = href;
 			}, 1);

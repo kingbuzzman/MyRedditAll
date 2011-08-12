@@ -761,10 +761,7 @@ var mra = {
                     }
                     $("#cboxTitle").show();
                     mra.imageBar.addClipboardCopy(document.getElementById('copyLink2'));
-                    if (mra.imageBar.lbHasInit == 0)
-                        mra.imageBar.initLightbox();
-                    repositionCopy(document.getElementById('copyLink2'));
-                    $("<iframe>").attr("src",$("img.cboxPhoto").attr("src")).appendTo("body").bind("load", function(){ $(this).remove() });
+					$("iframe").attr("src",$("img.cboxPhoto").attr("src"))
                 }, 
                 onLoad: function(){
                     mra.imageBar.loadMoreImages();
@@ -804,7 +801,7 @@ var mra = {
                 },1000);                    
             } 
         },
-        initLightbox: function(){
+        initCopyPaste: function(){
             $("#cboxContent").hover(
                 function(){
                     $("#cboxTitle").stop(true).fadeTo("normal",0); 
@@ -895,6 +892,7 @@ var mra = {
     
             mra.imageBar.applyLightBox();
             mra.imageBar.applyContextMenu();
+			mra.imageBar.initCopyPaste();
             //adGallery.thumbs_wrapper.scrollLeft(curPos);
 
         }
