@@ -5,6 +5,51 @@ if (typeof console == "undefined")
  * Setting wrapper
  * - handles all the that needs to persist
  */
+var SubReddits = function(){
+    var portlets = ko.observableArray();
+    var SubReddit = function(name){
+        this.name = name;
+        // this.items = ko.observable(null);
+        
+        this.remove = function(){
+            if (confirm("Are you sure you want to delete this section?")){
+                portlets.remove(this);
+            }
+        }.bind(this);
+        
+        this.toString = function(){
+            return this.name;
+        }.bind(this);
+        
+        return this;
+    };
+    
+    this.addPortlet = function(porlet){
+        portlets.push(new SubReddit(porlet));
+    }.bind(this);
+    
+    this.getPortlets = function(){
+        return portlets;
+    }.bind(this);
+    
+    this.toArray = function(){
+        var subs = [];
+        
+        for(var index in portlets()){
+            subs.push(portlets()[index]);
+        }
+        
+        return subs;
+    }.bind(this);
+    
+    this.toString = function(){
+        return this.toArray().join(", ");
+    }.bind(this);
+    
+    for(var index in arguments)
+        this.addPortlet(arguments[index]);
+};
+
 myVar = true;
 var settings = {
     // default cookie settings
@@ -14,12 +59,8 @@ var settings = {
             color: ko.observable(null),
             image: ko.observable("images/spacestorm.jpg")
         },
-        subreddits: ko.observableArray([
-			//TODO: Make sure page continues to load if an invalid one is entered
-            ko.observableArray(["Gadgets","Funny"]),
-            ko.observableArray(["Reddit.com","Javascript"]),
-            ko.observableArray(["WTF","Programming"])
-        ]),
+        // TODO: Make sure page continues to load if an invalid one is entered
+        subreddits: new SubReddits("Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"]),
 		visited_news: ko.observableArray([]),
     },
@@ -39,7 +80,7 @@ var settings = {
     init: function(){
         // initialize preferences's complex object
         settings.preferences = settings.preferences();
-        settings.preferences.load();
+        //settings.preferences.load();
 		ko.applyBindings(settings);
 		Cufon.refresh();
     },
@@ -70,7 +111,7 @@ var settings = {
         return this.activeSettings['background']['image']();
     },
     getSubreddits: function(){
-        return this.activeSettings['subreddits']();
+        return [settings.activeSettings.subreddits.getPortlets()];
     },
     getImageBar: function(newo){
         if(newo == undefined){
@@ -236,9 +277,18 @@ var settings = {
     },
 	
     toString: function(){
-        return ko.toJSON(this.activeSettings);
+        var settings = {
+            background: {
+                color: this.getBackgroundColor(),
+                image: this.getBackgroundImage()
+            },
+            subreddits: this.activeSettings.subreddits(),
+            imageBar: ko.toJSON(this.activeSettings.imageBar),
+            visitedNews: ko.toJSON(this.activeSettings.visited_news)
+        };
+        
+        return JSON.stringify(settings);
     }
-	
 }; 
 
 settings.showMoreMode= ko.dependentObservable(function(){
@@ -246,7 +296,10 @@ settings.showMoreMode= ko.dependentObservable(function(){
 },settings);
 
 
-$(document).ready(settings.init);
+$(document).ready(function(){
+    settings.init();
+    $("#newsSection").sortable().disableSelection();
+});
 	
 var wallpaperIndex = 0;
 var currentLayout = settings.getSubreddits();
@@ -486,23 +539,23 @@ var mra = {
             mra.news.portlets = $("#newsSection .portlet");    
     		mra.news.columns = $("div.column");
 			
-			mra.news.columns
-				.sortable({
-					connectWith: '.column',
-					stop: function(event, ui) { 
-						var arrColumns = [];
-						$(".column").each(function(i, o){
-							arrColumns[i] = [];
-							$(o).find('.portlet').each(function(ii, oo){
-								arrColumns[i][ii] = oo.title;
-							});
-							settings.activeSettings.subreddits()[i](arrColumns[i])
-						});
-						Cufon.refresh();
-						settings.preferences.save();
-					}
-				}) 
-				.disableSelection();
+            // mra.news.columns
+            //  .sortable({
+            //      connectWith: '.column',
+            //      stop: function(event, ui) { 
+            //          var arrColumns = [];
+            //          $(".column").each(function(i, o){
+            //              arrColumns[i] = [];
+            //              $(o).find('.portlet').each(function(ii, oo){
+            //                  arrColumns[i][ii] = oo.title;
+            //              });
+            //              settings.activeSettings.subreddits()[i](arrColumns[i])
+            //          });
+            //          Cufon.refresh();
+            //          settings.preferences.save();
+            //      }
+            //  }) 
+            //  .disableSelection();
     
             mra.news.loadNextFeed();
         }, 

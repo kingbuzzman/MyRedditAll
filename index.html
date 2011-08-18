@@ -55,10 +55,6 @@
 			{{/each}}
         </script>
 
-        <script id="columnTemplate" type="text/html">
-            <div class="column" data-bind="template: { name: 'subredditTemplate', foreach: $data }"></div>
-        </script>
-
 		<!--, beforeRemove: function(elem) { setTimeout(function(){ $(elem).fadeOut(), 5000}) } -->	
 		<script type="text/html" id="newsItemTemplate">
 			<li data-bind="visible: !$data.hidden(), attr: { title: $data.title }"> 
@@ -73,11 +69,11 @@
         
         <!-- href="http://www.reddit.com/r/${ $data }" -->
         <script id="subredditTemplate" type="text/html">
-            <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="${ $data }">
+            <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" data-bind="attr: { title: $data.name }">
                 <div class="portlet-header ui-widget-header ui-corner-all">
-                    <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: mra.news.deleteButton"></span>
+                    <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: remove"></span>
                     <span class="ui-icon ui-icon-minusthick ui-toggle-display" data-bind="click: mra.news.togglePortlet "></span>
-                    <a target="_blank" data-bind="text: $data, attr: { href: $data }"></a>
+                    <a target="_blank" data-bind="text: $data.name, attr: { href: $data.name }"></a>
 					<span data-bind="template: { name: 'newsButton', foreach: settings.newsButtons }"></span>
 				</div>
 				<div class="loader" data-bind="visible: settings.getFilteredData($data).length == 0"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
@@ -137,8 +133,8 @@
                  </div>   
                  <div class="ad-controls" style="display:none;"> </div>
             </h2>
-            
-            <div id="newsSection" data-bind="template: { name: 'columnTemplate', foreach: activeSettings.subreddits }"></div>
+
+            <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: activeSettings.subreddits.getPortlets() }"></div>
         </div>
 
 		<div id="metaRedditDialog" title="MetaReddit Picker" style="display:none;">

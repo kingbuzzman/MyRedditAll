@@ -1,10 +1,10 @@
 body { font-size:0.8em; font-family:Verdana, Geneva, sans-serif; color:#9FA8A8; margin:2px; padding:0; }
 a { text-decoration:none; }
 h2 { padding:0px 5px; }
-#newsSection { display:table; width:100%; table-layout:initial; }
-#newsSection  > .column { display: table-cell; float: left; min-width: 300px; width:100%; }
+#newsSection { width:100%; }
+#newsSection > div { width:32%; float:left; }
 @media screen and (min-width: 900px) {
-	#newsSection  > .column { 	
+	#newsSection  > .porlet { 	
 		 width: 33%;
     }
 }
