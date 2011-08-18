@@ -155,6 +155,7 @@ var settings = new (function(){
         // private class (individual portlets)
         var Portlet = function(name){
             this.name = name;
+            this.url = 'http://www.reddit.com/r/' + name;
             
             this.remove = function(){
                 if (confirm("Are you sure you want to delete this section?")){
