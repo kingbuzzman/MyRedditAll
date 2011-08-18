@@ -5,12 +5,13 @@ if (typeof console == "undefined")
  * Houses all the portlets (subreddits)
  */
 var SubReddits = function(){
+    // class
     var Portlet = function(name){
         this.name = name;
         
         this.remove = function(){
             if (confirm("Are you sure you want to delete this section?")){
-                portlets.remove(this);
+                SubReddits.removePortlet(this);
             }
         }.bind(this);
         
@@ -20,14 +21,32 @@ var SubReddits = function(){
         
         return this;
     };
+    
+    // private variables
+    var SubReddits = this;
     var portlets = ko.observableArray();
     
-    this.addPortlet = function(porlet){
-        portlets.push(new Portlet(porlet));
+    /*
+     * Adds a new portlet to the DOM
+     * @portlet string name of the subreddit
+     */
+    this.addPortlet = function(portlet){
+        portlets.push(new Portlet(portlet));
     }.bind(this);
     
+    /*
+     * Returns all the portlets (subreddits)
+     */
     this.getPortlets = function(){
         return portlets;
+    }.bind(this);
+    
+    /*
+     * Removes portlet
+     * @portlet Portlet() portlet object thats going to get deleted
+     */
+    this.removePortlet = function(portlet){
+        portlets.remove(portlet);
     }.bind(this);
     
     /*
@@ -37,6 +56,7 @@ var SubReddits = function(){
         return portlets().join(", ");
     }.bind(this);
     
+    // initializes all the portlets
     for(var index in arguments)
         this.addPortlet(arguments[index]);
 };
@@ -301,6 +321,7 @@ ko.bindingHandlers.sortableList = {
                 var item = ui.item.tmplItem().data;
                 //figure out its new position
                 var position = ko.utils.arrayIndexOf(ui.item.parent().children(), ui.item[0]);
+                
                 //remove the item and add it back in the right spot
                 if (position >= 0) {
                     list.remove(item);
