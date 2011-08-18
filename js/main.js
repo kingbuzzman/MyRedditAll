@@ -142,21 +142,6 @@ var settings = new (function(){
 			return (desc || true) ? b.created - a.created : b.created - a.created;
 		}));
 	};
-	
-	
-	
-	this.deleteSubReddit = function(SubRedditTitle){
-		for(i in settings.activeSettings.subreddits()) {
-			for(b in settings.activeSettings.subreddits()[i]()){ 
-				if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
-					settings.activeSettings.subreddits()[i]().splice(b,1);   
-				} 
-			}
-		}
-		delete settings.news()[SubRedditTitle];
-		delete settings.newsItemsVisible()[SubRedditTitle];
-		this.preferences.save();
-	};
     
     /*
      * Houses all the portlets (subreddits)
@@ -543,6 +528,7 @@ var mra = {
 					$portlet.find("div.loader").hide()
 					callback([]);
 					if (confirm(subReddit + " appears not to be loading, would you like to delete it?")){
+						// TODO: fix, this will crash.. for now
 						mra.news.deleteReddit($portlet);
 					}
 				}
@@ -628,18 +614,6 @@ var mra = {
 		togglePortlet: function(evt){ 
 			$(evt.target).toggleClass('ui-icon-minusthick').toggleClass('ui-icon-plusthick'); 
 			$(evt.target).parents('.portlet:first').find('.portlet-content').toggle(); 
-		},
-		deleteButton: function(evt){
-			if (confirm("Are you sure you want to delete this section?")){
-				 mra.news.deleteReddit($(evt.target).parent().parent()); 
-			 }    
-		},
-		deleteReddit: function(obj){
-			 $(obj).parent().hide(1000, function(){
-				 $(obj).parent().remove();
-			 }); 
-			 settings.deleteSubReddit($(obj).attr('title'));
-			 settings.preferences.save();
 		},
         addCount: function(){
 			mra.news.totalIndex += 1;
