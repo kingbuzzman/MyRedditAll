@@ -189,7 +189,6 @@ var settings = new (function(){
          * @portlet string name of the subreddit
          */
         this.addPortlet = function(portlet){
-            console.log(portlet);
             if(portlet.push){
                 for(var index in portlet)
                     this.addPortlet(portlet[index]);
