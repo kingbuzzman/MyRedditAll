@@ -284,15 +284,22 @@ var settings = new (function(){
                 // this.activeSettings['visited_news'](settings['visited_news'] || []);
                 
                 this.getSubreddits().removeAllPortlets();
-                for(var i in settings['subreddits']){
+                for(var i in settings['subreddits'])
                     this.getSubreddits().addPortlet(settings['subreddits'][i]);
-                }
                 
                 this.activeSettings['imageBar'](settings['imageBar']);
             } else {
                 // there was no cookie set, save it.
                 this.preferences.save();
             }
+            
+            // TODO: delete this ASAP
+            var portlets = this.getSubreddits().toStringArray();
+            for(var index in portlets){
+                this.news()[portlets[index]] = ko.observableArray();
+                this.newsItemsVisible()[portlets[index]] = ko.observable(this.defaultVisibleItems);
+            }
+            
         }.bind(settings);
         
         /*
@@ -357,7 +364,7 @@ $(document).ready(function(){
 });
 	
 var wallpaperIndex = 0;
-// var currentLayout = settings.getSubreddits();
+var currentLayout = settings.getSubreddits();
 var currentImageBar = settings.getImageBar();
 var redditURL = "http://www.reddit.com";
 var oCustomContextMenu = null;
