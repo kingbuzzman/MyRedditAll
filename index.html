@@ -134,7 +134,7 @@
                  <div class="ad-controls" style="display:none;"> </div>
             </h2>
 
-            <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: getSubreddits() }, sortableList: getSubreddits()"></div>
+            <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: getSubreddits().getPortlets() }, sortableList: getSubreddits().getPortlets()"></div>
         </div>
 
 		<div id="metaRedditDialog" title="MetaReddit Picker" style="display:none;">
@@ -149,7 +149,7 @@
         
         <div style="clear:both">&nbsp;</div>
         
-        <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>	
+        <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>
     
 	</div>
 

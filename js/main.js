@@ -1,76 +1,6 @@
 if (typeof console == "undefined")
     console = { log: function(){} };
 
-/*
- * Houses all the portlets (subreddits)
- */
-var SubReddits = function(){
-    // class
-    var Portlet = function(name){
-        this.name = name;
-        
-        this.remove = function(){
-            if (confirm("Are you sure you want to delete this section?")){
-                SubReddits.removePortlet(this);
-            }
-        }.bind(this);
-        
-        this.toString = function(){
-            return this.name;
-        }.bind(this);
-        
-        return this;
-    };
-    
-    // private variables
-    var SubReddits = this;
-    var portlets = ko.observableArray();
-    
-    /*
-     * Adds a new portlet to the DOM
-     * @portlet string name of the subreddit
-     */
-    this.addPortlet = function(portlet){
-        portlets.push(new Portlet(portlet));
-    }.bind(this);
-    
-    /*
-     * Returns all the portlets (subreddits)
-     */
-    this.getPortlets = function(){
-        return portlets;
-    }.bind(this);
-    
-    /*
-     * Removes portlet
-     * @portlet Portlet() portlet object thats going to get deleted
-     */
-    this.removePortlet = function(portlet){
-        portlets.remove(portlet);
-    }.bind(this);
-    
-    
-    /*
-     * Return all the portlets (subreddits) in a Array of Strings
-     */
-    this.toStringArray = function(){
-        return portlets().map(function(item){ 
-            return item.name;
-        });
-    }.bind(this);
-    
-    /*
-     * Return all the portlets (subreddits) in their order
-     */
-    this.toString = function(){
-        return this.toStringArray().join(", ");
-    }.bind(this);
-    
-    // initializes all the portlets
-    for(var index in arguments)
-        this.addPortlet(arguments[index]);
-};
-
 myVar = true;
 
 /*
@@ -79,6 +9,12 @@ myVar = true;
  */
 var settings = {
     // default cookie settings
+    BACKGROUND_COLOR: null,
+    BACKGROUND_IMAGE: "image/spacestorm.jpg",
+    SUBREDDITS: ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"],
+    SUBREDDIT_ITEMS: 10,
+    IMAGE_BAR: ["Pics","WTF","NSFW","Funny"],
+    
     // note: this gets overwritten when load() is ran with the current cookie settings
     activeSettings: {
         background: {
@@ -86,9 +22,9 @@ var settings = {
             image: ko.observable("images/spacestorm.jpg")
         },
         // TODO: Make sure page continues to load if an invalid one is entered
-        subreddits: new SubReddits("Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"),
+        subreddits: [], //new SubReddits("Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"]),
-		visited_news: ko.observableArray([]),
+        visited_news: ko.observableArray([]),
     },
  
 	newsButtons: ['hot','new','controversial','top'],
@@ -104,10 +40,12 @@ var settings = {
     metaReddits: ko.observableArray(),
      
     init: function(){
-        // initialize preferences's complex object
-        settings.preferences = settings.preferences();
-        //settings.preferences.load();
-		ko.applyBindings(settings);
+        // initialize complex object
+        this.preferences = new this.preferences(this);
+        this.subreddits = new this.subreddits(this.SUBREDDITS);
+        
+        settings.preferences.load();
+		ko.applyBindings(this);
 		Cufon.refresh();
     },
 	
@@ -137,7 +75,7 @@ var settings = {
         return this.activeSettings['background']['image']();
     },
     getSubreddits: function(){
-        return settings.activeSettings.subreddits.getPortlets();
+        return settings.subreddits;
     },
     getImageBar: function(newo){
         if(newo == undefined){
@@ -214,11 +152,101 @@ var settings = {
 		delete settings.newsItemsVisible()[SubRedditTitle];
 		this.preferences.save();
 	},
-	
-    preferences: function(){
+    
+    /*
+     * Houses all the portlets (subreddits)
+     * - needs to be initialized
+     */
+    subreddits: function(){
+        // private variables
+        var SubReddits = this;
+        var portlets = ko.observableArray();
+        
+        // private class (individual portlets)
+        var Portlet = function(name){
+            this.name = name;
+            
+            this.remove = function(){
+                if (confirm("Are you sure you want to delete this section?")){
+                    SubReddits.removePortlet(this);
+                }
+            }.bind(this);
+            
+            this.toString = function(){
+                return this.name;
+            }.bind(this);
+            
+            return this;
+        };
+        
+        /*
+         * Adds a new portlet to the DOM
+         * @portlet string name of the subreddit
+         */
+        this.addPortlet = function(portlet){
+            if(portlet.push){
+                for(var index in portlet)
+                    this.addPortlet(portlet[index]);
+            } else {
+                portlets.push(new Portlet(portlet));
+            }
+        };
+        
+        /*
+         * Returns all the portlets (subreddits)
+         */
+        this.getPortlets = function(){
+            return portlets;
+        };
+        
+        /*
+         * Removes portlet
+         * @portlet Portlet() portlet object thats going to get deleted
+         */
+        this.removePortlet = function(portlet){
+            portlets.remove(portlet);
+        };
+        
+        /*
+         * Removes all portlet
+         */
+        this.removeAllPortlets = function(){
+            portlets.removeAll();
+        };
+        
+        /*
+         * Return all the portlets (subreddits) in a Array of Strings
+         */
+        this.toStringArray = function(){
+            return portlets().map(function(item){ 
+                return item.name;
+            });
+        };
+        
+        /*
+         * Return all the portlets (subreddits) in their order
+         */
+        this.toString = function(){
+            return this.toStringArray().join(", ");
+        };
+        
+        // initializes all the portlets
+        for(var index in arguments)
+            this.addPortlet(arguments[index]);
+        
+        return this;
+    },
+    
+    /*
+     * Houses all the user preference code
+     * - needs to be initialized
+     */
+    preferences: function(settings){
+        var currentTime = (new Date()).getTime();
+        
         var COOKIE_NAME = "settings";
-        var COOKIE_EXPIRE_NOW = (new Date((new Date()).getTime() - 2*24*60*60*1000)).toGMTString(); // 2 days ago
-        var COOKIE_EXPIRATION = (new Date((new Date()).getTime() + 999*24*60*60*1000)).toGMTString(); // 999 days from now
+        var COOKIE_EXPIRE_NOW = (new Date(currentTime - 2*24*60*60*1000)).toGMTString(); // 2 days ago
+        var COOKIE_EXPIRATION = (new Date(currentTime + 999*24*60*60*1000)).toGMTString(); // 999 days from now
         
         /*
          * Get cookie value (private function)
@@ -251,41 +279,30 @@ var settings = {
          */
         this.load = function(){
             var cookie = getCookieValue(COOKIE_NAME);
-			var context = this;
             var settings = {};
             
+            // load the cookie if its available
             if(cookie){
                 settings = JSON.parse(cookie);
+                
                 this.activeSettings['background']['color'](settings['background']['color']);
                 this.activeSettings['background']['image'](settings['background']['image']);
-				this.activeSettings['visited_news'](settings['visited_news'] || []);
-				
-				this.activeSettings['subreddits'].removeAll(); 
-				for(var i in settings['subreddits']){ 
-					var column = ko.observableArray(settings['subreddits'][i]);
-					this.activeSettings['subreddits'].push(column);
-					$.each(column(), function(i,o){						
-						context.news()[o] = ko.observableArray();
-						context.newsItemsVisible()[o] = ko.observable(context.defaultVisibleItems);
-					});
-				}
+                // this.activeSettings['visited_news'](settings['visited_news'] || []);
+                
+                this.getSubreddits().removeAllPortlets();
+                for(var i in settings['subreddits']){
+                    this.getSubreddits().addPortlet(settings['subreddits'][i]);
+                }
                 
                 this.activeSettings['imageBar'](settings['imageBar']);
             } else {
                 // there was no cookie set, save it.
                 this.preferences.save();
-				for(var i in context.activeSettings['subreddits']()){ 
-					var column = context.activeSettings['subreddits']()[i];
-					$.each(column(), function(i,o){						
-						context.news()[o] = ko.observableArray();
-						context.newsItemsVisible()[o] = ko.observable(context.defaultVisibleItems);
-					});
-				}
-			}
-        };
+            }
+        }.bind(settings);
         
         /*
-         * Erase the cookie cookie
+         * Erase the cookie
          */
         this.erase = function(){
             document.cookie = COOKIE_NAME + "=; expires=" + COOKIE_EXPIRE_NOW + "; path=/";
@@ -297,7 +314,7 @@ var settings = {
          */
         this.save = function(){
             document.cookie = COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + COOKIE_EXPIRATION + "; path=/";
-        };
+        }.bind(settings);
         
         return this;
     },
@@ -308,7 +325,7 @@ var settings = {
                 color: this.getBackgroundColor(),
                 image: this.getBackgroundImage()
             },
-            subreddits: this.activeSettings.subreddits.toStringArray(),
+            subreddits: this.getSubreddits().toStringArray(),
             imageBar: ko.toJSON(this.activeSettings.imageBar),
             visitedNews: ko.toJSON(this.activeSettings.visited_news)
         });
@@ -348,7 +365,7 @@ $(document).ready(function(){
 });
 	
 var wallpaperIndex = 0;
-var currentLayout = settings.getSubreddits();
+// var currentLayout = settings.getSubreddits();
 var currentImageBar = settings.getImageBar();
 var redditURL = "http://www.reddit.com";
 var oCustomContextMenu = null;
