@@ -306,6 +306,8 @@ ko.bindingHandlers.sortableList = {
                     list.remove(item);
                     list.splice(position, 0, item);
                 }
+                
+                Cufon.refresh();
             }
         });
     }
