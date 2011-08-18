@@ -63,17 +63,19 @@
 			</li>
         </script>
         
+        <!-- TODO: keep track of which one is "active" - problem solved -->
+        <!-- {{if $data.NEWS_BUTTONS.indexOf($data) == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}} -->
         <script type="text/html" id="newsButton">
-			<span class="ui-icon toggleView {{if settings.newsButtons.indexOf($data) == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: mra.news.reloadSection, text: $data, attr: { title: $data, rel: $data }"></span>
+			<span class="ui-icon toggleView ui-icon-radio-on" data-bind="click: mra.news.reloadSection, text: $data, attr: { title: $data, rel: $data }"></span>
         </script>
         
         <script id="subredditTemplate" type="text/html">
-            <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" data-bind="attr: { title: $data.name }">
+            <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" data-bind="attr: { title: name }">
                 <div class="portlet-header ui-widget-header ui-corner-all">
                     <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: remove"></span>
                     <span class="ui-icon ui-icon-minusthick ui-toggle-display" data-bind="click: mra.news.togglePortlet"></span>
-                    <a target="_blank" data-bind="text: $data.name, attr: { href: $data.url }"></a>
-					<span data-bind="template: { name: 'newsButton', foreach: settings.newsButtons }"></span>
+                    <a target="_blank" data-bind="text: name, attr: { href: url }"></a>
+					<span data-bind="template: { name: 'newsButton', foreach: NEWS_BUTTONS }"></span>
 				</div>
 				<div class="loader" data-bind="visible: settings.getFilteredData($data).length == 0"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
                 <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: settings.getFilteredData($data) }"></ul>

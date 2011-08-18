@@ -26,8 +26,7 @@ var settings = new (function(){
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"]),
         visited_news: ko.observableArray([]),
     };
- 
-	this.newsButtons = ['hot','new','controversial','top'];
+    
 	this.images = ko.observableArray();
 	this.activeImage = function(){
 		return this.images()[this.activeImageIndex()];
@@ -151,9 +150,13 @@ var settings = new (function(){
         // private variables
         var SubReddits = this;
         var portlets = ko.observableArray();
+        var NEWS_BUTTONS = ['hot','new','controversial','top'];
         
         // private class (individual portlets)
         var Portlet = function(name){
+            // public constants
+            this.NEWS_BUTTONS = NEWS_BUTTONS;
+            
             this.name = name;
             this.url = 'http://www.reddit.com/r/' + name;
             
