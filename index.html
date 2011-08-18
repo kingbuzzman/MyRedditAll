@@ -79,9 +79,9 @@
 				</div>
 				<div class="loader" data-bind="visible: settings.getFilteredData($data).length == 0"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
                 <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: settings.getFilteredData($data) }"></ul>
-				<div class="ui-icon-more" data-bind="event: { click: mra.news.loadMore, mouseover: function(evt){ $(evt.target).find('.text').stop(true).fadeIn(); }, mouseout: function(evt){ $(evt.target).find('.text').stop(true).fadeOut(); } }">
+				<div class="ui-icon-more" data-bind="click: mra.news.loadMore">
 					<span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
-					<span class="text" style="display:none; float:right;">Read More</span>
+					<span class="text" style="float:right;">Read More</span>
 				</div>
             </div>
         </script>
