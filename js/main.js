@@ -49,11 +49,21 @@ var SubReddits = function(){
         portlets.remove(portlet);
     }.bind(this);
     
+    
     /*
-     * Return all the subreddits in their order
+     * Return all the portlets (subreddits) in a Array of Strings
+     */
+    this.toStringArray = function(){
+        return portlets().map(function(item){ 
+            return item.name;
+        });
+    }.bind(this);
+    
+    /*
+     * Return all the portlets (subreddits) in their order
      */
     this.toString = function(){
-        return portlets().join(", ");
+        return this.toStringArray().join(", ");
     }.bind(this);
     
     // initializes all the portlets
@@ -291,19 +301,17 @@ var settings = {
         
         return this;
     },
-	
+    
     toString: function(){
-        var settings = {
+        return JSON.stringify({
             background: {
                 color: this.getBackgroundColor(),
                 image: this.getBackgroundImage()
             },
-            subreddits: this.activeSettings.subreddits(),
+            subreddits: this.activeSettings.subreddits.toStringArray(),
             imageBar: ko.toJSON(this.activeSettings.imageBar),
             visitedNews: ko.toJSON(this.activeSettings.visited_news)
-        };
-        
-        return JSON.stringify(settings);
+        });
     }
 }; 
 
