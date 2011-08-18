@@ -1,15 +1,12 @@
 if (typeof console == "undefined")
     console = { log: function(){} };
-	
+
 /*
- * Setting wrapper
- * - handles all the that needs to persist
+ * Houses all the portlets (subreddits)
  */
 var SubReddits = function(){
-    var portlets = ko.observableArray();
-    var SubReddit = function(name){
+    var Portlet = function(name){
         this.name = name;
-        // this.items = ko.observable(null);
         
         this.remove = function(){
             if (confirm("Are you sure you want to delete this section?")){
@@ -23,27 +20,21 @@ var SubReddits = function(){
         
         return this;
     };
+    var portlets = ko.observableArray();
     
     this.addPortlet = function(porlet){
-        portlets.push(new SubReddit(porlet));
+        portlets.push(new Portlet(porlet));
     }.bind(this);
     
     this.getPortlets = function(){
         return portlets;
     }.bind(this);
     
-    this.toArray = function(){
-        var subs = [];
-        
-        for(var index in portlets()){
-            subs.push(portlets()[index]);
-        }
-        
-        return subs;
-    }.bind(this);
-    
+    /*
+     * Return all the subreddits in their order
+     */
     this.toString = function(){
-        return this.toArray().join(", ");
+        return portlets().join(", ");
     }.bind(this);
     
     for(var index in arguments)
@@ -51,6 +42,11 @@ var SubReddits = function(){
 };
 
 myVar = true;
+
+/*
+ * Setting wrapper
+ * - handles all the that needs to persist
+ */
 var settings = {
     // default cookie settings
     // note: this gets overwritten when load() is ran with the current cookie settings
@@ -111,7 +107,7 @@ var settings = {
         return this.activeSettings['background']['image']();
     },
     getSubreddits: function(){
-        return [settings.activeSettings.subreddits.getPortlets()];
+        return settings.activeSettings.subreddits.getPortlets();
     },
     getImageBar: function(newo){
         if(newo == undefined){
@@ -295,10 +291,29 @@ settings.showMoreMode= ko.dependentObservable(function(){
 	return this.activeSettings.imageBar().length > 4;	
 },settings);
 
+//connect items with observableArrays
+ko.bindingHandlers.sortableList = {
+    init: function(element, valueAccessor) {
+        var list = valueAccessor();
+        $(element).sortable({
+            update: function(event, ui) {
+                //retrieve our actual data item
+                var item = ui.item.tmplItem().data;
+                //figure out its new position
+                var position = ko.utils.arrayIndexOf(ui.item.parent().children(), ui.item[0]);
+                //remove the item and add it back in the right spot
+                if (position >= 0) {
+                    list.remove(item);
+                    list.splice(position, 0, item);
+                }
+            }
+        });
+    }
+};
 
 $(document).ready(function(){
     settings.init();
-    $("#newsSection").sortable().disableSelection();
+    // $("#newsSection").sortable().disableSelection();
 });
 	
 var wallpaperIndex = 0;

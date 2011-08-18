@@ -134,7 +134,7 @@
                  <div class="ad-controls" style="display:none;"> </div>
             </h2>
 
-            <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: activeSettings.subreddits.getPortlets() }"></div>
+            <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: getSubreddits() }, sortableList: getSubreddits()"></div>
         </div>
 
 		<div id="metaRedditDialog" title="MetaReddit Picker" style="display:none;">
