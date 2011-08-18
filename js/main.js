@@ -7,16 +7,16 @@ myVar = true;
  * Setting wrapper
  * - handles all the that needs to persist
  */
-var settings = {
+var settings = new (function(){
     // default cookie settings
-    BACKGROUND_COLOR: null,
-    BACKGROUND_IMAGE: "image/spacestorm.jpg",
-    SUBREDDITS: ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"],
-    SUBREDDIT_ITEMS: 10,
-    IMAGE_BAR: ["Pics","WTF","NSFW","Funny"],
+    var BACKGROUND_COLOR = null;
+    var BACKGROUND_IMAGE = "image/spacestorm.jpg";
+    var SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
+    var SUBREDDIT_ITEMS = 10;
+    var IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
     
     // note: this gets overwritten when load() is ran with the current cookie settings
-    activeSettings: {
+    this.activeSettings = {
         background: {
             color: ko.observable(null),
             image: ko.observable("images/spacestorm.jpg")
@@ -25,31 +25,36 @@ var settings = {
         subreddits: [], //new SubReddits("Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"),
         imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"]),
         visited_news: ko.observableArray([]),
-    },
+    };
  
-	newsButtons: ['hot','new','controversial','top'],
-	images: ko.observableArray(),
-	activeImage: function(){
+	this.newsButtons = ['hot','new','controversial','top'];
+	this.images = ko.observableArray();
+	this.activeImage = function(){
 		return this.images()[this.activeImageIndex()];
-	},
-	activeImageIndex: ko.observable(0),	
-	news: ko.observable({}),
-	defaultVisibleItems: 10,
-	newsItemsVisible: ko.observable({}),
-	isNewsItemVisible: ko.observable(myVar),
-    metaReddits: ko.observableArray(),
+	};
+	this.activeImageIndex = ko.observable(0);
+	this.news = ko.observable({});
+	this.defaultVisibleItems = 10;
+	this.newsItemsVisible = ko.observable({});
+	this.isNewsItemVisible = ko.observable(myVar);
+    this.metaReddits = ko.observableArray();
      
-    init: function(){
+    this.init = function(){
         // initialize complex object
         this.preferences = new this.preferences(this);
-        this.subreddits = new this.subreddits(this.SUBREDDITS);
+        this.subreddits = new this.subreddits(SUBREDDITS);
         
         settings.preferences.load();
 		ko.applyBindings(this);
 		Cufon.refresh();
-    },
+    };
+    
+    // TODO: needs to be inside the image object once its created
+    this.showMoreMode = ko.dependentObservable(function(){
+        return this.activeSettings.imageBar().length > 4;
+    }, this);
 	
-	visitPage: function(evt){
+	this.visitPage = function(evt){
 		setTimeout(function(){
 			settings.activeSettings.visited_news.push($(evt.target).parent().data('tmplItem').data.id);
 			settings.preferences.save();
@@ -57,27 +62,27 @@ var settings = {
 		$(evt.target).parent().fadeOut(2500);
 		mra.imageBar.popupWindow(evt.target.href);
 		//return true;
-	}, 
-	getFilteredData: function(data){
+	};
+	this.getFilteredData = function(data){
 		//return settings.news()[data].slice(0,settings.newsItemsVisible()[data]());
 		if (data in settings.news())
 			return ko.utils.arrayFilter(settings.news()[data](), function(item) {
 				return item.hidden() ? null : item;
 			}).slice(0,settings.newsItemsVisible()[data]());
 		else return [];	
-	},
+	};
     
     // getters
-    getBackgroundColor: function(color){
+    this.getBackgroundColor = function(color){
         return this.activeSettings['background']['color']();
-    },
-    getBackgroundImage: function(){
+    };
+    this.getBackgroundImage = function(){
         return this.activeSettings['background']['image']();
-    },
-    getSubreddits: function(){
+    };
+    this.getSubreddits = function(){
         return settings.subreddits;
-    },
-    getImageBar: function(newo){
+    };
+    this.getImageBar = function(newo){
         if(newo == undefined){
             // TODO: delete bellow (ASAP)
             var imageBar = [];
@@ -89,58 +94,58 @@ var settings = {
         }
         
         return this.activeSettings['imageBar']();
-    },
+    };
     
     // adders
-    addSubreddit: function(column, subreddit){
+    this.addSubreddit = function(column, subreddit){
 		this.newsItemsVisible()[subreddit] = ko.observable(this.defaultVisibleItems);
 		this.news()[subreddit] = ko.observableArray();
         this.activeSettings['subreddits']()[column].push(subreddit);
-    },
-    addImageBar: function(subreddit){
+    };
+    this.addImageBar = function(subreddit){
         this.activeSettings['imageBar'].push(subreddit);
-    },
+    };
     
     // removers
-    removeSubreddit: function(column, subreddit){
+    this.removeSubreddit = function(column, subreddit){
         this.activeSettings['subreddits']()[column].remove(subreddit);
-    },
+    };
 	
-	removeImageBar: function(subreddit){
+	this.removeImageBar = function(subreddit){
 		this.activeSettings['imageBar'].remove(subreddit);	 
-	},
+	};
     
     // setters
-    setBackgroundColor: function(color){
+    this.setBackgroundColor = function(color){
         this.activeSettings['background']['color'](color);
         this.activeSettings['background']['image'](null);
     },
-    setBackgroundImage: function(image){
+    this.setBackgroundImage = function(image){
         this.activeSettings['background']['color'](null);
         this.activeSettings['background']['image'](image);
-    },
+    };
 	
     // shortcuts
-    saveBackgroundColor: function(color){
+    this.saveBackgroundColor = function(color){
         this.setBackgroundColor(color);
         this.preferences.save();
-    },
-    saveBackgroundImage: function(image){
+    };
+    this.saveBackgroundImage = function(image){
         this.setBackgroundImage(image);
         this.preferences.save();
-    },
+    };
     
 	
 	//sorters
-	sortImagesByDate: function(desc){
+	this.sortImagesByDate = function(desc){
 		settings.images(settings.images().sort(function(a,b){
 			return (desc || true) ? b.created - a.created : b.created - a.created;
 		}));
-	},
+	};
 	
 	
 	
-	deleteSubReddit: function(SubRedditTitle){
+	this.deleteSubReddit = function(SubRedditTitle){
 		for(i in settings.activeSettings.subreddits()) {
 			for(b in settings.activeSettings.subreddits()[i]()){ 
 				if(settings.activeSettings.subreddits()[i]()[b].toUpperCase() == SubRedditTitle.toUpperCase()){
@@ -151,13 +156,13 @@ var settings = {
 		delete settings.news()[SubRedditTitle];
 		delete settings.newsItemsVisible()[SubRedditTitle];
 		this.preferences.save();
-	},
+	};
     
     /*
      * Houses all the portlets (subreddits)
      * - needs to be initialized
      */
-    subreddits: function(){
+    this.subreddits = function(){
         // private variables
         var SubReddits = this;
         var portlets = ko.observableArray();
@@ -184,6 +189,7 @@ var settings = {
          * @portlet string name of the subreddit
          */
         this.addPortlet = function(portlet){
+            console.log(portlet);
             if(portlet.push){
                 for(var index in portlet)
                     this.addPortlet(portlet[index]);
@@ -235,13 +241,13 @@ var settings = {
             this.addPortlet(arguments[index]);
         
         return this;
-    },
+    };
     
     /*
      * Houses all the user preference code
      * - needs to be initialized
      */
-    preferences: function(settings){
+    this.preferences = function(settings){
         var currentTime = (new Date()).getTime();
         
         var COOKIE_NAME = "settings";
@@ -317,9 +323,9 @@ var settings = {
         }.bind(settings);
         
         return this;
-    },
+    };
     
-    toString: function(){
+    this.toString = function(){
         return JSON.stringify({
             background: {
                 color: this.getBackgroundColor(),
@@ -329,12 +335,10 @@ var settings = {
             imageBar: ko.toJSON(this.activeSettings.imageBar),
             visitedNews: ko.toJSON(this.activeSettings.visited_news)
         });
-    }
-}; 
-
-settings.showMoreMode= ko.dependentObservable(function(){
-	return this.activeSettings.imageBar().length > 4;	
-},settings);
+    };
+    
+    return this
+})();
 
 //connect items with observableArrays
 ko.bindingHandlers.sortableList = {
