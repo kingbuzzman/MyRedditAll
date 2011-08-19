@@ -23,10 +23,10 @@ var settings = new (function(){
         },
         // TODO: Make sure page continues to load if an invalid one is entered
         subreddits: [], //new SubReddits("Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"),
-        imageBar: ko.observableArray(["Pics","WTF","NSFW","Funny"]),
         visited_news: ko.observableArray([]),
     };
     
+	this.imageBar = ko.observable({}),
 	this.images = ko.observableArray();
 	this.activeImage = function(){
 		return this.images()[this.activeImageIndex()];
@@ -50,7 +50,7 @@ var settings = new (function(){
     
     // TODO: needs to be inside the image object once its created
     this.showMoreMode = ko.dependentObservable(function(){
-        return this.activeSettings.imageBar().length > 4;
+        return this.imageBar().length > 4;
     }, this);
 	
 	this.visitPage = function(evt){
@@ -63,7 +63,6 @@ var settings = new (function(){
 		//return true;
 	};
 	this.getFilteredData = function(data){
-		//return settings.news()[data].slice(0,settings.newsItemsVisible()[data]());
 		if (data in settings.news())
 			return ko.utils.arrayFilter(settings.news()[data](), function(item) {
 				return item.hidden() ? null : item;
@@ -82,17 +81,9 @@ var settings = new (function(){
         return settings.subreddits;
     };
     this.getImageBar = function(newo){
-        if(newo == undefined){
-            // TODO: delete bellow (ASAP)
-            var imageBar = [];
-            $.each(this.activeSettings['imageBar'](), function(){
-                imageBar.push({"NAME": this, "SECTION": this});
-            });
-            return imageBar;
-            // TODO: delete above (ASAP)
-        }
-        
-        return this.activeSettings['imageBar']();
+        return $.map(this.imageBar(), function(i,o){
+		    return ({"NAME": o, "SECTION": o});
+		});;
     };
     
     // adders
@@ -102,7 +93,7 @@ var settings = new (function(){
         this.activeSettings['subreddits']()[column].push(subreddit);
     };
     this.addImageBar = function(subreddit){
-        this.activeSettings['imageBar'].push(subreddit);
+        this.imageBar()[subreddit] = ko.observableArray();
     };
     
     // removers
@@ -111,7 +102,7 @@ var settings = new (function(){
     };
 	
 	this.removeImageBar = function(subreddit){
-		this.activeSettings['imageBar'].remove(subreddit);	 
+		this.imageBar.remove({ "name":subreddit });	 
 	};
     
     // setters
@@ -287,7 +278,9 @@ var settings = new (function(){
                 for(var i in settings['subreddits'])
                     this.getSubreddits().addPortlet(settings['subreddits'][i]);
                 
-                this.activeSettings['imageBar'](settings['imageBar']);
+				$.each(settings['imageBar'],function(i,o){
+					window.settings.addImageBar(o);
+				});
             } else {
                 // there was no cookie set, save it.
                 this.preferences.save();
@@ -321,13 +314,13 @@ var settings = new (function(){
     };
     
     this.toString = function(){
-        return JSON.stringify({
+        return ko.toJSON({
             background: {
                 color: this.getBackgroundColor(),
                 image: this.getBackgroundImage()
             },
             subreddits: this.getSubreddits().toStringArray(),
-            imageBar: ko.toJSON(this.activeSettings.imageBar),
+            imageBar: ko.toJSON(this.imageBar),
             visitedNews: ko.toJSON(this.activeSettings.visited_news)
         });
     };
@@ -446,7 +439,7 @@ function copyToShare(el){
 
 var mra = {
     init: function(){
-		
+		currentImageBar = settings.getImageBar();
 		//all hover and click logic for buttons
 		$(".fg-button:not(.ui-state-disabled)")
 		.hover(
