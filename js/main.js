@@ -43,7 +43,7 @@ var settings = new (function(){
     this.init = function(){
         // initialize complex object
         this.preferences = new this.preferences(this);
-        this.subreddits = new this.subreddits(SUBREDDITS);
+        this.subreddits = new this.subreddits();
         
         settings.preferences.load();
 		ko.applyBindings(this);
@@ -248,6 +248,13 @@ var settings = new (function(){
             };
             
             /*
+             * Triggers the display of the load bar to the user
+             */
+            this.getShowLoadingBar = function(){
+                return !(newsItems().length > 0);
+            };
+            
+            /*
              * Populates the portlet with 10 more items
              */
             this.populateNext = function(){
@@ -270,6 +277,21 @@ var settings = new (function(){
             this.toString = function(){
                 return this.name;
             }.bind(this);
+            
+            // load the complete feed
+            loader.call(this.url, function(data){
+                for(var index in data){
+                    extraNewsItems.push({
+                        'text': data[index].title.substring(0, 100),
+                        'score': parseInt((data[index].ups/ (data[index].downs + data[index].ups)) * 100) + "%",
+                        'scoreTitle': data[index].score + "  of People Like It",
+                        'permalink': BASE_URL + data[index].permalink,
+                        'hidden': false
+                    });
+                }
+                
+                this.populateNext();
+            }.bind(this));
             
             return this;
         };
@@ -378,20 +400,23 @@ var settings = new (function(){
             
             // load the cookie if its available
             if(cookie){
-                newSettings = $.parseJSON(cookie);
+                settings = $.parseJSON(cookie);
                 
-                this.activeSettings['background']['color'](newSettings['background']['color']);
-                this.activeSettings['background']['image'](newSettings['background']['image']);
+                this.activeSettings['background']['color'](settings['background']['color']);
+                this.activeSettings['background']['image'](settings['background']['image']);
                 // this.activeSettings['visited_news'](settings['visited_news'] || []);
                 
                 this.getSubreddits().removeAllPortlets();
-                for(var i in newSettings['subreddits'])
-                    this.getSubreddits().addPortlet(newSettings['subreddits'][i]);
+                for(var i in settings['subreddits'])
+                    this.getSubreddits().addPortlet(settings['subreddits'][i]);
                 
-				$.each($.parseJSON(newSettings['imageBar']),function(i,o){
-					window.settings.addImageBar(i);
-				});
+				$.each($.parseJSON(settings['imageBar']),function(i,o){
+					this.addImageBar(i);
+				}.bind(this));
             } else {
+                // load default subreddits
+                this.getSubreddits().addPortlet(SUBREDDITS);
+                
                 // there was no cookie set, save it.
                 this.preferences.save();
             }
