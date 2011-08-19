@@ -45,7 +45,7 @@ var settings = new (function(){
         this.preferences = new this.preferences(this);
         this.subreddits = new this.subreddits();
         
-        settings.preferences.load();
+        this.preferences.load();
 		ko.applyBindings(this);
 		Cufon.refresh();
     };
@@ -71,7 +71,7 @@ var settings = new (function(){
         return this.activeSettings['background']['image']();
     };
     this.getSubreddits = function(){
-        return settings.subreddits;
+        return this.subreddits;
     };
     this.getImageBar = function(newo){
         return $.map(this.imageBar(), function(i,o){
@@ -451,8 +451,9 @@ var settings = new (function(){
                 // this.activeSettings['visited_news'](settings['visited_news'] || []);
                 
                 this.getSubreddits().removeAllPortlets();
-                for(var i in settings['subreddits'])
-                    this.getSubreddits().addPortlet(settings['subreddits'][i]);
+                settings['subreddits'].map(function(item){
+                    this.getSubreddits().addPortlet(item);
+                }.bind(this));
                 
 				$.each($.parseJSON(settings['imageBar']),function(i,o){
 					this.addImageBar(i);
