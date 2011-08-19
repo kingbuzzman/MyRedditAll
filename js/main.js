@@ -41,7 +41,7 @@ var settings = new (function(){
     this.init = function(){
         // initialize complex object
         this.preferences = new this.preferences(this);
-        this.subreddits = new this.subreddits(SUBREDDITS);
+        this.subreddits = new this.subreddits();
         
         settings.preferences.load();
 		ko.applyBindings(this);
@@ -282,6 +282,9 @@ var settings = new (function(){
 					window.settings.addImageBar(o);
 				});
             } else {
+                // load default subreddits
+                this.getSubreddits().addPortlet(SUBREDDITS);
+                
                 // there was no cookie set, save it.
                 this.preferences.save();
             }
