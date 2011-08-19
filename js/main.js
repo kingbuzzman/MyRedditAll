@@ -15,6 +15,8 @@ var settings = new (function(){
     var SUBREDDIT_ITEMS = 10;
     var IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
     
+    var BASE_URL = "http://www.reddit.com";
+    
     // note: this gets overwritten when load() is ran with the current cookie settings
     this.activeSettings = {
         background: {
@@ -134,6 +136,92 @@ var settings = new (function(){
 	};
     
     /*
+     * Request manager
+     * - keeps track of all outgoing remote calls
+     */
+    var loader = new (function(){
+        var MAX_CONNECTIONS = 10;
+        var activeConnections = [];
+        var queued = [];
+        
+        // TODO: redo, map-filter?
+        var cleanData = function(data){
+            var arrData = [];
+            data.data.children.sort(function(a,b){
+                return b.data.created - a.data.created;
+            }); 
+            for (i in data.data.children){
+                arrData.push(data.data.children[i].data);
+            }
+            
+            return arrData;
+        };
+        
+        /*
+         * Calls the next request
+         */
+        var nextCall = function(){
+            // if active connections is above the maximun threshold skip
+            // if the queue is empty skip
+            if(activeConnections.length > MAX_CONNECTIONS || queued.length == 0)
+                return;
+            
+            // get the first request from the queue and make the request again
+            var request = queued.shift();
+            this.call(request['url'], request['callback']);
+        };
+        
+        /*
+         * Makes external request
+         *
+         * @url string ie. http://www.reddit.com/r/miami
+         * @callback function calls back with one parameter, the data
+         * returns connection -- don't rely on it too much since the queue can fill up and return no connection, or the connection finished
+         */
+        this.call = function(url, callback){
+            if(activeConnections.length > MAX_CONNECTIONS){
+                queued.push({ "url": url, "callback": callback });
+                return;
+            }
+            
+            // make request
+            var connection = $.ajax({
+                type: 'GET',
+                url: url + "/.json?&limit=100",
+                dataType: 'jsonp',
+                jsonp: 'jsonp',
+                timeout: 20000, // 2 seconds timeout
+                success: function(data){
+                    var redditData = cleanData(data);
+                    if (redditData.length > 0){
+                        callback(redditData);
+                    }
+                },
+                error: function(){
+                    // stick it on the queue
+                    queued.push({ "url": url, "callback": callback });
+                },
+                completed: function(){
+                    // remove connection from the active connection list
+                    activeConnections.filter(function(item){
+                        return item !== connection;
+                    });
+                    
+                    nextCall();
+                }
+            });
+            
+            // add connection to the current connection pool
+            activeConnections.push(connection);
+            
+            // return the connection
+            return connection;
+        };
+        
+        return this;
+    })();
+    
+    /*
      * Houses all the portlets (subreddits)
      * - needs to be initialized
      */
@@ -145,12 +233,34 @@ var settings = new (function(){
         
         // private class (individual portlets)
         var Portlet = function(name){
+            var extraNewsItems = [];
+            var newsItems = ko.observableArray();
+            
             // public constants
             this.NEWS_BUTTONS = NEWS_BUTTONS;
             
+            // attributes
             this.name = name;
-            this.url = 'http://www.reddit.com/r/' + name;
+            this.url = BASE_URL + "/r/" + decodeURIComponent(name);
             
+            this.getNewsItems = function(){
+                return newsItems;
+            };
+            
+            /*
+             * Populates the portlet with 10 more items
+             */
+            this.populateNext = function(){
+                var itemsLeft = extraNewsItems.length - 10;
+                var limit = ((itemsLeft >= 0)? 10: itemsLeft);
+                
+                for(var index = 0; index < limit; index++)
+                    newsItems.push(extraNewsItems.pop())
+            }.bind(this);
+            
+            /*
+             * Remove portlet
+             */
             this.remove = function(){
                 if (confirm("Are you sure you want to delete this section?")){
                     SubReddits.removePortlet(this);
@@ -541,7 +651,7 @@ var mra = {
 				}
             }
         );
-    },        
+    },
     cleanData: function(data){
         var arrData = [];
         data.data.children.sort(function(a,b){
@@ -659,10 +769,10 @@ var mra = {
         },            
         loadNextFeed: function(){  
             var curTitle = mra.news.portlets[mra.news.totalIndex].title;
-            mra.fetchContentFromRemote(function(arrItems){
-                mra.news.addItemsToView(arrItems,curTitle);
-                mra.news.addCount();
-            }, curTitle, mra.news.totalItems);
+            // mra.fetchContentFromRemote(function(arrItems){
+            //     mra.news.addItemsToView(arrItems,curTitle);
+            //     mra.news.addCount();
+            // }, curTitle, mra.news.totalItems);
         },
         addItemsToView: function(arrItems, sectionName){
             if (arrItems.length == 0){

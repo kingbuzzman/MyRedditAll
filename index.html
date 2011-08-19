@@ -56,8 +56,9 @@
         </script>
 
 		<!--, beforeRemove: function(elem) { setTimeout(function(){ $(elem).fadeOut(), 5000}) } -->	
+		<!-- visible: !$data.hidden(), -->
 		<script type="text/html" id="newsItemTemplate">
-			<li data-bind="visible: !$data.hidden(), attr: { title: $data.title }"> 
+			<li data-bind="attr: { title: $data.title }"> 
 				<a target="_blank" class="link" data-bind="click: settings.visitPage, attr: { href: $data.url }, text: $data.text"></a>
 				<a target="_blank" class="comment" data-bind="attr: { href: $data.permalink, title: $data.score_title }, text: $data.score"></a>
 			</li>
@@ -78,8 +79,8 @@
 					<span data-bind="template: { name: 'newsButton', foreach: NEWS_BUTTONS }"></span>
 				</div>
 				<div class="loader" data-bind="visible: settings.getFilteredData($data).length == 0"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
-                <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: settings.getFilteredData($data) }"></ul>
-				<div class="ui-icon-more" data-bind="click: mra.news.loadMore">
+                <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }"></ul>
+				<div class="ui-icon-more" data-bind="click: populateNext">
 					<span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
 					<span class="text" style="float:right;">Read More</span>
 				</div>
