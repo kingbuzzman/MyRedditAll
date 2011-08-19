@@ -54,16 +54,7 @@ var settings = new (function(){
     this.showMoreMode = ko.dependentObservable(function(){
         return this.imageBar().length > 4;
     }, this);
-	
-	this.visitPage = function(evt){
-		setTimeout(function(){
-			settings.activeSettings.visited_news.push($(evt.target).parent().data('tmplItem').data.id);
-			settings.preferences.save();
-		},5000);
-		$(evt.target).parent().fadeOut(2500);
-		mra.imageBar.popupWindow(evt.target.href);
-		//return true;
-	};
+    
 	this.getFilteredData = function(data){
 		if (data in settings.news())
 			return ko.utils.arrayFilter(settings.news()[data](), function(item) {
@@ -138,6 +129,7 @@ var settings = new (function(){
     /*
      * Request manager
      * - keeps track of all outgoing remote calls
+     * TODO: if $.ajax returns more than X amount of errors stop making calls
      */
     var loader = new (function(){
         var MAX_CONNECTIONS = 10;
@@ -169,7 +161,7 @@ var settings = new (function(){
             // get the first request from the queue and make the request again
             var request = queued.shift();
             this.call(request['url'], request['callback']);
-        };
+        }.bind(this);
         
         /*
          * Makes external request
@@ -201,12 +193,13 @@ var settings = new (function(){
                     // stick it on the queue
                     queued.push({ "url": url, "callback": callback });
                 },
-                completed: function(){
+                complete: function(){
                     // remove connection from the active connection list
-                    activeConnections.filter(function(item){
+                    activeConnections = activeConnections.filter(function(item){
                         return item !== connection;
                     });
                     
+                    // see if there is anything waiting to be called
                     nextCall();
                 }
             });
@@ -235,9 +228,73 @@ var settings = new (function(){
         var Portlet = function(name){
             var extraNewsItems = [];
             var newsItems = ko.observableArray();
+            var portlet = this;
             
-            // public constants
-            this.NEWS_BUTTONS = NEWS_BUTTONS;
+            var load = function(section){
+                var url = this.url + ((section == undefined)? "": "/" + section);
+                
+                extraNewsItems = [];
+                newsItems.removeAll();
+                
+                // load the complete feed
+                loader.call(url, function(data){
+                    for(var index in data){
+                        extraNewsItems.push({
+                            'title': data[index].title,
+                            'text': data[index].title.substring(0, 100),
+                            'url': data[index].url,
+                            'score': parseInt((data[index].ups/ (data[index].downs + data[index].ups)) * 100) + "%",
+                            'scoreTitle': data[index].score + "  of People Like It",
+                            'permalink': BASE_URL + data[index].permalink
+                        });
+                    }
+                    
+                    this.populateNext();
+                }.bind(this));
+            }.bind(this);
+            
+            var NewsItem = function(item){
+                this.title = item['title'];
+                this.text = item['text'];
+                this.url = item['url'];
+                this.score = item['score'];
+                this.scoreTitle = item['scoreTitle'];
+                this.permalink = item['permalink'];
+                this.hidden = false;
+                
+                this.visitPage = function(evt){
+                    // TODO: figure out what the hell this does!
+                    // setTimeout(function(){
+                    //     settings.activeSettings.visited_news.push($(evt.target).parent().data('tmplItem').data.id);
+                    //     settings.preferences.save();
+                    // },5000);
+                    // $(evt.target).parent().fadeOut(2500);
+                    // mra.imageBar.popupWindow(evt.target.href);
+                    return true;
+                };
+                
+                return this;
+            };
+            
+            this.buttons = new (function(){
+                var activeButton = ko.observable('top');
+                
+                // public constants
+                this.NEWS_BUTTONS = NEWS_BUTTONS;
+                
+                this.getActiveButton = function(){
+                    return activeButton();
+                };
+                
+                this.reloadSection = function(i,e,o){
+                    var button = $(i.target).attr("rel");
+                    
+                    activeButton(button);
+                    load(button);
+                };
+                
+                return this;
+            })();
             
             // attributes
             this.name = name;
@@ -262,8 +319,8 @@ var settings = new (function(){
                 var limit = ((itemsLeft >= 0)? 10: itemsLeft);
                 
                 for(var index = 0; index < limit; index++)
-                    newsItems.push(extraNewsItems.pop())
-            }.bind(this);
+                    newsItems.push(new NewsItem(extraNewsItems.pop()));
+            };
             
             /*
              * Remove portlet
@@ -278,20 +335,7 @@ var settings = new (function(){
                 return this.name;
             }.bind(this);
             
-            // load the complete feed
-            loader.call(this.url, function(data){
-                for(var index in data){
-                    extraNewsItems.push({
-                        'text': data[index].title.substring(0, 100),
-                        'score': parseInt((data[index].ups/ (data[index].downs + data[index].ups)) * 100) + "%",
-                        'scoreTitle': data[index].score + "  of People Like It",
-                        'permalink': BASE_URL + data[index].permalink,
-                        'hidden': false
-                    });
-                }
-                
-                this.populateNext();
-            }.bind(this));
+            load();
             
             return this;
         };
