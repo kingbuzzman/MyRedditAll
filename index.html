@@ -35,17 +35,17 @@
         <script src="js/new_contextMenu.js" type="text/javascript" charset="ISO-8859-1"></script>
         <script src="js/font_ParmaPetit.js" type="text/javascript" charset="ISO-8859-1"></script>
         <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
-        
+        <!--{{if ko.utils.arrayIndexOf(settings.imageBar,index) < 4 }}
+					 {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, imageSection) == 0}}ui-corner-left ui-state-active{{/if}}
+				{{/if}}-->
         <script id="imageButtonTemplate" type="text/html">
-			{{each(index, imageSection) activeSettings.imageBar}}
-			   {{if index < 4 }}
-					<button class="changePic fg-button {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, imageSection) == 0}}ui-corner-left ui-state-active{{/if}}" data-bind="click: mra.imageBar.changePic" id="${ imageSection }">${ imageSection }</button>
-				{{/if}}
+			{{each(index, content) imageBar}}
+			   <button class="changePic fg-button" data-bind="click: mra.imageBar.changePic" id="${ index }">${ index }</button>
 			{{/each}}
         </script>
         
         <script id="moreImageButtonTemplate" type="text/html">
-			{{each(index, imageSection) activeSettings.imageBar}}
+			{{each(index, imageSection) imageBar}}
 			   {{if index > 3 }}
 					<li class="ui-state-default">
 						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ imageSection }" data-bind="click: mra.imageBar.removeImageBar"> 

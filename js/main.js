@@ -43,7 +43,7 @@ var settings = new (function(){
     this.init = function(){
         // initialize complex object
         this.preferences = new this.preferences(this);
-        this.subreddits = new this.subreddits();
+        this.subreddits = new this.subreddits(SUBREDDITS);
         
         settings.preferences.load();
 		ko.applyBindings(this);
@@ -104,7 +104,7 @@ var settings = new (function(){
     };
 	
 	this.removeImageBar = function(subreddit){
-		this.imageBar.remove({ "name":subreddit });	 
+		this.imageBar.remove(subreddit);	 
 	};
     
     // setters
@@ -378,23 +378,20 @@ var settings = new (function(){
             
             // load the cookie if its available
             if(cookie){
-                settings = JSON.parse(cookie);
+                newSettings = $.parseJSON(cookie);
                 
-                this.activeSettings['background']['color'](settings['background']['color']);
-                this.activeSettings['background']['image'](settings['background']['image']);
+                this.activeSettings['background']['color'](newSettings['background']['color']);
+                this.activeSettings['background']['image'](newSettings['background']['image']);
                 // this.activeSettings['visited_news'](settings['visited_news'] || []);
                 
                 this.getSubreddits().removeAllPortlets();
-                for(var i in settings['subreddits'])
-                    this.getSubreddits().addPortlet(settings['subreddits'][i]);
+                for(var i in newSettings['subreddits'])
+                    this.getSubreddits().addPortlet(newSettings['subreddits'][i]);
                 
-				$.each(settings['imageBar'],function(i,o){
-					window.settings.addImageBar(o);
+				$.each($.parseJSON(newSettings['imageBar']),function(i,o){
+					window.settings.addImageBar(i);
 				});
             } else {
-                // load default subreddits
-                this.getSubreddits().addPortlet(SUBREDDITS);
-                
                 // there was no cookie set, save it.
                 this.preferences.save();
             }
