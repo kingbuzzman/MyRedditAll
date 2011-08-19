@@ -1,5 +1,7 @@
 .search_field {
 	background: #FFF url(../images/search.gif) no-repeat right center;
+	padding:5px;
+	vertical-align:top;
 }
 
 .search_field_spin {

@@ -5,7 +5,7 @@ if (typeof console == "undefined")
  * Setting wrapper
  * - handles all the that needs to persist
  */
-myVar = true;
+
 var settings = {
     // default cookie settings
     // note: this gets overwritten when load() is ran with the current cookie settings
@@ -32,8 +32,9 @@ var settings = {
 	activeImageIndex: ko.observable(0),	
 	news: ko.observable({}),
 	defaultVisibleItems: 10,
+	loadedImages: ko.observable(15),
 	newsItemsVisible: ko.observable({}),
-	isNewsItemVisible: ko.observable(myVar),
+	isNewsItemVisible: ko.observable(true),
     metaReddits: ko.observableArray(),
      
     init: function(){
@@ -245,6 +246,10 @@ settings.showMoreMode= ko.dependentObservable(function(){
 	return this.activeSettings.imageBar().length > 4;	
 },settings);
 
+settings.imageLoader = ko.dependentObservable(function(){
+	return this.images.slice(0,this.loadedImages());
+},settings);
+
 
 $(document).ready(settings.init);
 	
@@ -397,11 +402,14 @@ var mra = {
         script.setAttribute("src",url);
         document.body.appendChild(script);
     },
-    fetchContentFromRemote: function(callback, subReddit, limit, start, useBackup){
+    fetchContentFromRemote: function(callback, subReddit, limit, start, useBackup, searchKeyword){
+		if (typeof searchKeyword == "undefined") searchKeyword = "";
         if (typeof start == "undefined") start = 0;
-        /*if (typeof useBackup == "undefined")
+        if (searchKeyword.length > 3)
+			reqURL = weburl + "fetchContent.cfm?r=" + decodeURIComponent(subReddit) + "&limit=" + parseInt(limit + start) + "&searchKeyword=" + searchKeyword;
+		else if (typeof useBackup == "undefined")
             reqURL = weburl + "fetchContent.cfm?r=" + decodeURIComponent(subReddit) + "&limit=" + parseInt(limit + start);
-        else*/     
+        else
             reqURL = baseurl + "/r/" + decodeURIComponent(subReddit) + "/.json?&limit=" + parseInt(limit + start);    
 		
         $.ajax({
@@ -516,8 +524,9 @@ var mra = {
 			 }    
 		},
 		deleteReddit: function(obj){
-			 $(obj).parent().hide(1000, function(){
-				 $(obj).parent().remove();
+			console.log(obj);
+			 $(obj).hide(1000, function(){
+				 $(obj).remove();
 			 }); 
 			 settings.deleteSubReddit($(obj).attr('title'));
 			 settings.preferences.save();
@@ -575,6 +584,7 @@ var mra = {
 					obj.score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100) + "%";
 					obj.score_title = obj.score + "  of People Like It";
 					obj.permalink = redditURL + obj.permalink;
+					obj.url = redditURL + "/tb/" + obj.id;
 					obj.hidden = ko.dependentObservable(function() {
 						return settings.activeSettings.visited_news.indexOf(obj.id) != -1 && settings.isNewsItemVisible() == true;
 					}, settings);
@@ -586,8 +596,7 @@ var mra = {
     }, 
     imageBar: { 
         init: function(){ 
-            mra.imageBar.lbHasInit = 0;
-            mra.imageBar.currentImageBar = "Pics"; 
+            mra.imageBar.currentImageBar = settings.activeSettings.imageBar()[0];
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
             }, mra.imageBar.currentImageBar, 100); 
@@ -601,6 +610,20 @@ var mra = {
     
             mra.imageBar.loadMeta('Favorites'); 
         },
+		searchByKeyword: function(obj){	
+			setTimeout(function(){
+				if (obj.value.length > 3 && obj.value == $("#searchField input").val() && mra.imageBar.currentKeyword != obj.value)	
+					mra.imageBar.currentKeyword = obj.value;	
+					mra.fetchContentFromRemote(function(arrItems){
+						mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
+					}, mra.imageBar.currentImageBar, 100, 0, 0, obj.value);
+			},1000);
+		},
+		toggleSearchView: function(){
+			$(".changePic:not(#searchButton)").toggle()
+			$("#showMore").hide($("#searchButton").is(":visible"));
+			$("#searchField").toggle()
+		},
         loadMeta: function(metaSection){
             if (metaSection == 'Favorites'){
                 settings.metaReddits(currentImageBar);
@@ -785,11 +808,8 @@ var mra = {
             });
         },
         loadMoreImages: function(){
-            if (arrPics.length > 0){
-                $.each(arrPics.splice(0,10),function(i,o){
-					if ($("#" + o.id).length == 0)
-                    settings.images.unshift(o)	
-                });
+            if (settings.loadedImages() < 100){
+				settings.loadedImages(settings.loadedImages()+10);
 				
                 isLoading = false;
                 setTimeout(function(){
@@ -800,6 +820,9 @@ var mra = {
                     isLoading = true;
                 },1000);                    
             } 
+			else {
+				 clearTimeout(window.imageLoader)
+			}
         },
         initCopyPaste: function(){
             $("#cboxContent").hover(
@@ -811,8 +834,6 @@ var mra = {
                 }
             );
             $("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
-            mra.imageBar.lbHasInit = 1;    
-    
             ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
             clip = new ZeroClipboard.Client();
             clip.setHandCursor( true );
@@ -893,7 +914,7 @@ var mra = {
             mra.imageBar.applyLightBox();
             mra.imageBar.applyContextMenu();
 			mra.imageBar.initCopyPaste();
-            //adGallery.thumbs_wrapper.scrollLeft(curPos);
+            setTimeout(function(){ window.imageLoader = setInterval(mra.imageBar.loadMoreImages,1000 * 10);  },1000 * 10);
 
         }
     }
