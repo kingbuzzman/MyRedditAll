@@ -13,7 +13,8 @@ var settings = new (function(){
     var BACKGROUND_IMAGE = "image/spacestorm.jpg";
     var SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
     var SUBREDDIT_ITEMS = 10;
-    var IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
+	//cannot figure out how to leave this as a var
+    this.IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
     
     var BASE_URL = "http://www.reddit.com";
     
@@ -34,8 +35,6 @@ var settings = new (function(){
 		return this.images()[this.activeImageIndex()];
 	};
 	this.activeImageIndex = ko.observable(0);
-	this.news = ko.observable({});
-	this.defaultVisibleItems = 10;
 	this.newsItemsVisible = ko.observable({});
 	this.isNewsItemVisible = ko.observable(myVar);
     this.metaReddits = ko.observableArray();
@@ -55,14 +54,6 @@ var settings = new (function(){
         return this.imageBar().length > 4;
     }, this);
     
-	this.getFilteredData = function(data){
-		if (data in settings.news())
-			return ko.utils.arrayFilter(settings.news()[data](), function(item) {
-				return item.hidden() ? null : item;
-			}).slice(0,settings.newsItemsVisible()[data]());
-		else return [];	
-	};
-    
     // getters
     this.getBackgroundColor = function(color){
         return this.activeSettings['background']['color']();
@@ -81,8 +72,6 @@ var settings = new (function(){
     
     // adders
     this.addSubreddit = function(column, subreddit){
-		this.newsItemsVisible()[subreddit] = ko.observable(this.defaultVisibleItems);
-		this.news()[subreddit] = ko.observableArray();
         this.activeSettings['subreddits']()[column].push(subreddit);
     };
     this.addImageBar = function(subreddit){
@@ -231,7 +220,8 @@ var settings = new (function(){
             var minimized = ko.observable(false);
             
             var load = function(section){
-                var url = this.url + ((section == undefined)? "": "/" + section);
+				// undefined is not inherent like null, it has to be checked with typeof
+                var url = this.url + ((typeof section == "undefined")? "" : "/" + section);
                 
                 newsItems.removeAll();
                 
@@ -467,32 +457,29 @@ var settings = new (function(){
             // load the cookie if its available
             if(cookie){
                 settings = $.parseJSON(cookie);
-                
                 this.activeSettings['background']['color'](settings['background']['color']);
                 this.activeSettings['background']['image'](settings['background']['image']);
-                // this.activeSettings['visited_news'](settings['visited_news'] || []);
                 
                 this.getSubreddits().removeAllPortlets();
                 settings['subreddits'].map(function(item){
                     this.getSubreddits().addPortlet(item);
                 }.bind(this));
-                
-				$.each($.parseJSON(settings['imageBar']),function(i,o){
-					this.addImageBar(i);
+				
+                //Populate the cookie variable into the settings.imageBar variable
+				$.each(settings['imageBar'],function(i,o){
+					this.addImageBar(o);
 				}.bind(this));
             } else {
                 // load default subreddits
                 this.getSubreddits().addPortlet(SUBREDDITS);
                 
+				/*cannot figure out how to get at the IMAGE_BAR variable without setting it to this.*/
+				$.each(this.IMAGE_BAR,function(i,o){
+					this.addImageBar(o);
+				}.bind(this));
+				
                 // there was no cookie set, save it.
                 this.preferences.save();
-            }
-            
-            // TODO: delete this ASAP
-            var portlets = this.getSubreddits().toStringArray();
-            for(var index in portlets){
-                this.news()[portlets[index]] = ko.observableArray();
-                this.newsItemsVisible()[portlets[index]] = ko.observable(this.defaultVisibleItems);
             }
             
         }.bind(settings);
@@ -522,7 +509,7 @@ var settings = new (function(){
                 image: this.getBackgroundImage()
             },
             subreddits: this.getSubreddits().toStringArray(),
-            imageBar: ko.toJSON(this.imageBar),
+            imageBar: $.map(ko.toJS(settings.imageBar()), function(o,i){ return i; }),
             visitedNews: ko.toJSON(this.activeSettings.visited_news)
         });
     };
@@ -760,7 +747,6 @@ var mra = {
         addTime: function(){ 
             mra.timer.countMins = mra.timer.countMins + 1;
             if (mra.timer.countMins % 15 == 0){ 
-				mra.news.loadNextFeed(); 
 				mra.fetchContentFromRemote(function(arrItems){
 					arrPics = arrItems;
 					mra.imageBar.loadMoreImages();
@@ -796,57 +782,12 @@ var mra = {
         init: function(){
             mra.news.portlets = $("#newsSection .portlet");    
     		mra.news.columns = $("div.column");
-			
-            // mra.news.columns
-            //  .sortable({
-            //      connectWith: '.column',
-            //      stop: function(event, ui) { 
-            //          var arrColumns = [];
-            //          $(".column").each(function(i, o){
-            //              arrColumns[i] = [];
-            //              $(o).find('.portlet').each(function(ii, oo){
-            //                  arrColumns[i][ii] = oo.title;
-            //              });
-            //              settings.activeSettings.subreddits()[i](arrColumns[i])
-            //          });
-            //          Cufon.refresh();
-            //          settings.preferences.save();
-            //      }
-            //  }) 
-            //  .disableSelection();
-    
-            mra.news.loadNextFeed();
         }, 
 		togglePortlet: function(evt){ 
 			$(evt.target).toggleClass('ui-icon-minusthick').toggleClass('ui-icon-plusthick'); 
 			$(evt.target).parents('.portlet:first').find('.portlet-content').toggle(); 
 		},
-        addCount: function(){
-			mra.news.totalIndex += 1;
-			if (mra.news.totalIndex <= (mra.news.portlets.length - 1)){ 
-			   mra.news.loadNextFeed();
-			}
-			else {
-				mra.news.totalIndex = 0;    
-			}   
-        },
-        loadMore: function(evt){
-			var subReddit = $(evt.target).parent().attr("Title");
-			var newLength = settings.newsItemsVisible()[subReddit]() + settings.defaultVisibleItems;
-			settings.newsItemsVisible()[subReddit](newLength);
-        },
-        reloadSection: function(evt){
-            //$('#newsSection .portlet[title=' + subReddit + '] .portlet-content').html(mra.loaderImage);
-			var curObj = $(evt.target);
-			var subReddit = curObj.parent().parent().parent().attr('title');
-			var section = curObj.attr('rel');
-			settings.news()[subReddit](ko.observableArray());
-            mra.fetchContentFromRemote(function(arrItems){
-                mra.news.addItemsToView(arrItems,subReddit);
-            }, subReddit + "/" + section, mra.news.totalItems);
-            $('#newsSection .portlet[title=' + subReddit + '] .portlet-header .toggleView').removeClass('ui-icon-bullet').addClass('ui-icon-radio-on');
-            $('#newsSection .portlet[title=' + subReddit + '] .portlet-header .toggleView[rel=' + section + ']').removeClass('ui-icon-radio-on').addClass('ui-icon-bullet');
-        },
+		
         loadNewSection: function(curReddit, column){
 		    currentColumnSelected = (typeof column == "undefined") ? $("[name=btnColumn].ui-state-active").val() : column;
 			settings.addSubreddit(column,curReddit);
@@ -855,33 +796,7 @@ var mra = {
             mra.fetchContentFromRemote(function(arrItems){
                 mra.news.addItemsToView(arrItems,curReddit);
             }, curReddit, mra.news.totalItems);
-        },            
-        loadNextFeed: function(){  
-            var curTitle = mra.news.portlets[mra.news.totalIndex].title;
-            // mra.fetchContentFromRemote(function(arrItems){
-            //     mra.news.addItemsToView(arrItems,curTitle);
-            //     mra.news.addCount();
-            // }, curTitle, mra.news.totalItems);
         },
-        addItemsToView: function(arrItems, sectionName){
-            if (arrItems.length == 0){
-				var curNewsColumn = mra.news.portlets.filter('.portlet[title=' + sectionName + ']').find('ul.portlet-content');
-                curNewsColumn.html('<div class="ui-state-default">Nothing here to see</div>');
-            }
-            else {
-				$.each(arrItems,function(i,obj){
-					obj.text = left(obj.title,100);
-					obj.score = parseInt((obj.ups/ (obj.downs + obj.ups)) * 100) + "%";
-					obj.score_title = obj.score + "  of People Like It";
-					obj.permalink = redditURL + obj.permalink;
-					obj.hidden = ko.dependentObservable(function() {
-						return settings.activeSettings.visited_news.indexOf(obj.id) != -1 && settings.isNewsItemVisible() == true;
-					}, settings);
-					settings.news()[sectionName].push(obj);
-				});
-            }
-            return true;
-        }
     }, 
     imageBar: { 
         init: function(){ 
@@ -944,10 +859,7 @@ var mra = {
 		removeImageBar: function(evt){
 			$(evt).parent().fadeOut()
 			settings.removeImageBar(evt.target.id); 
-		},
-        killimage: function(curObj){
-            $(curObj).parent().remove();        
-        },
+		}, 
         popupWindow: function(href){
              window.open(href, '_blank');
         },
