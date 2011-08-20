@@ -645,10 +645,10 @@ var mra = {
 				$(this).removeClass("ui-state-active");
 			}
 		});
-			
-        //mra.loaderImage = $("<img src='images/ajaxLoader.gif' width='126' height='22' align='middle'>");
-        mra.news.init();
+
         mra.imageBar.init();
+		
+		//TODO move this to the portlet class
         mra.timer.init(); 
 
 		/* This is the actual binding to the popupAdd container that decides what to do based on what is clicked */
@@ -676,14 +676,6 @@ var mra = {
 			}
 		});
         $( "#customizeDialog" ).draggable({ handle: "#customizeHeader" })    
-    },
-    debug: {
-        init: function(){ 
-            time.errors = true;
-            time.setLineReportMethod(mra.debug.report);
-        },
-        report: function(s){
-        }
     },
     jsonpRequest: function(url){
         var script = document.createElement("script"); 
@@ -952,6 +944,7 @@ var mra = {
 			
             Cufon.refresh();
         },
+		/* This is the main module that inits the image overlay for the imageBar*/
         applyLightBox: function(){
             $("#container div.ad-gallery a").colorbox({ 
                 maxHeight: function(){ return (window.innerHeight * 0.9) }, 
@@ -965,10 +958,7 @@ var mra = {
                     }
                     $("#cboxTitle").show();
                     mra.imageBar.addClipboardCopy(document.getElementById('copyLink2'));
-                    if (mra.imageBar.lbHasInit == 0)
-                        mra.imageBar.initLightbox();
-                    repositionCopy(document.getElementById('copyLink2'));
-                    $("<iframe>").attr("src",$("img.cboxPhoto").attr("src")).appendTo("body").bind("load", function(){ $(this).remove() });
+					$("iframe").attr("src",$("img.cboxPhoto").attr("src"));
                 }, 
                 onLoad: function(){
                     mra.imageBar.loadMoreImages();
@@ -1008,7 +998,8 @@ var mra = {
                 },1000);                    
             } 
         },
-        initLightbox: function(){
+		/* this initializes the copy to share functionality for the overlay */
+        initCopyPaste: function(){
             $("#cboxContent").hover(
                 function(){
                     $("#cboxTitle").stop(true).fadeTo("normal",0); 
@@ -1018,14 +1009,14 @@ var mra = {
                 }
             );
             $("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
-            mra.imageBar.lbHasInit = 1;    
-    
             ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
+			//ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
             clip = new ZeroClipboard.Client();
             clip.setHandCursor( true );
             clip.addEventListener( 'onComplete', function() { afterCopy() } );
             clip_curr='';
-        },
+        },		
+		//this function is there because the onmouseover event gets removed every time the picture changes
         addClipboardCopy: function(obj){
             obj.onmouseover = function(){
                 clip_curr=this.id;
@@ -1046,23 +1037,11 @@ var mra = {
         },
         processItems: function(pics, subReddit){ 
 			var sImageBar = "";  
-
 			window.arrPics = pics;
 			$(".ad-gallery").show();
-            $(".ad-gallery-loading").hide();
-			
-            /*sImageBar = sImageBar + mra.imageBar.createElements(arrPics.splice(0,15)); 
-            $("ul.ad-thumb-list").html(sImageBar);
-    
-            
-    		*/
-			
+            $(".ad-gallery-loading").hide(); 
 			settings.images.removeAll(); 
-			mra.imageBar.filterElements(pics); 
-					
-			
-            //var catOnDom  = ($("div.ad-gallery").attr('id') != '') ? $("div.ad-gallery").attr('id').split('_')[1] : "";
-            //var curPos = (catOnDom == "") ? 0 : adGallery.thumbs_wrapper.scrollLeft();    
+			mra.imageBar.filterElements(pics);    
             window.adGallery = $("div.ad-gallery")    
                 .attr("id", "imagebar_" + mra.imageBar.currentImageBar)
                 .adGallery({
@@ -1099,7 +1078,8 @@ var mra = {
     
             mra.imageBar.applyLightBox();
             mra.imageBar.applyContextMenu();
-            //adGallery.thumbs_wrapper.scrollLeft(curPos);
+			mra.imageBar.initCopyPaste();
+            setTimeout(function(){ window.imageLoader = setInterval(mra.imageBar.loadMoreImages,1000 * 10);  },1000 * 10);
 
         }
     }
