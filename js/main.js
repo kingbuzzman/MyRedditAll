@@ -254,10 +254,10 @@ var settings = new (function(){
                 /*
                  * Observable that checks whether or not the link is visible
                  */
-                this.isHidden = ko.dependentObservable(function(){
+                this.isVisible = ko.dependentObservable(function(){
                     // TODO: remove the settings reference
                     // checks the the link to see if its been visited, or if all the news items are visible
-                    return settings.activeSettings.visited_news.indexOf(this.id) != -1 && settings.isNewsItemVisible();
+                    return settings.activeSettings.visited_news.indexOf(this.id) == -1 || settings.isNewsItemVisible();
                 });
                 
                 /*
@@ -308,8 +308,8 @@ var settings = new (function(){
             this.amountVisible = ko.observable(10);
 
 			this.getNewsItems = function(){
-				return ko.utils.arrayFilter(newsItems(), function(newsItem) {
-					return newsItem.isHidden() ? null : newsItem;
+				return ko.utils.arrayFilter(newsItems(), function(newsItem){
+					return newsItem.isVisible() ? newsItem: null;
 				}).slice(0,this.amountVisible());
 			}
             /*
