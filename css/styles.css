@@ -78,7 +78,8 @@ a { border:0; }
 
 .itemUL:hover { background-color:#333; opacity:1; }
 .ui-icon { display:inline-block; }
-.ui-icon-more { width:100%; cursor:pointer; height:16px; font-size:13px; }
+.ui-icon-more > div { width:17px; overflow:hidden; cursor:pointer; height:16px; font-size:13px; }
+.ui-icon-more:hover > div { width:100%; }
 .ui-dialog .ui-dialog-content { overflow:visible; }
 .portlet-header { background:none !important; border:none !important; }
 div.portlet-header a { font-size:24px; color:#EEE; font-weight:bold; }

@@ -83,8 +83,10 @@
 				<div class="loader" data-bind="visible: getShowLoadingBar()"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
                 <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }"></ul>
 				<div class="ui-icon-more" data-bind="click: populateNext">
-					<span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
-					<span class="text" style="float:right;">Read More</span>
+				    <div>
+    					<span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
+    					<span class="text" style="float:right;">Read More</span>
+				    </div>
 				</div>
             </div>
         </script>
