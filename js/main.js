@@ -229,15 +229,6 @@ var settings = new (function(){
             var newsItems = ko.observableArray();
             var portlet = this;
             
-			this.visitPage = function(evt){
-				setTimeout(function(){
-					settings.activeSettings.visited_news.push(this.id);
-					settings.preferences.save();
-				},2*60*1000);
-				$(evt.target).parent().fadeOut(2500);
-				return true;
-			}; 
-				
             var load = function(section){
                 var url = this.url + ((section == undefined)? "": "/" + section);
                 
@@ -246,35 +237,48 @@ var settings = new (function(){
                 // load the complete feed
                 loader.call(url, function(data){
                     for(var index in data){
-                        newsItems.push({
-							'id': data[index].id,	
-                            'title': data[index].title,
-                            'text': data[index].title.substring(0, 100),
-                            'url': BASE_URL + "/tb/" + data[index].id,
-                            'score': parseInt((data[index].ups/ (data[index].downs + data[index].ups)) * 100) + "%",
-                            'scoreTitle': data[index].score + "  of People Like It",
-                            'permalink': BASE_URL + data[index].permalink,
-							'hidden': ko.dependentObservable(function() {
-								return settings.activeSettings.visited_news.indexOf(data[index].id) != -1 && settings.isNewsItemVisible() == true;
-							}),
-							'visitPage': portlet.visitPage
-                        });
+                        newsItems.push(new NewsItem(data[index]));
                     }
                 }.bind(this));
             }.bind(this);
             
             var NewsItem = function(item){
+                this.id = item['id'],
                 this.title = item['title'];
-                this.text = item['text'];
-                this.url = item['url'];
-                this.score = item['score'];
-                this.scoreTitle = item['scoreTitle'];
-                this.permalink = item['permalink'];
-                this.hidden = false; 
+                this.text = item['title'].substring(0, 100);
+                this.url = BASE_URL + "/tb/" + item['id'];
+                this.score =  parseInt((item['ups'] / (item['downs'] + item['ups'])) * 100) + "%";
+                this.scoreTitle = item['score'] + "  of People Like It";
+                this.permalink = BASE_URL + item['permalink'];
+                
+                /*
+                 * Observable that checks whether or not the link is visible
+                 */
+                this.isHidden = ko.dependentObservable(function(){
+                    // TODO: remove the settings reference
+                    // checks the the link to see if its been visited, or if all the news items are visible
+                    return settings.activeSettings.visited_news.indexOf(this.id) != -1 && settings.isNewsItemVisible();
+                });
+                
+                /*
+                 * Marks the page as seem/visited
+                 */
+                this.visitPage = function(evt){
+                    setTimeout(function(){
+                            // TODO: this needs to GO
+                            settings.activeSettings.visited_news.push(this.id);
+                            settings.preferences.save();
+                        }, 2*60*1000
+                    );
+                    
+                    $(evt.target).parent().fadeOut(2500);
+                    
+                    return true;
+                };
+                
                 return this;
             };
-           
-			
+            
             this.buttons = new (function(){
                 var activeButton = ko.observable('top');
                 
@@ -302,7 +306,7 @@ var settings = new (function(){
 
 			this.getNewsItems = function(){
 				return ko.utils.arrayFilter(newsItems(), function(newsItem) {
-					return newsItem.hidden() ? null : newsItem;
+					return newsItem.isHidden() ? null : newsItem;
 				}).slice(0,this.amountVisible());
 			}
             /*
