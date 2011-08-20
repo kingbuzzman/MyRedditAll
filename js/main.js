@@ -228,6 +228,7 @@ var settings = new (function(){
         var Portlet = function(name){
             var newsItems = ko.observableArray();
             var portlet = this;
+            var minimized = ko.observable(false);
             
             var load = function(section){
                 var url = this.url + ((section == undefined)? "": "/" + section);
@@ -312,6 +313,23 @@ var settings = new (function(){
 					return newsItem.isVisible() ? newsItem: null;
 				}).slice(0,this.amountVisible());
 			}
+            
+            /*
+             * Returns the state of the minimized property
+             */
+            this.isMinimized = function(){
+                return minimized();
+            };
+            
+            /*
+             * Toggles the state of the minimized property
+             */
+            this.toggleMinimize = function(){
+                // toggles from true to false depending on current value:
+                // ie. true ^ true -> false
+                // ie. false ^ true -> true
+                minimized(Boolean(minimized() ^ true));
+            };
             /*
              * Triggers the display of the load bar to the user
              */
