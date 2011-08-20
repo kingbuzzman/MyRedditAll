@@ -20,22 +20,20 @@ var settings = new (function(){
     
     // note: this gets overwritten when load() is ran with the current cookie settings
     this.activeSettings = {
-        background: {
-            color: ko.observable(null),
-            image: ko.observable("images/spacestorm.jpg")
-        },
-        // TODO: Make sure page continues to load if an invalid one is entered
-        subreddits: [], //new SubReddits("Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"),
         visited_news: ko.observableArray([]),
     };
     
+	this.background = {
+		color: ko.observable(null),
+		image: ko.observable("images/spacestorm.jpg")
+	};
+	
 	this.imageBar = ko.observable({}),
 	this.images = ko.observableArray();
 	this.activeImage = function(){
 		return this.images()[this.activeImageIndex()];
 	};
 	this.activeImageIndex = ko.observable(0);
-	this.newsItemsVisible = ko.observable({});
 	this.isNewsItemVisible = ko.observable(myVar);
     this.metaReddits = ko.observableArray();
      
@@ -56,10 +54,10 @@ var settings = new (function(){
     
     // getters
     this.getBackgroundColor = function(color){
-        return this.activeSettings['background']['color']();
+        return this['background']['color']();
     };
     this.getBackgroundImage = function(){
-        return this.activeSettings['background']['image']();
+        return this['background']['image']();
     };
     this.getSubreddits = function(){
         return this.subreddits;
@@ -71,16 +69,15 @@ var settings = new (function(){
     };
     
     // adders
-    this.addSubreddit = function(column, subreddit){
-        this.activeSettings['subreddits']()[column].push(subreddit);
-    };
     this.addImageBar = function(subreddit){
         this.imageBar()[subreddit] = ko.observableArray();
     };
     
     // removers
     this.removeSubreddit = function(column, subreddit){
-        this.activeSettings['subreddits']()[column].remove(subreddit);
+        //TODO find the index of the reddit and remove it from the array
+		//this.activeSettings['subreddits']()[column].remove(subreddit);
+		
     };
 	
 	this.removeImageBar = function(subreddit){
@@ -89,12 +86,12 @@ var settings = new (function(){
     
     // setters
     this.setBackgroundColor = function(color){
-        this.activeSettings['background']['color'](color);
-        this.activeSettings['background']['image'](null);
+        this['background']['color'](color);
+        this['background']['image'](null);
     },
     this.setBackgroundImage = function(image){
-        this.activeSettings['background']['color'](null);
-        this.activeSettings['background']['image'](image);
+        this['background']['color'](null);
+        this['background']['image'](image);
     };
 	
     // shortcuts
@@ -360,6 +357,7 @@ var settings = new (function(){
          */
         this.removePortlet = function(portlet){
             portlets.remove(portlet);
+			settings.preferences.save();
         };
         
         /*
@@ -439,8 +437,8 @@ var settings = new (function(){
             // load the cookie if its available
             if(cookie){
                 settings = $.parseJSON(cookie);
-                this.activeSettings['background']['color'](settings['background']['color']);
-                this.activeSettings['background']['image'](settings['background']['image']);
+                this['background']['color'](settings['background']['color']);
+                this['background']['image'](settings['background']['image']);
                 
                 this.getSubreddits().removeAllPortlets();
                 settings['subreddits'].map(function(item){
@@ -637,6 +635,7 @@ var mra = {
         mra.imageBar.init();
         mra.timer.init(); 
 
+		/* This is the actual binding to the popupAdd container that decides what to do based on what is clicked */
         $("button[name=btnColumn]").bind("click",function(){
             (this.value == 3) ? settings.addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
 			settings.preferences.save();
@@ -737,6 +736,7 @@ var mra = {
         }
     },
 	locationPicker: {
+		/*this is the little popup you see when you click on meta and customize this so u can pick 1|2|3|image*/
 		passEvent: function(evt){
 			var curObj = $(evt.target); 
 			mra.locationPicker.show( curObj, curObj.attr("id").split("_")[1] );
@@ -762,8 +762,7 @@ var mra = {
         totalIndex: 0,
         totalItems: 100, //maximum limit imposed by reddit
         init: function(){
-            mra.news.portlets = $("#newsSection .portlet");    
-    		mra.news.columns = $("div.column");
+			
         }, 
 		togglePortlet: function(evt){ 
 			$(evt.target).toggleClass('ui-icon-minusthick').toggleClass('ui-icon-plusthick'); 
@@ -772,12 +771,8 @@ var mra = {
 		
         loadNewSection: function(curReddit, column){
 		    currentColumnSelected = (typeof column == "undefined") ? $("[name=btnColumn].ui-state-active").val() : column;
-			settings.addSubreddit(column,curReddit);
+			settings.subreddits.addPortlet(curReddit);
             Cufon.refresh();
-            mra.news.portlets = $("#newsSection .portlet");
-            mra.fetchContentFromRemote(function(arrItems){
-                mra.news.addItemsToView(arrItems,curReddit);
-            }, curReddit, mra.news.totalItems);
         },
     }, 
     imageBar: { 
