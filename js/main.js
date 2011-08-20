@@ -226,30 +226,40 @@ var settings = new (function(){
         
         // private class (individual portlets)
         var Portlet = function(name){
-            var extraNewsItems = [];
             var newsItems = ko.observableArray();
             var portlet = this;
             
+			this.visitPage = function(evt){
+				setTimeout(function(){
+					settings.activeSettings.visited_news.push(this.id);
+					settings.preferences.save();
+				},2*60*1000);
+				$(evt.target).parent().fadeOut(2500);
+				return true;
+			}; 
+				
             var load = function(section){
                 var url = this.url + ((section == undefined)? "": "/" + section);
                 
-                extraNewsItems = [];
                 newsItems.removeAll();
                 
                 // load the complete feed
                 loader.call(url, function(data){
                     for(var index in data){
-                        extraNewsItems.push({
+                        newsItems.push({
+							'id': data[index].id,	
                             'title': data[index].title,
                             'text': data[index].title.substring(0, 100),
-                            'url': data[index].url,
+                            'url': BASE_URL + "/tb/" + data[index].id,
                             'score': parseInt((data[index].ups/ (data[index].downs + data[index].ups)) * 100) + "%",
                             'scoreTitle': data[index].score + "  of People Like It",
-                            'permalink': BASE_URL + data[index].permalink
+                            'permalink': BASE_URL + data[index].permalink,
+							'hidden': ko.dependentObservable(function() {
+								return settings.activeSettings.visited_news.indexOf(data[index].id) != -1 && settings.isNewsItemVisible() == true;
+							}),
+							'visitPage': portlet.visitPage
                         });
                     }
-                    
-                    this.populateNext();
                 }.bind(this));
             }.bind(this);
             
@@ -260,22 +270,11 @@ var settings = new (function(){
                 this.score = item['score'];
                 this.scoreTitle = item['scoreTitle'];
                 this.permalink = item['permalink'];
-                this.hidden = false;
-                
-                this.visitPage = function(evt){
-                    // TODO: figure out what the hell this does!
-                    // setTimeout(function(){
-                    //     settings.activeSettings.visited_news.push($(evt.target).parent().data('tmplItem').data.id);
-                    //     settings.preferences.save();
-                    // },5000);
-                    // $(evt.target).parent().fadeOut(2500);
-                    // mra.imageBar.popupWindow(evt.target.href);
-                    return true;
-                };
-                
+                this.hidden = false; 
                 return this;
             };
-            
+           
+			
             this.buttons = new (function(){
                 var activeButton = ko.observable('top');
                 
@@ -299,11 +298,13 @@ var settings = new (function(){
             // attributes
             this.name = name;
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
-            
-            this.getNewsItems = function(){
-                return newsItems;
-            };
-            
+            this.amountVisible = ko.observable(10);
+
+			this.getNewsItems = function(){
+				return ko.utils.arrayFilter(newsItems(), function(newsItem) {
+					return newsItem.hidden() ? null : newsItem;
+				}).slice(0,this.amountVisible());
+			}
             /*
              * Triggers the display of the load bar to the user
              */
@@ -315,11 +316,7 @@ var settings = new (function(){
              * Populates the portlet with 10 more items
              */
             this.populateNext = function(){
-                var itemsLeft = extraNewsItems.length - 10;
-                var limit = ((itemsLeft >= 0)? 10: itemsLeft);
-                
-                for(var index = 0; index < limit; index++)
-                    newsItems.push(new NewsItem(extraNewsItems.pop()));
+				this.amountVisible(this.amountVisible()+10);
             };
             
             /*

@@ -58,9 +58,9 @@
 		<!--, beforeRemove: function(elem) { setTimeout(function(){ $(elem).fadeOut(), 5000}) } -->	
 		<!-- visible: !$data.hidden(), -->
 		<script type="text/html" id="newsItemTemplate">
-			<li data-bind="attr: { title: title }"> 
-				<a target="_blank" class="link" data-bind="click: visitPage, attr: { href: url }, text: text"></a>
-				<a target="_blank" class="comment" data-bind="attr: { href: permalink, title: scoreTitle }, text: score"></a>
+			<li data-bind="attr: { title: $data.title }"> 
+				<a target="_blank" class="link" data-bind="click: $data.visitPage, attr: { href: $data.url }, text: $data.text"></a>
+				<a target="_blank" class="comment" data-bind="attr: { href: $data.permalink, title: $data.scoreTitle }, text: $data.score"></a>
 			</li>
         </script>
         
