@@ -13,8 +13,7 @@ var settings = new (function(){
     var BACKGROUND_IMAGE = "image/spacestorm.jpg";
     var SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
     var SUBREDDIT_ITEMS = 10;
-	//cannot figure out how to leave this as a var
-    this.IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
+    var IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
     
     var BASE_URL = "http://www.reddit.com";
     
@@ -214,6 +213,7 @@ var settings = new (function(){
         var Portlet = function(name){
             var newsItems = ko.observableArray();
             var portlet = this;
+            var minimized = ko.observable(false);
             
             var load = function(section){
 				// undefined is not inherent like null, it has to be checked with typeof
@@ -299,6 +299,23 @@ var settings = new (function(){
 					return newsItem.isVisible() ? newsItem: null;
 				}).slice(0,this.amountVisible());
 			}
+            
+            /*
+             * Returns the state of the minimized property
+             */
+            this.isMinimized = function(){
+                return minimized();
+            };
+            
+            /*
+             * Toggles the state of the minimized property
+             */
+            this.toggleMinimize = function(){
+                // toggles from true to false depending on current value:
+                // ie. true ^ true -> false
+                // ie. false ^ true -> true
+                minimized(Boolean(minimized() ^ true));
+            };
             /*
              * Triggers the display of the load bar to the user
              */
@@ -453,8 +470,7 @@ var settings = new (function(){
                 // load default subreddits
                 this.getSubreddits().addPortlet(SUBREDDITS);
                 
-				/*cannot figure out how to get at the IMAGE_BAR variable without setting it to this.*/
-				$.each(this.IMAGE_BAR,function(i,o){
+				$.each(IMAGE_BAR,function(i,o){
 					this.addImageBar(o);
 				}.bind(this));
 				

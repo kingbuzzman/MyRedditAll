@@ -62,8 +62,6 @@
         </li>
         </script>
         
-        <!-- TODO: keep track of which one is "active" - problem solved -->
-        <!-- {{if $data.NEWS_BUTTONS.indexOf($data) == 0}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}} -->
         <script type="text/html" id="newsButton">
             {{each(index, name) buttons.NEWS_BUTTONS}}
                 <span class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection, text: name, attr: { title: name, rel: name }"></span>
@@ -74,13 +72,13 @@
             <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" data-bind="attr: { title: name }">
                 <div class="portlet-header ui-widget-header ui-corner-all">
                     <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: remove"></span>
-                    <span class="ui-icon ui-icon-minusthick ui-toggle-display" data-bind="click: mra.news.togglePortlet"></span>
+                    <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
                     <a target="_blank" data-bind="text: name, attr: { href: url }"></a>
-					<span data-bind="template: { name: 'newsButton', value: buttons }"></span>
+					<span data-bind="template: { name: 'newsButton', value: buttons }, visible: !isMinimized()"></span>
 				</div>
 				<div class="loader" data-bind="visible: getShowLoadingBar()"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
-                <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }"></ul>
-				<div class="ui-icon-more" data-bind="click: populateNext">
+                <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
+				<div class="ui-icon-more" data-bind="click: populateNext, visible: !isMinimized()">
 				    <div>
     					<span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
     					<span class="text" style="float:right;">Read More</span>
