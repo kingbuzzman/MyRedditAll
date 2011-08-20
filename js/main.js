@@ -218,8 +218,10 @@ var settings = new (function(){
             var portlet = this;
             var minimized = ko.observable(false);
             
+            /*
+             * Loads the content for the subreddit
+             */
             var load = function(section){
-				// undefined is not inherent like null, it has to be checked with typeof
                 var url = this.url + ((typeof section == "undefined")? "" : "/" + section);
                 
                 newsItems.removeAll();
@@ -236,7 +238,8 @@ var settings = new (function(){
                 this.id = item['id'],
                 this.title = item['title'];
                 this.text = item['title'].substring(0, 100);
-                this.url = BASE_URL + "/tb/" + item['id'];
+                this.redditURL = BASE_URL + "/tb/" + item['id'];
+                this.url = item['url'];
                 this.score =  parseInt((item['ups'] / (item['downs'] + item['ups'])) * 100) + "%";
                 this.scoreTitle = item['score'] + "  of People Like It";
                 this.permalink = BASE_URL + item['permalink'];
@@ -254,14 +257,20 @@ var settings = new (function(){
                  * Marks the page as seem/visited
                  */
                 this.visitPage = function(evt){
+                    var element = $(evt.target);
+                    
+                    // replace link with reddit's link for it
+                    element.attr('href', this.redditURL)
+                    
                     setTimeout(function(){
-                            // TODO: this needs to GO
+                            // swap back the original link
+                            element.attr('href', this.url);
+                            
+                            // TODO: this needs to GO, should not reference settings like that
                             settings.activeSettings.visited_news.push(this.id);
                             settings.preferences.save();
-                        }, 2*60*1000
+                        }.bind(this), 1000
                     );
-                    
-                    $(evt.target).parent().fadeOut(2500);
                     
                     return true;
                 };
