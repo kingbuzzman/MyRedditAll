@@ -292,6 +292,9 @@ var settings = new (function(){
                 this.reloadSection = function(i,e,o){
                     var button = $(i.target).attr("rel");
                     
+                    // reset the amount visible back to 10 news stories..
+                    portlet.amountVisible(10);
+                    
                     activeButton(button);
                     load(button);
                 };
