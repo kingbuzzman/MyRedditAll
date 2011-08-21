@@ -1139,7 +1139,8 @@ var mra = {
                   cycle: true // If set to false, you can't go from the last image to the first, and vice versa,
                 });
             window.adGallery = window.adGallery[0];    
-    
+   			document.addEventListener('touchmove', function(e){ e.preventDefault(); });
+			myScroll = new iScroll($('.ad-thumb-list')[0], { desktopCompatibility: true, vScrollbar:false });
             mra.imageBar.applyLightBox();
             mra.imageBar.applyContextMenu();
 			mra.imageBar.initCopyPaste();
