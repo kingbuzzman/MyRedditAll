@@ -136,11 +136,11 @@ var settings = new (function(){
         // TODO: redo, map-filter?
         var cleanData = function(data){
             var arrData = [];
-            data.data.children.sort(function(a,b){
-                return b.data.created - a.data.created;
+            data.sort(function(a,b){
+                return b.created - a.created;
             }); 
-            for (i in data.data.children){
-                arrData.push(data.data.children[i].data);
+            for (i in data){
+                arrData.push(data[i].data);
             }
             
             return arrData;
@@ -181,7 +181,7 @@ var settings = new (function(){
                 jsonp: 'jsonp',
                 timeout: 20000, // 2 seconds timeout
                 success: function(data){
-                    var redditData = cleanData(data);
+                    var redditData = cleanData(data.data.children);
                     if (redditData.length > 0){
                         callback(redditData);
                     }
@@ -206,6 +206,51 @@ var settings = new (function(){
             
             // return the connection
             return connection;
+        };
+        
+        return this;
+    })();
+    
+    
+    /*
+     * Houses all the visited links
+     */
+    this.visitedLinks = new (function(){
+        var _links = {}; // clean object
+        
+        this.links = ko.observable(_links);
+        
+        /*
+         * Append a visited link
+         * @id string the id from reddit
+         */
+        this.add = function(id){
+            _links[id] = id;
+        };
+        
+        /*
+         * Checks if the link has been visited or not
+         * @id string the id from reddit
+         * returns true if there is a match
+         */
+        this.visited = function(id){
+            return (id in _links);
+        };
+        
+        this.load = function(){
+            // TODO: load links
+        };
+        
+        /*
+         * Returns all the visited links separeted by a comma
+         */
+        this.toString = function(){
+            var keys = [];
+            
+            for(var key in _links)
+                keys.push(key);
+            
+            return keys.join(",");
         };
         
         return this;
