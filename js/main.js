@@ -709,8 +709,7 @@ var mra = {
 			if(! $(this).is('.fg-button-toggleable, .fg-buttonset-single .fg-button,  .fg-buttonset-multi .fg-button') ){
 				$(this).removeClass("ui-state-active");
 			}
-		}); 
-							
+		});
         mra.imageBar.init();
 		
 		//TODO move this to the portlet class
