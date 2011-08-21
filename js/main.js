@@ -711,16 +711,6 @@ var mra = {
 			}
 		});
 
-		new Autocomplete("feedName", function() {
-			this.setValue = function( SubRedditTitle ) {
-				if (SubRedditTitle != ''){ 
-					popupAdd($("#addSubIcon"),SubRedditTitle)
-				}
-			}
-			if (this.isModified) this.setValue("");
-			return "findfeed.html?q=" + this.value;
-		});
-							
         mra.imageBar.init();
 		
 		//TODO move this to the portlet class
