@@ -263,7 +263,12 @@ var settings = new (function(){
             var newsItems = ko.observableArray();
             var portlet = this;
             var minimized = ko.observable(false);
-            var showVisited = ko.observable(false);
+            
+            this.showVisited = ko.observable(false);
+            
+            this.toggleVisited = function(){
+                this.showVisited(Boolean(this.showVisited() ^ true));
+            };
             
             /*
              * Loads the content for the subreddit
@@ -299,7 +304,7 @@ var settings = new (function(){
                 this.isVisible = ko.dependentObservable(function(){
                     // TODO: remove the settings reference
                     // checks the the link to see if its been visited, or if all the news items are visible
-                    return !visited() || showVisited();
+                    return !visited() || portlet.showVisited();
                 }.bind(this));
                 
                 /*

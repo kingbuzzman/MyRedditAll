@@ -69,6 +69,7 @@
                     <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: remove"></span>
                     <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
                     <a target="_blank" data-bind="text: name, attr: { href: url }"></a>
+                    <span class="ui-icon toggleView" title="Toggle visited links" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'ui-icon-radio-on': showVisited(), 'ui-icon-bullet': !showVisited() }"></span>
 					<span data-bind="template: { name: 'newsButton', value: buttons }, visible: !isMinimized()"></span>
 				</div>
 				<div class="loader" data-bind="visible: getShowLoadingBar()"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
