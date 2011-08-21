@@ -1,5 +1,6 @@
-if (typeof console == "undefined")
+if (typeof console == "undefined") {
     console = { log: function(){} };
+}
 
 myVar = true;
 
@@ -19,21 +20,21 @@ var settings = new (function(){
     
     // note: this gets overwritten when load() is ran with the current cookie settings
     this.activeSettings = {
-        visited_news: ko.observableArray([]),
+        visited_news: ko.observableArray([])
     };
     
-	this.background = {
-		color: ko.observable(null),
-		image: ko.observable("images/spacestorm.jpg")
-	};
-	
-	this.imageBar = ko.observable({}),
-	this.images = ko.observableArray();
-	this.activeImage = function(){
-		return this.images()[this.activeImageIndex()];
-	};
-	this.activeImageIndex = ko.observable(0);
-	this.isNewsItemVisible = ko.observable(myVar);
+    this.background = {
+        color: ko.observable('black'),
+        image: ko.observable(null)
+    };
+    
+    this.imageBar = ko.observable({});
+    this.images = ko.observableArray();
+    this.activeImage = function(){
+        return this.images()[this.activeImageIndex()];
+    };
+    this.activeImageIndex = ko.observable(0);
+    this.isNewsItemVisible = ko.observable(myVar);
     this.metaReddits = ko.observableArray();
      
     this.init = function(){
@@ -42,43 +43,42 @@ var settings = new (function(){
         this.subreddits = new this.subreddits();
         
         this.preferences.load();
-		ko.applyBindings(this);
-		Cufon.refresh();
+        ko.applyBindings(this);
     };
 
     
     // getters
     this.getBackgroundColor = function(color){
-        return this['background']['color']();
+        return this.background.color();
     };
     this.getBackgroundImage = function(){
-        return this['background']['image']();
+        return this.background.image();
     };
     this.getSubreddits = function(){
         return this.subreddits;
     };
     this.getImageBar = function(newo){
         return $.map(this.imageBar(), function(i,o){
-		    return ({"NAME": o, "SECTION": o});
-		});
+            return ({"NAME": o, "SECTION": o});
+        });
     };
-	/* this converts the object { "Pics": [], "NSFW": [] } into a simple array [Pics,NSFW] */
-	this.getImageBarNames = function(){
-		return $.map(ko.toJS(window.settings.imageBar()), function(o,i){ return i; });
-	};
-	/* This is tied to the image buttons */
-	this.getFirstFourFromImageBar = function(){
-		return this.getImageBarNames().slice(0,4);
-	};
-	/* This is the code that populates the heart drop down <3 */
-	this.getTheRestFromImageBar = function(){
-		return this.getImageBarNames().slice(4,this.getImageBarNames().length);
-	};
-	/*this part decides whether to show the heart once there is more than four (goal to avoid clutter) */
-	this.showMoreMode = function(){
-		return this.getImageBarNames().length > 4;
-	};
-	
+    /* this converts the object { "Pics": [], "NSFW": [] } into a simple array [Pics,NSFW] */
+    this.getImageBarNames = function(){
+        return $.map(ko.toJS(window.settings.imageBar()), function(o,i){ return i; });
+    };
+    /* This is tied to the image buttons */
+    this.getFirstFourFromImageBar = function(){
+        return this.getImageBarNames().slice(0,4);
+    };
+    /* This is the code that populates the heart drop down <3 */
+    this.getTheRestFromImageBar = function(){
+        return this.getImageBarNames().slice(4,this.getImageBarNames().length);
+    };
+    /*this part decides whether to show the heart once there is more than four (goal to avoid clutter) */
+    this.showMoreMode = function(){
+        return this.getImageBarNames().length > 4;
+    };
+    
     // adders
     this.addImageBar = function(subreddit){
         this.imageBar()[subreddit] = ko.observableArray();
@@ -87,24 +87,25 @@ var settings = new (function(){
     // removers
     this.removeSubreddit = function(column, subreddit){
         //TODO find the index of the reddit and remove it from the array
-		//this.activeSettings['subreddits']()[column].remove(subreddit);
-		
+        //this.activeSettings['subreddits']()[column].remove(subreddit);
+        
     };
-	
-	this.removeImageBar = function(subreddit){
-		this.imageBar.remove(subreddit);	 
-	};
+    
+    this.removeImageBar = function(subreddit){
+        this.imageBar.remove(subreddit);     
+    };
     
     // setters
     this.setBackgroundColor = function(color){
-        this['background']['color'](color);
-        this['background']['image'](null);
-    },
-    this.setBackgroundImage = function(image){
-        this['background']['color'](null);
-        this['background']['image'](image);
+        this.background.color(color);
+        this.background.image(null);
     };
-	
+
+    this.setBackgroundImage = function(image){
+        this.background.color(null);
+        this.background.image(image);
+    };
+    
     // shortcuts
     this.saveBackgroundColor = function(color){
         this.setBackgroundColor(color);
@@ -115,13 +116,13 @@ var settings = new (function(){
         this.preferences.save();
     };
     
-	
-	//sorters
-	this.sortImagesByDate = function(desc){
-		settings.images(settings.images().sort(function(a,b){
-			return (desc || true) ? b.created - a.created : b.created - a.created;
-		}));
-	};
+    
+    //sorters
+    this.sortImagesByDate = function(desc){
+        settings.images(settings.images().sort(function(a,b){
+            return (desc || true) ? b.created - a.created : b.created - a.created;
+        }));
+    };
     
     /*
      * Request manager
@@ -152,12 +153,13 @@ var settings = new (function(){
         var nextCall = function(){
             // if active connections is above the maximun threshold skip
             // if the queue is empty skip
-            if(activeConnections.length > MAX_CONNECTIONS || queued.length == 0)
+            if(activeConnections.length > MAX_CONNECTIONS || queued.length === 0) {
                 return;
+            }
             
             // get the first request from the queue and make the request again
             var request = queued.shift();
-            this.call(request['url'], request['callback']);
+            this.call(request.url, request.callback);
         }.bind(this);
         
         /*
@@ -246,8 +248,9 @@ var settings = new (function(){
         this.toString = function(){
             var keys = [];
             
-            for(var key in _links)
+            for(var key in _links) {
                 keys.push(key);
+            }
             
             return keys.join(",");
         };
@@ -288,14 +291,14 @@ var settings = new (function(){
             }.bind(this);
             
             var NewsItem = function(item){
-                this.id = item['id'],
-                this.title = item['title'];
-                this.text = item['title'].substring(0, 100);
-                this.redditURL = BASE_URL + "/tb/" + item['id'];
-                this.url = item['url'];
-                this.score =  parseInt((item['ups'] / (item['downs'] + item['ups'])) * 100) + "%";
-                this.scoreTitle = item['score'] + "  of People Like It";
-                this.permalink = BASE_URL + item['permalink'];
+                this.id = item.id;
+                this.title = item.title;
+                this.text = item.title.substring(0, 100);
+                this.redditURL = BASE_URL + "/tb/" + item.id;
+                this.url = item.url;
+                this.score =  parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
+                this.scoreTitle = item.score + "  of People Like It";
+                this.permalink = BASE_URL + item.permalink;
                 
                 /*
                  * Observable that checks whether or not the link is visible
@@ -313,7 +316,7 @@ var settings = new (function(){
                     var element = $(evt.target);
                     
                     // replace link with reddit's link for it
-                    element.attr('href', this.redditURL)
+                    element.attr('href', this.redditURL);
                     
                     setTimeout(function(){
                             // swap back the original link
@@ -358,12 +361,12 @@ var settings = new (function(){
             this.name = name;
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
             this.amountVisible = ko.observable(10);
-
-			this.getNewsItems = function(){
-				return ko.utils.arrayFilter(newsItems(), function(newsItem){
-					return newsItem.isVisible() ? newsItem: null;
-				}).slice(0,this.amountVisible());
-			}
+            
+            this.getNewsItems = function(){
+                return ko.utils.arrayFilter(newsItems(), function(newsItem){
+                    return newsItem.isVisible() ? newsItem: null;
+                }).slice(0,this.amountVisible());
+            };
             
             /*
              * Returns the state of the minimized property
@@ -385,14 +388,14 @@ var settings = new (function(){
              * Triggers the display of the load bar to the user
              */
             this.getShowLoadingBar = function(){
-                return !(newsItems().length > 0);
+                return !Boolean(newsItems().length > 0);
             };
             
             /*
              * Populates the portlet with 10 more items
              */
             this.populateNext = function(){
-				this.amountVisible(this.amountVisible()+10);
+                this.amountVisible(this.amountVisible()+10);
             };
             
             /*
@@ -419,8 +422,9 @@ var settings = new (function(){
          */
         this.addPortlet = function(portlet){
             if(portlet.push){
-                for(var index in portlet)
+                for(var index in portlet) {
                     this.addPortlet(portlet[index]);
+                }
             } else {
                 portlets.push(new Portlet(portlet));
             }
@@ -439,7 +443,7 @@ var settings = new (function(){
          */
         this.removePortlet = function(portlet){
             portlets.remove(portlet);
-			settings.preferences.save();
+            settings.preferences.save();
         };
         
         /*
@@ -466,8 +470,9 @@ var settings = new (function(){
         };
         
         // initializes all the portlets
-        for(var index in arguments)
+        for(var index in arguments) {
             this.addPortlet(arguments[index]);
+        }
         
         return this;
     };
@@ -494,15 +499,16 @@ var settings = new (function(){
             var rawCookieData = null;
             
             // leave if theres nothing worth searching for
-            if(cookie == undefined || cookie == "") return;
+            if(typeof(cookie) === 'undefined' || cookie === "") { return; }
             
             // loop over all the cookies
-            for(var i in rawCookies){
+            for(var i in rawCookies) {
                 rawCookieData = rawCookies[i].split("=");
                 
                 // if the cookie name matches return the value of the cookie [escaped]
-                if(rawCookieData[0].replace(/(^\s+|\s+$)/g, "") == cookie)
+                if(rawCookieData[0].replace(/(^\s+|\s+$)/g, "") == cookie) {
                     return unescape(rawCookieData[1]);
+                }
             }
             
             // nothing found
@@ -519,26 +525,26 @@ var settings = new (function(){
             // load the cookie if its available
             if(cookie){
                 settings = $.parseJSON(cookie);
-                this['background']['color'](settings['background']['color']);
-                this['background']['image'](settings['background']['image']);
+                this.background.color(settings.background.color);
+                this.background.image(settings.background.image);
                 
                 this.getSubreddits().removeAllPortlets();
-                settings['subreddits'].map(function(item){
+                settings.subreddits.map(function(item){
                     this.getSubreddits().addPortlet(item);
                 }.bind(this));
-				
+                
                 //Populate the cookie variable into the settings.imageBar variable
-				$.each(settings['imageBar'],function(i,o){
-					this.addImageBar(o);
-				}.bind(this));
+                $.each(settings.imageBar, function(i, o){
+                    this.addImageBar(o);
+                }.bind(this));
             } else {
                 // load default subreddits
                 this.getSubreddits().addPortlet(SUBREDDITS);
                 
-				$.each(IMAGE_BAR,function(i,o){
-					this.addImageBar(o);
-				}.bind(this));
-				
+                $.each(IMAGE_BAR,function(i, o){
+                    this.addImageBar(o);
+                }.bind(this));
+                
                 // there was no cookie set, save it.
                 this.preferences.save();
             }
@@ -575,7 +581,7 @@ var settings = new (function(){
         });
     };
     
-    return this
+    return this;
 })(); 
 
 //connect items with observableArrays
@@ -595,7 +601,6 @@ ko.bindingHandlers.sortableList = {
                     list.splice(position, 0, item);
                 }
                 
-                Cufon.refresh();
             }
         });
     }
@@ -605,7 +610,7 @@ $(document).ready(function(){
     settings.init();
     // $("#newsSection").sortable().disableSelection();
 });
-	
+    
 var wallpaperIndex = 0;
 var currentLayout = settings.getSubreddits();
 var currentImageBar = settings.getImageBar();
@@ -613,7 +618,7 @@ var redditURL = "http://www.reddit.com";
 var oCustomContextMenu = null;
 var oBase = null; 
 var doAppend = true;
-var baseurl = "http://www.reddit.com";	
+var baseurl = "http://www.reddit.com";  
 var weburl = "http://myredditall.com/";
 var arrWallpapers = [
     "images/spacestorm.jpg",
@@ -655,8 +660,9 @@ function customizeLayout(){
     {
       preload_image_object = new Image();
         
-       for(i=0; i<=arrWallpapers.length-1; i++) 
+       for(i=0; i<=arrWallpapers.length-1; i++) {
          preload_image_object.src = arrWallpapers[i];
+       }
     }
 }
 
@@ -678,67 +684,67 @@ function repositionCopy(elem){
 
 function copyToShare(el){
     mra.currentComment = el.title + ": " + el.href;
-	$("#copyLink2").zclip({
-		path:'ZeroClipboard.swf',
-		copy:function(){
-			return mra.currentComment;
-		}
-	});
-	$("#imageMenu").destroyContextMenu()
+    $("#copyLink2").zclip({
+        path:'ZeroClipboard.swf',
+        copy:function(){
+            return mra.currentComment;
+        }
+    });
+    $("#imageMenu").destroyContextMenu();
 }
 
 var mra = {
     init: function(){
-		currentImageBar = settings.getImageBar();
-		//all hover and click logic for buttons
-		$(".fg-button:not(.ui-state-disabled)")
-		.hover(
-			function(){ 
-				$(this).addClass("ui-state-hover"); 
-			},
-			function(){ 
-				$(this).removeClass("ui-state-hover"); 
-			}
-		)
-		.mousedown(function(){
-				$(this).parents('.fg-buttonset-single:first').find(".fg-button.ui-state-active").removeClass("ui-state-active");
-				if( $(this).is('.ui-state-active.fg-button-toggleable, .fg-buttonset-multi .ui-state-active') ){ $(this).removeClass("ui-state-active"); }
-				else { $(this).addClass("ui-state-active"); }    
-		})
-		.mouseup(function(){
-			if(! $(this).is('.fg-button-toggleable, .fg-buttonset-single .fg-button,  .fg-buttonset-multi .fg-button') ){
-				$(this).removeClass("ui-state-active");
-			}
-		});
+        currentImageBar = settings.getImageBar();
+        //all hover and click logic for buttons
+        $(".fg-button:not(.ui-state-disabled)")
+        .hover(
+            function(){ 
+                $(this).addClass("ui-state-hover"); 
+            },
+            function(){ 
+                $(this).removeClass("ui-state-hover"); 
+            }
+        )
+        .mousedown(function(){
+                $(this).parents('.fg-buttonset-single:first').find(".fg-button.ui-state-active").removeClass("ui-state-active");
+                if( $(this).is('.ui-state-active.fg-button-toggleable, .fg-buttonset-multi .ui-state-active') ){ $(this).removeClass("ui-state-active"); }
+                else { $(this).addClass("ui-state-active"); }    
+        })
+        .mouseup(function(){
+            if(! $(this).is('.fg-button-toggleable, .fg-buttonset-single .fg-button,  .fg-buttonset-multi .fg-button') ){
+                $(this).removeClass("ui-state-active");
+            }
+        });
         mra.imageBar.init();
-		
-		//TODO move this to the portlet class
+        
+        //TODO move this to the portlet class
         mra.timer.init(); 
 
-		/* This is the actual binding to the popupAdd container that decides what to do based on what is clicked */
+        /* This is the actual binding to the popupAdd container that decides what to do based on what is clicked */
         $("button[name=btnColumn]").bind("click",function(){
             (this.value == 3) ? settings.addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
-			settings.preferences.save();
+            settings.preferences.save();
             mra.locationPicker.hide();
         }); 
-		
-		$('#colorSelector').ColorPicker({
-			color: '#0000ff',
-			onShow: function (colpkr) {
-				$(colpkr).fadeIn(500);
-				return false;
-			},
-			onHide: function (colpkr) {
-				$(colpkr).fadeOut(500);
-				settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
-				settings.preferences.save();
-				return false;
-			},
-			onChange: function (hsb, hex, rgb) {
-				$('#colorSelector div').css('backgroundColor', '#' + hex);								
-				$('body').css({"background-color":'#' + hex, "background-image":"none" });
-			}
-		});
+        
+        $('#colorSelector').ColorPicker({
+            color: '#0000ff',
+            onShow: function (colpkr) {
+                $(colpkr).fadeIn(500);
+                return false;
+            },
+            onHide: function (colpkr) {
+                $(colpkr).fadeOut(500);
+                settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
+                settings.preferences.save();
+                return false;
+            },
+            onChange: function (hsb, hex, rgb) {
+                $('#colorSelector div').css('backgroundColor', '#' + hex);                              
+                $('body').css({"background-color":'#' + hex, "background-image":"none" });
+            }
+        });
         $( "#customizeDialog" ).draggable({ handle: "#customizeHeader" })    
     },
     jsonpRequest: function(url){
@@ -753,31 +759,31 @@ var mra = {
             reqURL = weburl + "fetchContent.cfm?r=" + decodeURIComponent(subReddit) + "&limit=" + parseInt(limit + start);
         else*/     
             reqURL = baseurl + "/r/" + decodeURIComponent(subReddit) + "/.json?&limit=" + parseInt(limit + start);    
-		
+        
         $.ajax({
                 type: 'GET',
                 url: reqURL, 
                 dataType: 'jsonp',
                 jsonp: 'jsonp',
-				timeout: 20000, // 2 seconds timeout
+                timeout: 20000, // 2 seconds timeout
                 success: function(data){
                     arrData = mra.cleanData(data);
                     if (arrData.length == 0){
-						(subReddit in mra.news) ? mra.news[subReddit]++ : mra.news[subReddit] = 0;
-						(mra.news[subReddit] < 5) ? mra.fetchContentFromRemote(callback,subReddit,limit,start, 1) : callback([]);
-					} else {
-						callback(arrData);
-					}
+                        (subReddit in mra.news) ? mra.news[subReddit]++ : mra.news[subReddit] = 0;
+                        (mra.news[subReddit] < 5) ? mra.fetchContentFromRemote(callback,subReddit,limit,start, 1) : callback([]);
+                    } else {
+                        callback(arrData);
+                    }
                 },
-				error: function(){
-					var $portlet = $("div.portlet[title="+subReddit+"]");
-					$portlet.find("div.loader").hide()
-					callback([]);
-					if (confirm(subReddit + " appears not to be loading, would you like to delete it?")){
-						// TODO: fix, this will crash.. for now
-						mra.news.deleteReddit($portlet);
-					}
-				}
+                error: function(){
+                    var $portlet = $("div.portlet[title="+subReddit+"]");
+                    $portlet.find("div.loader").hide()
+                    callback([]);
+                    if (confirm(subReddit + " appears not to be loading, would you like to delete it?")){
+                        // TODO: fix, this will crash.. for now
+                        mra.news.deleteReddit($portlet);
+                    }
+                }
             }
         );
     },
@@ -800,51 +806,50 @@ var mra = {
         addTime: function(){ 
             mra.timer.countMins = mra.timer.countMins + 1;
             if (mra.timer.countMins % 15 == 0){ 
-				mra.fetchContentFromRemote(function(arrItems){
-					arrPics = arrItems;
-					mra.imageBar.loadMoreImages();
-				}, mra.imageBar.currentImageBar, 100);
+                mra.fetchContentFromRemote(function(arrItems){
+                    arrPics = arrItems;
+                    mra.imageBar.loadMoreImages();
+                }, mra.imageBar.currentImageBar, 100);
             }
         }
     },
-	locationPicker: {
-		/*this is the little popup you see when you click on meta and customize this so u can pick 1|2|3|image*/
-		passEvent: function(evt){
-			var curObj = $(evt.target); 
-			mra.locationPicker.show( curObj, curObj.attr("id").split("_")[1] );
-		},
-		show: function(obj, sectionName){
-			if (sectionName != ''){  
-				selectedReddit = sectionName; 
-				$("#popupAdd").fadeIn().position({
-					of: obj,
-					my: "right top",
-					at: "left bottom",
-					offset: 0, 
-					collision: "flip flip"
-				});
-			}	
-		},
-		hide: function(){
-		    $("#popupAdd").fadeOut();
-		    selectedReddit = "";
-		}
-	},
+    locationPicker: {
+        /*this is the little popup you see when you click on meta and customize this so u can pick 1|2|3|image*/
+        passEvent: function(evt){
+            var curObj = $(evt.target); 
+            mra.locationPicker.show( curObj, curObj.attr("id").split("_")[1] );
+        },
+        show: function(obj, sectionName){
+            if (sectionName != ''){  
+                selectedReddit = sectionName; 
+                $("#popupAdd").fadeIn().position({
+                    of: obj,
+                    my: "right top",
+                    at: "left bottom",
+                    offset: 0, 
+                    collision: "flip flip"
+                });
+            }   
+        },
+        hide: function(){
+            $("#popupAdd").fadeOut();
+            selectedReddit = "";
+        }
+    },
     news: {
         totalIndex: 0,
         totalItems: 100, //maximum limit imposed by reddit
         init: function(){
-			
+            
         }, 
-		togglePortlet: function(evt){ 
-			$(evt.target).toggleClass('ui-icon-minusthick').toggleClass('ui-icon-plusthick'); 
-			$(evt.target).parents('.portlet:first').find('.portlet-content').toggle(); 
-		},
-		
+        togglePortlet: function(evt){ 
+            $(evt.target).toggleClass('ui-icon-minusthick').toggleClass('ui-icon-plusthick'); 
+            $(evt.target).parents('.portlet:first').find('.portlet-content').toggle(); 
+        },
+        
         loadNewSection: function(curReddit, column){
-		    currentColumnSelected = (typeof column == "undefined") ? $("[name=btnColumn].ui-state-active").val() : column;
-			settings.subreddits.addPortlet(curReddit);
-            Cufon.refresh();
+            currentColumnSelected = (typeof column == "undefined") ? $("[name=btnColumn].ui-state-active").val() : column;
+            settings.subreddits.addPortlet(curReddit);
         },
     }, 
     imageBar: { 
@@ -882,11 +887,11 @@ var mra = {
             );
         },
         showMore: function(){
-			morePos = jQuery("#showMore").position(); 
-			$("#showMoreList")
-				.css({ "position": "absolute", "top": (morePos.top + 31) })
-				.css({ left: (morePos.left + 32) - $("#showMoreList").width() })
-				.toggle();
+            morePos = jQuery("#showMore").position(); 
+            $("#showMoreList")
+                .css({ "position": "absolute", "top": (morePos.top + 31) })
+                .css({ left: (morePos.left + 32) - $("#showMoreList").width() })
+                .toggle();
         },
         viewComments: function(){
             mra.imageBar.popupWindow(
@@ -905,27 +910,27 @@ var mra = {
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
             }, mra.imageBar.currentImageBar, 100);
         },
-		removeImageBar: function(evt){
-			$(evt).parent().fadeOut()
-			settings.removeImageBar(evt.target.id); 
-		}, 
+        removeImageBar: function(evt){
+            $(evt).parent().fadeOut()
+            settings.removeImageBar(evt.target.id); 
+        }, 
         popupWindow: function(href){
              window.open(href, '_blank');
         },
         filterElements: function(arrElems){
             var regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif)$");
             var sElements = "";
-			var filtered = [];
+            var filtered = [];
             for (i in arrElems){
                 var pic = arrElems[i];
-				pic.permalink = redditURL + pic.permalink;
+                pic.permalink = redditURL + pic.permalink;
                 if (pic.url != ''){
                     if (  pic.url.indexOf("http://imgur.com/") >= 0 ){
                          pic.url = pic.url + ".jpg";
                     }
                     if (regex.exec( pic.url )){
-						settings.images.push(pic);
-						//filtered.push(pic);	
+                        settings.images.push(pic);
+                        //filtered.push(pic);   
                         //sElements += mra.imageBar.makeHTML(pic);
                     }
                     else {
@@ -947,8 +952,8 @@ var mra = {
                     success: function(data){
                         try {
                             if (data.query.results.result['content-type'].indexOf("image") >= 0){                         
-								settings.images.push(curPic);
-								settings.sortImagesByDate();
+                                settings.images.push(curPic);
+                                settings.sortImagesByDate();
                             } 
                         }catch(e){}    
                     }
@@ -1005,16 +1010,14 @@ var mra = {
                 mra.imageBar.currentImageContext = e;
                 return oCustomContextMenu.Display(e);
             });    
-			
-            Cufon.refresh();
+            
         },
-		/* This is the main module that inits the image overlay for the imageBar*/
+        /* This is the main module that inits the image overlay for the imageBar*/
         applyLightBox: function(){
             $("#container div.ad-gallery a").colorbox({ 
                 maxHeight: function(){ return (window.innerHeight * 0.9) }, 
                 maxWidth: function(){ return (window.innerWidth * 0.9) },
                 onComplete:function(){ 
-                    Cufon.refresh() 
                     var largeMode = $("img.cboxPhoto").width() > 400;
                     $("#cboxCurrent span").toggle(largeMode);
                     if (!largeMode){
@@ -1022,7 +1025,7 @@ var mra = {
                     }
                     $("#cboxTitle").show();
                     mra.imageBar.addClipboardCopy(document.getElementById('copyLink2'));
-					$("iframe").attr("src",$("img.cboxPhoto").attr("src"));
+                    $("iframe").attr("src",$("img.cboxPhoto").attr("src"));
                 }, 
                 onLoad: function(){
                     mra.imageBar.loadMoreImages();
@@ -1048,10 +1051,10 @@ var mra = {
         loadMoreImages: function(){
             if (arrPics.length > 0){
                 $.each(arrPics.splice(0,10),function(i,o){
-					if ($("#" + o.id).length == 0)
-                    settings.images.unshift(o)	
+                    if ($("#" + o.id).length == 0)
+                    settings.images.unshift(o)  
                 });
-				
+                
                 isLoading = false;
                 setTimeout(function(){
                     if (isLoading == false){
@@ -1062,7 +1065,7 @@ var mra = {
                 },1000);                    
             } 
         },
-		/* this initializes the copy to share functionality for the overlay */
+        /* this initializes the copy to share functionality for the overlay */
         initCopyPaste: function(){
             $("#cboxContent").hover(
                 function(){
@@ -1074,13 +1077,13 @@ var mra = {
             );
             $("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
             ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
-			//ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
+            //ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
             clip = new ZeroClipboard.Client();
             clip.setHandCursor( true );
             clip.addEventListener( 'onComplete', function() { afterCopy() } );
             clip_curr='';
-        },		
-		//this function is there because the onmouseover event gets removed every time the picture changes
+        },      
+        //this function is there because the onmouseover event gets removed every time the picture changes
         addClipboardCopy: function(obj){
             obj.onmouseover = function(){
                 clip_curr=this.id;
@@ -1100,12 +1103,12 @@ var mra = {
             i.src = $.colorbox.element().children().attr('src')
         },
         processItems: function(pics, subReddit){ 
-			var sImageBar = "";  
-			window.arrPics = pics;
-			$(".ad-gallery").show();
+            var sImageBar = "";  
+            window.arrPics = pics;
+            $(".ad-gallery").show();
             $(".ad-gallery-loading").hide(); 
-			settings.images.removeAll(); 
-			mra.imageBar.filterElements(pics);    
+            settings.images.removeAll(); 
+            mra.imageBar.filterElements(pics);    
             window.adGallery = $("div.ad-gallery")    
                 .attr("id", "imagebar_" + mra.imageBar.currentImageBar)
                 .adGallery({
@@ -1139,11 +1142,11 @@ var mra = {
                   cycle: true // If set to false, you can't go from the last image to the first, and vice versa,
                 });
             window.adGallery = window.adGallery[0];    
-   			document.addEventListener('touchmove', function(e){ e.preventDefault(); });
-			myScroll = new iScroll($('.ad-thumb-list')[0], { desktopCompatibility: true, vScrollbar:false });
+            document.addEventListener('touchmove', function(e){ e.preventDefault(); });
+            myScroll = new iScroll($('.ad-thumb-list')[0], { desktopCompatibility: true, vScrollbar:false });
             mra.imageBar.applyLightBox();
             mra.imageBar.applyContextMenu();
-			mra.imageBar.initCopyPaste();
+            mra.imageBar.initCopyPaste();
             setTimeout(function(){ window.imageLoader = setInterval(mra.imageBar.loadMoreImages,1000 * 10);  },1000 * 10);
 
         }
