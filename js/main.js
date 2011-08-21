@@ -710,17 +710,7 @@ var mra = {
 			if(! $(this).is('.fg-button-toggleable, .fg-buttonset-single .fg-button,  .fg-buttonset-multi .fg-button') ){
 				$(this).removeClass("ui-state-active");
 			}
-		});
-
-		new Autocomplete("feedName", function() {
-			this.setValue = function( SubRedditTitle ) {
-				if (SubRedditTitle != ''){ 
-					popupAdd($("#addSubIcon"),SubRedditTitle)
-				}
-			}
-			if (this.isModified) this.setValue("");
-			return "findfeed.html?q=" + this.value;
-		});
+		}); 
 							
         mra.imageBar.init();
 		
