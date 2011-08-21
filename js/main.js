@@ -199,6 +199,51 @@ var settings = new (function(){
         return this;
     })();
     
+    
+    /*
+     * Houses all the visited links
+     */
+    this.visitedLinks = new (function(){
+        var _links = {}; // clean object
+        
+        this.links = ko.observable(_links);
+        
+        /*
+         * Append a visited link
+         * @id string the id from reddit
+         */
+        this.add = function(id){
+            _links[id] = id;
+        };
+        
+        /*
+         * Checks if the link has been visited or not
+         * @id string the id from reddit
+         * returns true if there is a match
+         */
+        this.visited = function(id){
+            return (id in _links);
+        };
+        
+        this.load = function(){
+            // TODO: load links
+        };
+        
+        /*
+         * Returns all the visited links separeted by a comma
+         */
+        this.toString = function(){
+            var keys = [];
+            
+            for(var key in _links)
+                keys.push(key);
+            
+            return keys.join(",");
+        };
+        
+        return this;
+    })();
+    
     /*
      * Houses all the portlets (subreddits)
      * - needs to be initialized
