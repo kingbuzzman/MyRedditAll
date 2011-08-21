@@ -124,11 +124,11 @@ var settings = new (function(){
         // TODO: redo, map-filter?
         var cleanData = function(data){
             var arrData = [];
-            data.data.children.sort(function(a,b){
-                return b.data.created - a.data.created;
+            data.sort(function(a,b){
+                return b.created - a.created;
             }); 
-            for (i in data.data.children){
-                arrData.push(data.data.children[i].data);
+            for (i in data){
+                arrData.push(data[i].data);
             }
             
             return arrData;
@@ -169,7 +169,7 @@ var settings = new (function(){
                 jsonp: 'jsonp',
                 timeout: 20000, // 2 seconds timeout
                 success: function(data){
-                    var redditData = cleanData(data);
+                    var redditData = cleanData(data.data.children);
                     if (redditData.length > 0){
                         callback(redditData);
                     }
