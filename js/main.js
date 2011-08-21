@@ -15,11 +15,6 @@ var settings = new (function(){
     
     var BASE_URL = "http://www.reddit.com";
     
-    // note: this gets overwritten when load() is ran with the current cookie settings
-    this.activeSettings = {
-        visited_news: ko.observableArray([]),
-    };
-    
 	this.background = {
 		color: ko.observable(null),
 		image: ko.observable("images/spacestorm.jpg")
@@ -31,7 +26,6 @@ var settings = new (function(){
 		return this.images()[this.activeImageIndex()];
 	};
 	this.activeImageIndex = ko.observable(0);
-	this.isNewsItemVisible = ko.observable(false);
     this.metaReddits = ko.observableArray();
      
     this.init = function(){
@@ -213,14 +207,14 @@ var settings = new (function(){
      * Houses all the visited links
      */
     this.visitedLinks = new (function(){
-        this.links = ko.observable({});
+        var links = {};
         
         /*
          * Append a visited link
          * @id string the id from reddit
          */
         this.add = function(id){
-            this.links()[id] = id;
+            links[id] = id;
         };
         
         /*
@@ -229,7 +223,7 @@ var settings = new (function(){
          * returns true if there is a match
          */
         this.visited = function(id){
-            return (id in this.links());
+            return (id in links);
         };
         
         this.load = function(links){
@@ -245,7 +239,7 @@ var settings = new (function(){
         this.toString = function(){
             var keys = [];
             
-            for(var key in this.links())
+            for(var key in links)
                 keys.push(key);
             
             return keys.join(",");
@@ -269,6 +263,7 @@ var settings = new (function(){
             var newsItems = ko.observableArray();
             var portlet = this;
             var minimized = ko.observable(false);
+            var showVisited = ko.observable(false);
             
             /*
              * Loads the content for the subreddit
@@ -296,13 +291,15 @@ var settings = new (function(){
                 this.scoreTitle = item['score'] + "  of People Like It";
                 this.permalink = BASE_URL + item['permalink'];
                 
+                var visited = ko.observable(settings.visitedLinks.visited(this.id));
+                
                 /*
                  * Observable that checks whether or not the link is visible
                  */
                 this.isVisible = ko.dependentObservable(function(){
                     // TODO: remove the settings reference
                     // checks the the link to see if its been visited, or if all the news items are visible
-                    return !settings.visitedLinks.visited(this.id) || settings.isNewsItemVisible();
+                    return !visited() || showVisited();
                 }.bind(this));
                 
                 /*
@@ -313,6 +310,8 @@ var settings = new (function(){
                     
                     // replace link with reddit's link for it
                     element.attr('href', this.redditURL)
+                    // set the page as visited
+                    visited(true);
                     
                     setTimeout(function(){
                             // swap back the original link
