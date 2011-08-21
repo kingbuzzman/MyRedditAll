@@ -1,6 +1,10 @@
 # mac
 .DS_Store
+*.orig
 
-# windows
+# windows 
 *.bak
 *.cfm
+
+# everywhere
+*.swp
