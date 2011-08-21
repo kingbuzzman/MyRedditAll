@@ -1,8 +1,6 @@
 if (typeof console == "undefined")
     console = { log: function(){} };
 
-myVar = true;
-
 /*
  * Setting wrapper
  * - handles all the that needs to persist
@@ -33,7 +31,7 @@ var settings = new (function(){
 		return this.images()[this.activeImageIndex()];
 	};
 	this.activeImageIndex = ko.observable(0);
-	this.isNewsItemVisible = ko.observable(myVar);
+	this.isNewsItemVisible = ko.observable(false);
     this.metaReddits = ko.observableArray();
      
     this.init = function(){
@@ -215,16 +213,14 @@ var settings = new (function(){
      * Houses all the visited links
      */
     this.visitedLinks = new (function(){
-        var _links = {}; // clean object
-        
-        this.links = ko.observable(_links);
+        this.links = ko.observable({});
         
         /*
          * Append a visited link
          * @id string the id from reddit
          */
         this.add = function(id){
-            _links[id] = id;
+            this.links()[id] = id;
         };
         
         /*
@@ -233,11 +229,14 @@ var settings = new (function(){
          * returns true if there is a match
          */
         this.visited = function(id){
-            return (id in _links);
+            return (id in this.links());
         };
         
-        this.load = function(){
-            // TODO: load links
+        this.load = function(links){
+            links = links.split(",");
+            
+            for(var index in links)
+                this.add(links[index]);
         };
         
         /*
@@ -246,7 +245,7 @@ var settings = new (function(){
         this.toString = function(){
             var keys = [];
             
-            for(var key in _links)
+            for(var key in this.links())
                 keys.push(key);
             
             return keys.join(",");
@@ -303,8 +302,8 @@ var settings = new (function(){
                 this.isVisible = ko.dependentObservable(function(){
                     // TODO: remove the settings reference
                     // checks the the link to see if its been visited, or if all the news items are visible
-                    return settings.activeSettings.visited_news.indexOf(this.id) == -1 || settings.isNewsItemVisible();
-                });
+                    return !settings.visitedLinks.visited(this.id) || settings.isNewsItemVisible();
+                }.bind(this));
                 
                 /*
                  * Marks the page as seem/visited
@@ -320,7 +319,7 @@ var settings = new (function(){
                             element.attr('href', this.url);
                             
                             // TODO: this needs to GO, should not reference settings like that
-                            settings.activeSettings.visited_news.push(this.id);
+                            settings.visitedLinks.add(this.id);
                             settings.preferences.save();
                         }.bind(this), 1000
                     );
@@ -522,6 +521,7 @@ var settings = new (function(){
                 this['background']['color'](settings['background']['color']);
                 this['background']['image'](settings['background']['image']);
                 
+                this.visitedLinks.load(settings['visitedLinks']);
                 this.getSubreddits().removeAllPortlets();
                 settings['subreddits'].map(function(item){
                     this.getSubreddits().addPortlet(item);
@@ -571,7 +571,7 @@ var settings = new (function(){
             },
             subreddits: this.getSubreddits().toStringArray(),
             imageBar: this.getImageBarNames(),
-            visitedNews: ko.toJSON(this.activeSettings.visited_news)
+            visitedLinks: this.visitedLinks.toString()
         });
     };
     
