@@ -211,7 +211,6 @@ var settings = new (function(){
         return this;
     })();
     
-    
     /*
      * Houses all the visited links
      */
