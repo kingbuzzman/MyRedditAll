@@ -39,20 +39,14 @@
 					 {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, imageSection) == 0}}ui-corner-left ui-state-active{{/if}}
 				{{/if}}-->
         <script id="imageButtonTemplate" type="text/html">
-			{{each(index, content) imageBar}}
-			   <button class="changePic fg-button" data-bind="click: mra.imageBar.changePic" id="${ index }">${ index }</button>
-			{{/each}}
+		   <button class="changePic fg-button" data-bind="click: mra.imageBar.changePic" id="${ $data }">${ $data }</button>
         </script>
         
         <script id="moreImageButtonTemplate" type="text/html">
-			{{each(index, imageSection) imageBar}}
-			   {{if index > 3 }}
-					<li class="ui-state-default">
-						<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ imageSection }" data-bind="click: mra.imageBar.removeImageBar"> 
-						<span class="moreText" data-bind="click: mra.imageBar.changePic" id="${ imageSection }">${ imageSection }</span>
-					</li>
-				{{/if}}
-			{{/each}}
+			<li class="ui-state-default">
+				<img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ imageSection }" data-bind="click: mra.imageBar.removeImageBar"> 
+				<span class="moreText" data-bind="click: mra.imageBar.changePic" id="${ imageSection }">${ imageSection }</span>
+			</li>
         </script>
         
         <script type="text/html" id="newsItemTemplate">
@@ -128,10 +122,10 @@
                 <span class="cufonize">Live Dangerously?</span>
                 <a onclick="customizeLayout()" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
                 <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
-                	<span data-bind="template: { name: 'imageButtonTemplate' }"></span>
+                	<span data-bind="template: { name: 'imageButtonTemplate', foreach: getFirstFourFromImageBar() }"></span>
                     <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
-	                <button data-bind="visible: showMoreMode" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
-                    <ul data-bind="template: { name: 'moreImageButtonTemplate' }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
+	                <button data-bind="visible: showMoreMode()" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
+                    <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: getTheRestFromImageBar() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
                  </div>   
                  <div class="ad-controls" style="display:none;"> </div>
             </h2>
@@ -185,10 +179,6 @@
         <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
             <span class="ui-icon ui-icon-closethick" onClick="closeCustomize()"></span>
             <a>Customize MyRedditAll</a>
-            <a href="#" onClick="$('#saveSettingsForm').toggle(); return false;" class="cufonize" style="color:#3F0; font-size:14px;">Save Settings</a>
-            <span id="saveSettingsForm" style="display:none;">
-                <input type="Text" name="saveName" size="30" class="ui-state-defalt" value="Save Name"> <img src="images/fileTypes/disk.png" style="cursor:pointer;" onClick="saveSettings()" width="16" height="16">
-            </span>
         </div>
         <div class="portlet-content">
             <table border="0" cellpadding="0" cellspacing="3" width="100%">
@@ -213,19 +203,7 @@
                     <td>
                         <input type="Text" name="feedName" size="30" class="ui-state-defalt">
                         <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="mra.locationPicker.show(this,$('input[name=feedName]').val())" width="16" height="16">
-                        <script type="text/javascript">
-                            new Autocomplete("feedName", function() {
-                                this.setValue = function( SubRedditTitle ) {
-                                    if (SubRedditTitle != ''){ 
-                                        popupAdd($("#addSubIcon"),SubRedditTitle)
-                                    }
-                                }
-                                if (this.isModified) this.setValue("");
-                                return "findfeed.html?q=" + this.value;
-                            });
-                        </script>
                     </td>
-    
                 </tr>
             </table>
         </div>

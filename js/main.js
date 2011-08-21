@@ -45,11 +45,7 @@ var settings = new (function(){
 		ko.applyBindings(this);
 		Cufon.refresh();
     };
-    
-    // TODO: needs to be inside the image object once its created
-    this.showMoreMode = ko.dependentObservable(function(){
-        return this.imageBar().length > 4;
-    }, this);
+
     
     // getters
     this.getBackgroundColor = function(color){
@@ -64,9 +60,25 @@ var settings = new (function(){
     this.getImageBar = function(newo){
         return $.map(this.imageBar(), function(i,o){
 		    return ({"NAME": o, "SECTION": o});
-		});;
+		});
     };
-    
+	/* this converts the object { "Pics": [], "NSFW": [] } into a simple array [Pics,NSFW] */
+	this.getImageBarNames = function(){
+		return $.map(ko.toJS(window.settings.imageBar()), function(o,i){ return i; });
+	};
+	/* This is tied to the image buttons */
+	this.getFirstFourFromImageBar = function(){
+		return this.getImageBarNames().slice(0,4);
+	};
+	/* This is the code that populates the heart drop down <3 */
+	this.getTheRestFromImageBar = function(){
+		return this.getImageBarNames().slice(4,this.getImageBarNames().length);
+	};
+	/*this part decides whether to show the heart once there is more than four (goal to avoid clutter) */
+	this.showMoreMode = function(){
+		return this.getImageBarNames().length > 4;
+	};
+	
     // adders
     this.addImageBar = function(subreddit){
         this.imageBar()[subreddit] = ko.observableArray();
@@ -514,13 +526,13 @@ var settings = new (function(){
                 image: this.getBackgroundImage()
             },
             subreddits: this.getSubreddits().toStringArray(),
-            imageBar: $.map(ko.toJS(settings.imageBar()), function(o,i){ return i; }),
+            imageBar: this.getImageBarNames(),
             visitedNews: ko.toJSON(this.activeSettings.visited_news)
         });
     };
     
     return this
-})();
+})(); 
 
 //connect items with observableArrays
 ko.bindingHandlers.sortableList = {
@@ -655,6 +667,16 @@ var mra = {
 			}
 		});
 
+		new Autocomplete("feedName", function() {
+			this.setValue = function( SubRedditTitle ) {
+				if (SubRedditTitle != ''){ 
+					popupAdd($("#addSubIcon"),SubRedditTitle)
+				}
+			}
+			if (this.isModified) this.setValue("");
+			return "findfeed.html?q=" + this.value;
+		});
+							
         mra.imageBar.init();
 		
 		//TODO move this to the portlet class
@@ -795,7 +817,7 @@ var mra = {
     imageBar: { 
         init: function(){ 
             mra.imageBar.lbHasInit = 0;
-            mra.imageBar.currentImageBar = "Pics"; 
+            mra.imageBar.currentImageBar = settings.getImageBarNames()[0]; 
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
             }, mra.imageBar.currentImageBar, 100); 
@@ -1092,20 +1114,6 @@ var mra = {
 
         }
     }
-}
-
-function saveSettings(){
-    $.ajax({
-        url: "/saveSettings.cfm",
-        data: {
-            layout: encodeURIComponent(JSON.stringify(currentLayout)),
-            imagebar: encodeURIComponent(JSON.stringify(currentImageBar)), 
-            saveName: $('input[name=saveName]').val()
-        },
-        success: function(response){
-            location.href = $.parseJSON(response).directory;
-        }
-    })
-}
+} 
 
 $(document).ready(mra.init);
