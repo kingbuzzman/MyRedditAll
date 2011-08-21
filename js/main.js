@@ -710,7 +710,6 @@ var mra = {
 				$(this).removeClass("ui-state-active");
 			}
 		});
-
         mra.imageBar.init();
 		
 		//TODO move this to the portlet class
