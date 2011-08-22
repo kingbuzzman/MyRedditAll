@@ -37,7 +37,6 @@ var settings = new (function(){
         this.preferences.load();
         ko.applyBindings(this);
     };
-
     
     // getters
     this.getBackgroundColor = function(color){
@@ -298,8 +297,7 @@ var settings = new (function(){
                 this.score =  parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
                 this.scoreTitle = item.score + "  of People Like It";
                 this.permalink = BASE_URL + item.permalink;
-                
-                var visited = ko.observable(settings.visitedLinks.visited(this.id));
+                this.visited = ko.observable(settings.visitedLinks.visited(this.id));
                 
                 /*
                  * Observable that checks whether or not the link is visible
@@ -307,7 +305,7 @@ var settings = new (function(){
                 this.isVisible = ko.dependentObservable(function(){
                     // TODO: remove the settings reference
                     // checks the the link to see if its been visited, or if all the news items are visible
-                    return !visited() || portlet.showVisited();
+                    return !this.visited() || portlet.showVisited();
                 }.bind(this));
                 
                 /*
@@ -319,7 +317,7 @@ var settings = new (function(){
                     // replace link with reddit's link for it
                     element.attr('href', this.redditURL)
                     // set the page as visited
-                    visited(true);
+                    this.visited(true);
                     
                     setTimeout(function(){
                             // swap back the original link

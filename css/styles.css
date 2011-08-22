@@ -21,7 +21,7 @@ ul.portlet-content { list-style-type:none; padding:0; margin:0; }
 ul.portlet-content > li { overflow:hidden; text-align:left; border-bottom:1px solid #3d3d3d; }
 ul.portlet-content > li > a.link { float:left; width:86%; margin: 2px; padding: 0 0 0 5px; }
 ul.portlet-content > li > a.comment { float:right; width:8%; font-size: 12px; padding: 3px 8px 0 0; }
-ul.portlet-content > li > a.link:visited { color: #666; }
+ul.portlet-content > li > a.link:visited, ul.portlet-content > li > a.link.visited { color: #666; }
 ul.portlet-content > li > a.comment:visited { color: #666; }
 .portlet { margin: 6px;  }
 .portlet-header { margin: 0 0.2em 0.2em 0.2em; padding-left:7px; }
