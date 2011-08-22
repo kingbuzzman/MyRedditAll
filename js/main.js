@@ -322,12 +322,13 @@ var settings = new (function(){
                     
                     // replace link with reddit's link for it
                     element.attr('href', this.redditURL)
-                    // set the page as visited
-                    this.visited(true);
                     
                     setTimeout(function(){
                             // swap back the original link
                             element.attr('href', this.url);
+                            
+                            // set the page as visited
+                            this.visited(true);
                             
                             // TODO: this needs to GO, should not reference settings like that
                             settings.visitedLinks.add(this.id);
