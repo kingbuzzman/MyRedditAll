@@ -293,13 +293,15 @@ var settings = new (function(){
             }.bind(this);
             
             var NewsItem = function(item){
+                var MAX_TITLE_LENGTH = 100;
+                
                 this.id = item.id;
                 this.title = item.title;
-                this.text = item.title.substring(0, 100);
+                this.text = item.title.substring(0, MAX_TITLE_LENGTH) + ((item.title.length > MAX_TITLE_LENGTH)? "...": "");
                 this.redditURL = BASE_URL + "/tb/" + item.id;
                 this.url = item.url;
                 this.score =  parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
-                this.scoreTitle = item.score + "  of People Like It";
+                this.scoreTitle = item.score + " of People Like It";
                 this.permalink = BASE_URL + item.permalink;
                 this.visited = ko.observable(settings.visitedLinks.visited(this.id));
                 

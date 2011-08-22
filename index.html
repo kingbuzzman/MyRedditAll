@@ -46,7 +46,7 @@
     </script>
 
     <script type="text/html" id="newsItemTemplate">
-      <li title="title" data-bind="visible: isVisible()">
+      <li title="${ title }" data-bind="visible: isVisible()">
         <a target="_blank" href="${ url }" class="link" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
         <a target="_blank" href="${ permalink }" class="comment" title="${ scoreTitle }">${ score }</a>
       </li>
