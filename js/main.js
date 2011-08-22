@@ -614,88 +614,9 @@ $(document).ready(function(){
     settings.init();
     // $("#newsSection").sortable().disableSelection();
 });
-    
-var wallpaperIndex = 0;
-var currentLayout = settings.getSubreddits();
+   
 var currentImageBar = settings.getImageBar();
 var redditURL = "http://www.reddit.com";
-var oCustomContextMenu = null;
-var oBase = null; 
-var doAppend = true;
-var baseurl = "http://www.reddit.com";  
-var weburl = "http://myredditall.com/";
-var arrWallpapers = [
-    "images/spacestorm.jpg",
-    "http://www.dinpattern.com/tiles/prestige-COD.gif",
-    "http://www.dinpattern.com/tiles/bones-leather.gif",
-    "http://i.imgur.com/GNUvG.jpg",
-    "http://i.imgur.com/UL45j.jpg",
-    "http://i.imgur.com/vsRWY.jpg",
-    "http://i.imgur.com/FuUYr.jpg",
-    "http://i.imgur.com/SQb2u.jpg", 
-    "http://i.imgur.com/ishzk.jpg",
-    "http://i.imgur.com/I77im.jpg",
-    "http://i.imgur.com/FHV3p.jpg",
-    "http://i.imgur.com/6FDRX.jpg",
-    "http://i.imgur.com/n8bZ8.jpg",
-    "http://i.imgur.com/4zX8q.jpg"
-]; 
-
-function nextWallpaper(){ 
-    wallpaperIndex++
-    if (wallpaperIndex > (arrWallpapers.length - 1))
-        wallpaperIndex = 0;  
-    settings.saveBackgroundImage(arrWallpapers[wallpaperIndex]); 
-}
-function prevWallpaper(){ 
-    wallpaperIndex--
-    if (wallpaperIndex < 0)
-        wallpaperIndex = (arrWallpapers.length - 1);
-    settings.saveBackgroundImage(arrWallpapers[wallpaperIndex]); 
-}
-
-function left(str,count){
-    return String(str).substring(0,count);
-}
- 
-function customizeLayout(){
-     jQuery('#customizeDialog').fadeIn();
-      if (document.images)
-    {
-      preload_image_object = new Image();
-        
-       for(i=0; i<=arrWallpapers.length-1; i++) {
-         preload_image_object.src = arrWallpapers[i];
-       }
-    }
-}
-
-function closeCustomize(){
-    jQuery('#customizeDialog').fadeOut();
-    mra.locationPicker.hide();
-}
- 
-
-function afterCopy(btn){
-    $("#"+clip_curr).html('copied');
-}
-function repositionCopy(elem){ 
-    clip.setText( elem.title + ": " + elem.href );
-    jQuery(clip.div).topZIndex();
-    clip.receiveEvent('mouseout', null);
-    clip.reposition(elem);    
-}
-
-function copyToShare(el){
-    mra.currentComment = el.title + ": " + el.href;
-    $("#copyLink2").zclip({
-        path:'ZeroClipboard.swf',
-        copy:function(){
-            return mra.currentComment;
-        }
-    });
-    $("#imageMenu").destroyContextMenu();
-}
 
 var mra = {
     init: function(){
@@ -720,36 +641,16 @@ var mra = {
                 $(this).removeClass("ui-state-active");
             }
         });
-        mra.imageBar.init();
-        
+        mra.imageBar.init(); 
         //TODO move this to the portlet class
         mra.timer.init(); 
-
+		mra.customize.init();
         /* This is the actual binding to the popupAdd container that decides what to do based on what is clicked */
         $("button[name=btnColumn]").bind("click",function(){
             (this.value == 3) ? settings.addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
             settings.preferences.save();
             mra.locationPicker.hide();
         }); 
-        
-        $('#colorSelector').ColorPicker({
-            color: '#0000ff',
-            onShow: function (colpkr) {
-                $(colpkr).fadeIn(500);
-                return false;
-            },
-            onHide: function (colpkr) {
-                $(colpkr).fadeOut(500);
-                settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
-                settings.preferences.save();
-                return false;
-            },
-            onChange: function (hsb, hex, rgb) {
-                $('#colorSelector div').css('backgroundColor', '#' + hex);                              
-                $('body').css({"background-color":'#' + hex, "background-image":"none" });
-            }
-        });
-        $( "#customizeDialog" ).draggable({ handle: "#customizeHeader" })    
     },
     jsonpRequest: function(url){
         var script = document.createElement("script"); 
@@ -759,10 +660,7 @@ var mra = {
     },
     fetchContentFromRemote: function(callback, subReddit, limit, start, useBackup){
         if (typeof start == "undefined") start = 0;
-        /*if (typeof useBackup == "undefined")
-            reqURL = weburl + "fetchContent.cfm?r=" + decodeURIComponent(subReddit) + "&limit=" + parseInt(limit + start);
-        else*/     
-            reqURL = baseurl + "/r/" + decodeURIComponent(subReddit) + "/.json?&limit=" + parseInt(limit + start);    
+            reqURL = redditURL + "/r/" + decodeURIComponent(subReddit) + "/.json?&limit=" + parseInt(limit + start);    
         
         $.ajax({
                 type: 'GET',
@@ -817,6 +715,66 @@ var mra = {
             }
         }
     },
+	customize: {
+		wallpaperIndex: 0,	
+		wallpapers: [
+				"images/spacestorm.jpg",
+				"http://www.dinpattern.com/tiles/prestige-COD.gif",
+				"http://www.dinpattern.com/tiles/bones-leather.gif",
+				"http://i.imgur.com/GNUvG.jpg",
+				"http://i.imgur.com/UL45j.jpg",
+				"http://i.imgur.com/vsRWY.jpg",
+				"http://i.imgur.com/FuUYr.jpg",
+				"http://i.imgur.com/SQb2u.jpg", 
+				"http://i.imgur.com/ishzk.jpg",
+				"http://i.imgur.com/I77im.jpg",
+				"http://i.imgur.com/FHV3p.jpg",
+				"http://i.imgur.com/6FDRX.jpg",
+				"http://i.imgur.com/n8bZ8.jpg",
+				"http://i.imgur.com/4zX8q.jpg"
+		],
+		init: function(){
+			$('#colorSelector').ColorPicker({
+				color: '#0000ff',
+				onShow: function (colpkr) {
+					$(colpkr).fadeIn(500);
+					return false;
+				},
+				onHide: function (colpkr) {
+					$(colpkr).fadeOut(500);
+					settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
+					settings.preferences.save();
+					return false;
+				},
+				onChange: function (hsb, hex, rgb) {
+					$('#colorSelector div').css('backgroundColor', '#' + hex);                              
+					$('body').css({"background-color":'#' + hex, "background-image":"none" });
+				}
+			});
+			$( "#customizeDialog" ).draggable({ handle: "#customizeHeader" });
+ 	
+		},
+		nextWallpaper: function(){ 
+			mra.customize.wallpaperIndex++
+			if (mra.customize.wallpaperIndex > (mra.customize.wallpapers.length - 1))
+				mra.customize.wallpaperIndex = 0;  
+			mra.customize.saveWallpaper();
+		},
+		prevWallpaper: function(){ 
+			mra.customize.wallpaperIndex--
+			if (mra.customize.wallpaperIndex < 0)
+				mra.customize.wallpaperIndex = (mra.customize.wallpapers.length - 1);
+			mra.customize.saveWallpaper();	
+		},
+		saveWallpaper: function(){
+			settings.saveBackgroundImage(mra.customize.wallpapers[mra.customize.wallpaperIndex]); 
+		},
+		closeDialog: function(){
+			jQuery('#customizeDialog').fadeOut();
+			mra.locationPicker.hide();
+		}
+
+	},
     locationPicker: {
         /*this is the little popup you see when you click on meta and customize this so u can pick 1|2|3|image*/
         passEvent: function(evt){
@@ -840,17 +798,7 @@ var mra = {
             selectedReddit = "";
         }
     },
-    news: {
-        totalIndex: 0,
-        totalItems: 100, //maximum limit imposed by reddit
-        init: function(){
-            
-        }, 
-        togglePortlet: function(evt){ 
-            $(evt.target).toggleClass('ui-icon-minusthick').toggleClass('ui-icon-plusthick'); 
-            $(evt.target).parents('.portlet:first').find('.portlet-content').toggle(); 
-        },
-        
+    news: {   
         loadNewSection: function(curReddit, column){
             currentColumnSelected = (typeof column == "undefined") ? $("[name=btnColumn].ui-state-active").val() : column;
             settings.subreddits.addPortlet(curReddit);
@@ -978,15 +926,11 @@ var mra = {
                 }
                 if (action == 'analyze'){
                     mra.imageBar.popupWindow("analyze.cfm?imgURL=" + $(el).attr('href'));
-                }
-                if (action == 'copy'){
-            
-                }
-        
-                // oCustomContextMenu.Hide();   
+                } 
         },
         applyContextMenu: function(){
-            oBase = document.getElementById('div');
+            window.oCustomContextMenu = null;
+			window.oBase = document.getElementById('div');
 
             var Arguments = {
                 Base: oBase,
@@ -1028,7 +972,7 @@ var mra = {
                         $.colorbox.resize({ width: 400 })
                     }
                     $("#cboxTitle").show();
-                    mra.imageBar.addClipboardCopy(document.getElementById('copyLink2'));
+                    mra.imageBar.clipboard.addCopy(document.getElementById('copyLink2'));
                     $("iframe").attr("src",$("img.cboxPhoto").attr("src"));
                 }, 
                 onLoad: function(){
@@ -1070,34 +1014,45 @@ var mra = {
             } 
         },
         /* this initializes the copy to share functionality for the overlay */
-        initCopyPaste: function(){
-            $("#cboxContent").hover(
-                function(){
-                    $("#cboxTitle").stop(true).fadeTo("normal",0); 
-                },
-                function(){  
-                    $("#cboxTitle").stop(true).fadeTo("normal",0.85); 
-                }
-            );
-            $("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
-            ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
-            //ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
-            clip = new ZeroClipboard.Client();
-            clip.setHandCursor( true );
-            clip.addEventListener( 'onComplete', function() { afterCopy() } );
-            clip_curr='';
-        },      
-        //this function is there because the onmouseover event gets removed every time the picture changes
-        addClipboardCopy: function(obj){
-            obj.onmouseover = function(){
-                clip_curr=this.id;
-                if (clip.div) {
-                    repositionCopy(this);
-                }
-                else clip.glue(this);
-                clip.receiveEvent('mouseover', null);
-            }
-        },
+		clipboard: {
+			init: function(){
+				mra.imageBar.clipboard.curObj = "";
+				$("#cboxContent").hover(
+					function(){
+						$("#cboxTitle").stop(true).fadeTo("normal",0); 
+					},
+					function(){  
+						$("#cboxTitle").stop(true).fadeTo("normal",0.85); 
+					}
+				);
+				$("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
+				ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
+				//ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
+				clip = new ZeroClipboard.Client();
+				clip.setHandCursor( true );
+				clip.addEventListener( 'onComplete', function() { afterCopy() } );				
+			},
+			after: function(){
+				 $("#"+mra.imageBar.clipboard.curObj).html('copied');
+			},
+			reposition: function(elem){
+				clip.setText( elem.title + ": " + elem.href );
+				jQuery(clip.div).topZIndex();
+				clip.receiveEvent('mouseout', null);
+				clip.reposition(elem);  
+			},
+			//this function is there because the onmouseover event gets removed every time the picture changes
+			addCopy: function(obj){
+				obj.onmouseover = function(){
+					mra.imageBar.clipboard.curObj=this.id;
+					if (clip.div) {
+						mra.imageBar.clipboard.reposition(this);
+					}
+					else clip.glue(this);
+					clip.receiveEvent('mouseover', null);
+				}
+			}
+		}, 
         fullscreenLightbox: function(){
             var i = new Image();
             i.onload = function(){
@@ -1141,16 +1096,16 @@ var mra = {
                     countdown_prefix: '(', // Wrap around the countdown
                     countdown_sufix: ')'
                   },
-                  effect: 'slide-hori', // or 'slide-vert', 'resize', 'fade', 'none' or false
-                  enable_keyboard_move: false, // Move to next/previous image with keyboard arrows?
-                  cycle: true // If set to false, you can't go from the last image to the first, and vice versa,
-                });
+				effect: 'slide-hori', // or 'slide-vert', 'resize', 'fade', 'none' or false
+				enable_keyboard_move: false, // Move to next/previous image with keyboard arrows?
+				cycle: true // If set to false, you can't go from the last image to the first, and vice versa,
+			});
             window.adGallery = window.adGallery[0];    
             document.addEventListener('touchmove', function(e){ e.preventDefault(); });
             myScroll = new iScroll($('.ad-thumb-list')[0], { desktopCompatibility: true, vScrollbar:false });
             mra.imageBar.applyLightBox();
             mra.imageBar.applyContextMenu();
-            mra.imageBar.initCopyPaste();
+            mra.imageBar.clipboard.init();
             setTimeout(function(){ window.imageLoader = setInterval(mra.imageBar.loadMoreImages,1000 * 10);  },1000 * 10);
 
         }

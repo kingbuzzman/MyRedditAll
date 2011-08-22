@@ -116,7 +116,7 @@
 
       <h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
         <span class="cufonize">Live Dangerously?</span>
-        <a onclick="customizeLayout()" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
+        <a onclick="jQuery('#customizeDialog').fadeIn(); return false;" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
         <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
           <span data-bind="template: { name: 'imageButtonTemplate', foreach: getFirstFourFromImageBar() }"></span>
           <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
@@ -173,7 +173,7 @@
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="left:8%; position:absolute; top:99px; width:80%; display:none; border:1px solid #ffdab9;" id="customizeDialog">
       <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
-        <span class="ui-icon ui-icon-closethick" onClick="closeCustomize()"></span>
+        <span class="ui-icon ui-icon-closethick" onClick="mra.customize.closeDialog()"></span>
         <a>Customize MyRedditAll</a>
       </div>
       <div class="portlet-content">
@@ -181,14 +181,8 @@
           <tr>
             <td class="cufonize">Pick Wallpaper </td>
             <td colspan="3" style="text-align:left;">
-              <input type="button" value="Previous" class="ui-state-default" onClick="prevWallpaper()">
-              <input type="button" value="Next" class="ui-state-default" onClick="nextWallpaper()">
-
-              <span class="cufonize">
-                Custom:
-                <input type="hidden" value="" size="5" id="customWallpaper">
-                <img src="images/fileTypes/picture.png" onClick="saveWallpaper($('#customWallpaper').val());" width="16" height="16">
-              </span>
+              <input type="button" value="Previous" class="ui-state-default" onClick="mra.customize.prevWallpaper()">
+              <input type="button" value="Next" class="ui-state-default" onClick="mra.customize.nextWallpaper()">
             </td>
             <td><span class="cufonize">Hide Viewed</span> <input type="checkbox" data-bind="checked: settings.isNewsItemVisible, attr: { checked: settings.isNewsItemVisible }"></td>
             <td class="cufonize">Color </td>
