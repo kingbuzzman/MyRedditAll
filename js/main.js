@@ -9,7 +9,7 @@ if (typeof console == "undefined") {
 var settings = new (function(){
     // default cookie settings
     var BACKGROUND_COLOR = null;
-    var BACKGROUND_IMAGE = "image/spacestorm.jpg";
+    var BACKGROUND_IMAGE = "images/spacestorm.jpg";
     var SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
     var SUBREDDIT_ITEMS = 10;
     var IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
@@ -17,8 +17,8 @@ var settings = new (function(){
     var BASE_URL = "http://www.reddit.com";
     
     this.background = {
-        color: ko.observable(null),
-        image: ko.observable("images/spacestorm.jpg")
+        color: ko.observable(BACKGROUND_COLOR),
+        image: ko.observable(BACKGROUND_IMAGE)
     };
     
     this.imageBar = ko.observable({});
@@ -554,7 +554,6 @@ var settings = new (function(){
                 // there was no cookie set, save it.
                 this.preferences.save();
             }
-            
         }.bind(settings);
         
         /*
