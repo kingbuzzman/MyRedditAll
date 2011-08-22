@@ -227,6 +227,10 @@ var settings = new (function(){
             return (id in links);
         };
         
+        /*
+         * Loads the current visited links
+         * @links string list of visited links in a long array ie "link1,link2" NOT: ["link1","link2"]
+         */
         this.load = function(links){
             links = links.split(",");
             
