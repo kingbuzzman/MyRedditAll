@@ -118,11 +118,11 @@
         <span class="cufonize">Live Dangerously?</span>
         <a onclick="jQuery('#customizeDialog').fadeIn(); return false;" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
         <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
-          <span data-bind="template: { name: 'imageButtonTemplate', foreach: getFirstFourFromImageBar() }"></span>
+          <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.getFrontPage() }"></span>
           <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
           <button data-bind="visible: showMoreMode()" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
-          <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: getTheRestFromImageBar() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
-        </div>   
+          
+        </div>
         <div class="ad-controls" style="display:none;"> </div>
       </h2>
 

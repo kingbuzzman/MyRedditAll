@@ -21,7 +21,6 @@ var settings = new (function(){
         image: ko.observable(BACKGROUND_IMAGE)
     };
     
-    this.imageBar = ko.observable({});
     this.images = ko.observableArray();
     this.activeImage = function(){
         return this.images()[this.activeImageIndex()];
@@ -49,13 +48,15 @@ var settings = new (function(){
         return this.subreddits;
     };
     this.getImageBar = function(newo){
-        return $.map(this.imageBar(), function(i,o){
-            return ({"NAME": o, "SECTION": o});
-        });
+        return [{"NAME": "pics", "SECTION": "pix"}];
+        // return $.map(this.imageBar(), function(i,o){
+        //     return ({"NAME": o, "SECTION": o});
+        // });
     };
     /* this converts the object { "Pics": [], "NSFW": [] } into a simple array [Pics,NSFW] */
     this.getImageBarNames = function(){
-        return $.map(ko.toJS(window.settings.imageBar()), function(o,i){ return i; });
+        return ["pics","pics"]
+        // return $.map(ko.toJS(window.settings.imageBar()), function(o,i){ return i; });
     };
     /* This is tied to the image buttons */
     this.getFirstFourFromImageBar = function(){
@@ -72,7 +73,7 @@ var settings = new (function(){
     
     // adders
     this.addImageBar = function(subreddit){
-        this.imageBar()[subreddit] = ko.observableArray();
+        //this.imageBar()[subreddit] = ko.observableArray();
     };
     
     // removers
@@ -83,7 +84,7 @@ var settings = new (function(){
     };
     
     this.removeImageBar = function(subreddit){
-        this.imageBar.remove(subreddit);     
+        //this.imageBar.remove(subreddit);     
     };
     
     // setters
@@ -253,6 +254,51 @@ var settings = new (function(){
         
         return this;
     })();
+    
+    this.imageBar = function(){
+        var buttons = ko.observableArray();
+        
+        var ImageButton = function(name){
+            this.name = name;
+            this.active = false;
+            
+            this.toString = function(){
+                return this.name;
+            };
+        }
+        
+        this.addButton = function(name){
+            if(name.push){
+                for(var index in name) {
+                    this.addButton(name[index]);
+                }
+            } else {
+                buttons.push(new ImageButton(name));
+            }
+        };
+        
+        this.getFrontPage = function(){
+            return buttons().slice(0,4);
+        };
+        
+        /*
+         * Return all the portlets (subreddits) in a Array of Strings
+         */
+        this.toStringArray = function(){
+            return buttons().map(function(item){ 
+                return item.name;
+            });
+        };
+        
+        /*
+         * Return all the portlets (subreddits) in their order
+         */
+        this.toString = function(){
+            return this.toStringArray().join(", ");
+        };
+        
+        return this;
+    };
     
     /*
      * Houses all the portlets (subreddits)
@@ -624,6 +670,7 @@ var redditURL = "http://www.reddit.com";
 
 var mra = {
     init: function(){
+        return; //kill this fucking thing!
         currentImageBar = settings.getImageBar();
         //all hover and click logic for buttons
         $(".fg-button:not(.ui-state-disabled)")
