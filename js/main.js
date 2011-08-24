@@ -46,45 +46,6 @@ var settings = new (function(){
     this.getSubreddits = function(){
         return this.subreddits;
     };
-    this.getImageBar = function(newo){
-        return [{"NAME": "pics", "SECTION": "pix"}];
-        // return $.map(this.imageBar(), function(i,o){
-        //     return ({"NAME": o, "SECTION": o});
-        // });
-    };
-    /* this converts the object { "Pics": [], "NSFW": [] } into a simple array [Pics,NSFW] */
-    this.getImageBarNames = function(){
-        return ["pics","pics"]
-        // return $.map(ko.toJS(window.settings.imageBar()), function(o,i){ return i; });
-    };
-    /* This is tied to the image buttons */
-    this.getFirstFourFromImageBar = function(){
-        return this.getImageBarNames().slice(0,4);
-    };
-    /* This is the code that populates the heart drop down <3 */
-    this.getTheRestFromImageBar = function(){
-        return this.getImageBarNames().slice(4,this.getImageBarNames().length);
-    };
-    /*this part decides whether to show the heart once there is more than four (goal to avoid clutter) */
-    this.showMoreMode = function(){
-        return this.getImageBarNames().length > 4;
-    };
-    
-    // adders
-    this.addImageBar = function(subreddit){
-        //this.imageBar()[subreddit] = ko.observableArray();
-    };
-    
-    // removers
-    this.removeSubreddit = function(column, subreddit){
-        //TODO find the index of the reddit and remove it from the array
-        //this.activeSettings['subreddits']()[column].remove(subreddit);
-        
-    };
-    
-    this.removeImageBar = function(subreddit){
-        //this.imageBar.remove(subreddit);     
-    };
     
     // setters
     this.setBackgroundColor = function(color){
@@ -683,8 +644,7 @@ $(document).ready(function(){
     settings.init();
     // $("#newsSection").sortable().disableSelection();
 });
-   
-var currentImageBar = settings.getImageBar();
+
 var redditURL = "http://www.reddit.com";
 
 var mra = {
@@ -1180,6 +1140,4 @@ var mra = {
 
         }
     }
-} 
-
-$(document).ready(mra.init);
+}
