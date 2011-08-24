@@ -309,7 +309,7 @@ var settings = new (function(){
             this.showVisited = ko.observable(false);
             
             this.toggleVisited = function(){
-                this.showVisited(Boolean(this.showVisited() ^ true));
+                this.showVisited((this.showVisited() ^ true) === 1);
             };
             
             /*
@@ -422,13 +422,13 @@ var settings = new (function(){
                 // toggles from true to false depending on current value:
                 // ie. true ^ true -> false
                 // ie. false ^ true -> true
-                minimized(Boolean(minimized() ^ true));
+                minimized((minimized() ^ true) === 1);
             };
             /*
              * Triggers the display of the load bar to the user
              */
             this.getShowLoadingBar = function(){
-                return !Boolean(newsItems().length > 0);
+                return !(newsItems().length > 0);
             };
             
             /*
