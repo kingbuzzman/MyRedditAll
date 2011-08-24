@@ -211,6 +211,10 @@ var settings = new (function(){
         };
     })();
     
+    /*
+     * Houses the image bar -- controls the image view
+     * TODO: self fetch images
+     */
     this.imageBar = new (function(){
         var MAX_IMAGE_BAR_BUTTONS = 4;
         
@@ -225,7 +229,7 @@ var settings = new (function(){
             }.bind(this));
             
             this.select = function(e){
-                mra.imageBar.changePic(e);
+                mra.imageBar.changePic(e); // DELETE THIS!
                 selected(this);
             }
             
@@ -292,7 +296,6 @@ var settings = new (function(){
     
     /*
      * Houses all the portlets (subreddits)
-     * - needs to be initialized
      */
     this.subreddits = new (function(){
         // private variables
@@ -601,8 +604,6 @@ var settings = new (function(){
         this.save = function(){
             document.cookie = COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + COOKIE_EXPIRATION + "; path=/";
         }.bind(settings);
-        
-        return this;
     };
     
     this.toString = function(){
