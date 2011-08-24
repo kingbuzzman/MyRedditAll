@@ -340,7 +340,7 @@ var settings = new (function(){
                 this.redditURL = BASE_URL + "/tb/" + item.id;
                 this.url = item.url;
                 this.score =  parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
-                this.scoreTitle = item.score + " of People Like It";
+                this.scoreTitle = this.score + " of People Like It";
                 this.permalink = BASE_URL + item.permalink;
                 this.visited = ko.observable(settings.visitedLinks.visited(this.id));
                 
