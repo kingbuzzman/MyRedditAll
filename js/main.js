@@ -301,7 +301,7 @@ var settings = new (function(){
         // private variables
         var SubReddits = this;
         var portlets = ko.observableArray();
-        var NEWS_BUTTONS = ['hot','new','controversial','top'];
+        var NEWS_BUTTONS = ['hot','new','top','controversial'];
         var NEWS_ITEMS_PER_REQUEST = 10;
         
         // private class (individual portlets)
@@ -380,11 +380,12 @@ var settings = new (function(){
             };
             
             this.buttons = new (function(){
-                var activeButton = ko.observable('top');
+                var activeButton = ko.observable('hot');
                 
                 // public constants
                 this.NEWS_BUTTONS = NEWS_BUTTONS;
                 
+                // TODO: create an object out of each button and make a property inside of it with isActive()
                 this.getActiveButton = function(){
                     return activeButton();
                 };

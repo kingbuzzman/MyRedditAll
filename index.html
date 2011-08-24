@@ -51,6 +51,7 @@
       </li>
     </script>
 
+    <!-- TODO: STOP the FLOAT:RIGHT madness  -->
     <script type="text/html" id="newsButton">
       {{each(index, name) buttons.NEWS_BUTTONS}}
       <span title="${ name }" rel="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
