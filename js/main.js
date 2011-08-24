@@ -264,15 +264,16 @@ var settings = new (function(){
                 .css({ left: (morePos.left + 32) - $("#showMoreList").width() })
                 .toggle();
         };
-        
+		
+        /* Returns the buttons for the top right imagebar buttons */
         this.getFrontPage = ko.dependentObservable(function(){
             return buttons().slice(0, MAX_IMAGE_BAR_BUTTONS);
         }.bind(this));
-        
+        /* this is an observeable that decides whether to show the extended menu icon */
         this.populatedMenu = ko.dependentObservable(function(){
             return buttons().length > MAX_IMAGE_BAR_BUTTONS;
         }.bind(this));
-        
+        /* This shows the extended menu of items */
         this.getMenu = ko.dependentObservable(function(){
             return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
         }.bind(this));
