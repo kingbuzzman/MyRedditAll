@@ -302,6 +302,7 @@ var settings = new (function(){
         var SubReddits = this;
         var portlets = ko.observableArray();
         var NEWS_BUTTONS = ['hot','new','controversial','top'];
+        var NEWS_ITEMS_PER_REQUEST = 10;
         
         // private class (individual portlets)
         var Portlet = function(name){
@@ -321,13 +322,12 @@ var settings = new (function(){
             var load = function(){
                 var url = this.requestURL();
                 
-                newsItems.removeAll();
-                
                 // load the complete feed
                 loader.call(url, function(data){
-                    for(var index in data){
+                    for(var index in data)
                         newsItems.push(new NewsItem(data[index]));
-                    }
+                    
+                    this.last(newsItems()[newsItems().length-1]);
                 }.bind(this));
             }.bind(this);
             
@@ -392,8 +392,7 @@ var settings = new (function(){
                 this.reloadSection = function(i,e,o){
                     var button = $(i.target).attr("rel");
                     
-                    // reset the amount visible back to 10 news stories..
-                    portlet.amountVisible(10);
+                    newsItems.removeAll();
                     
                     activeButton(button);
                     load(); // redo this
@@ -404,16 +403,15 @@ var settings = new (function(){
             this.name = name;
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
             this.last = ko.observable();
-            this.amountVisible = ko.observable(10);
             
             this.requestURL = function(){
-                return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + this.amountVisible() + ((this.last())? "&after=" + this.last(): "");
+                return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
             };
             
             this.getNewsItems = function(){
                 return ko.utils.arrayFilter(newsItems(), function(newsItem){
                     return newsItem.isVisible() ? newsItem: null;
-                }).slice(0,this.amountVisible());
+                });
             };
             
             /*
@@ -443,7 +441,7 @@ var settings = new (function(){
              * Populates the portlet with 10 more items
              */
             this.populateNext = function(){
-                this.amountVisible(this.amountVisible()+10);
+                load();
             };
             
             /*
