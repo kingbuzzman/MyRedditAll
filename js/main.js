@@ -130,7 +130,7 @@ var settings = new (function(){
             // make request
             var connection = $.ajax({
                 type: 'GET',
-                url: url + "/.json?&limit=100",
+                url: url,
                 dataType: 'jsonp',
                 jsonp: 'jsonp',
                 timeout: 20000, // 2 seconds timeout
@@ -318,8 +318,8 @@ var settings = new (function(){
             /*
              * Loads the content for the subreddit
              */
-            var load = function(section){
-                var url = this.url + ((typeof section == "undefined")? "" : "/" + section);
+            var load = function(){
+                var url = this.requestURL();
                 
                 newsItems.removeAll();
                 
@@ -396,14 +396,19 @@ var settings = new (function(){
                     portlet.amountVisible(10);
                     
                     activeButton(button);
-                    load(button);
+                    load(); // redo this
                 };
             })();
             
             // attributes
             this.name = name;
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
+            this.last = ko.observable();
             this.amountVisible = ko.observable(10);
+            
+            this.requestURL = function(){
+                return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + this.amountVisible() + ((this.last())? "&after=" + this.last(): "");
+            };
             
             this.getNewsItems = function(){
                 return ko.utils.arrayFilter(newsItems(), function(newsItem){
