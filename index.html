@@ -31,17 +31,16 @@
     <script src="js/new_contextMenu.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/iScroll.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <!--{{if ko.utils.arrayIndexOf(settings.imageBar,index) < 4 }}
-    {{if ko.utils.arrayIndexOf(settings.activeSettings.imageBar, imageSection) == 0}}ui-corner-left ui-state-active{{/if}}
-    {{/if}}-->
+
+    <!-- TODO: you can delete this? and if you can why not do it in the same place as moreImageButtonTemplate -->
     <script id="imageButtonTemplate" type="text/html">
-      <button class="changePic fg-button" data-bind="click: mra.imageBar.changePic" id="${ $data }">${ $data }</button>
+      <button class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }" id="${ name }">${ name }</button>
     </script>
 
+    <!-- TODO: remove the X (remove) from here and add a better UI for this -->
     <script id="moreImageButtonTemplate" type="text/html">
-      <li class="ui-state-default">
-        <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ imageSection }" data-bind="click: mra.imageBar.removeImageBar"> 
-        <span class="moreText" data-bind="click: mra.imageBar.changePic" id="${ imageSection }">${ imageSection }</span>
+      <li class="ui-state-default" data-bind="click: select">
+        ${ name } <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ name }" data-bind="click: remove">
       </li>
     </script>
 
@@ -120,8 +119,8 @@
         <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
           <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.getFrontPage() }"></span>
           <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
-          <button data-bind="visible: showMoreMode()" id="showMore" class="changePic fg-button ui-corner-right" onclick="mra.imageBar.showMore()"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
-          
+          <button data-bind="click: imageBar.showMenu, visible: imageBar.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
+          <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.getMenu() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
         </div>
         <div class="ad-controls" style="display:none;"> </div>
       </h2>

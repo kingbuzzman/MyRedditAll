@@ -31,7 +31,6 @@ var settings = new (function(){
     this.init = function(){
         // initialize complex object
         this.preferences = new this.preferences(this);
-        this.subreddits = new this.subreddits();
         
         this.preferences.load();
         ko.applyBindings(this);
@@ -201,8 +200,6 @@ var settings = new (function(){
             // return the connection
             return connection;
         };
-        
-        return this;
     })();
     
     /*
@@ -251,16 +248,29 @@ var settings = new (function(){
             
             return keys.join(",");
         };
-        
-        return this;
     })();
     
-    this.imageBar = function(){
+    this.imageBar = new (function(){
+        var MAX_IMAGE_BAR_BUTTONS = 4;
+        
         var buttons = ko.observableArray();
+        var selected = ko.observable();
         
         var ImageButton = function(name){
             this.name = name;
-            this.active = false;
+            
+            this.selected = ko.dependentObservable(function(){
+                return (selected() == this);
+            }.bind(this));
+            
+            this.select = function(e){
+                mra.imageBar.changePic(e);
+                selected(this);
+            }
+            
+            this.remove = function(){
+                buttons.remove(this);
+            };
             
             this.toString = function(){
                 return this.name;
@@ -269,42 +279,61 @@ var settings = new (function(){
         
         this.addButton = function(name){
             if(name.push){
-                for(var index in name) {
+                for(var index in name){
                     this.addButton(name[index]);
                 }
             } else {
                 buttons.push(new ImageButton(name));
             }
+            
+            // TODO: redo this.. it sucks
+            if(buttons().length === 1)
+                buttons()[0].select(buttons()[0].name);
         };
         
-        this.getFrontPage = function(){
-            return buttons().slice(0,4);
+        this.showMenu = function(){
+            // TODO: REDO THIS ASAP
+            var morePos = jQuery("#showMore").position();
+            $("#showMoreList")
+                .css({ "position": "absolute", "top": (morePos.top + 31) })
+                .css({ left: (morePos.left + 32) - $("#showMoreList").width() })
+                .toggle();
         };
+        
+        this.getFrontPage = ko.dependentObservable(function(){
+            return buttons().slice(0, MAX_IMAGE_BAR_BUTTONS);
+        }.bind(this));
+        
+        this.populatedMenu = ko.dependentObservable(function(){
+            return buttons().length > MAX_IMAGE_BAR_BUTTONS;
+        }.bind(this));
+        
+        this.getMenu = ko.dependentObservable(function(){
+            return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
+        }.bind(this));
         
         /*
-         * Return all the portlets (subreddits) in a Array of Strings
+         * Return all the image bar buttons in a Array of Strings
          */
         this.toStringArray = function(){
-            return buttons().map(function(item){ 
+            return buttons().map(function(item){
                 return item.name;
             });
         };
         
         /*
-         * Return all the portlets (subreddits) in their order
+         * Return all the image bar buttons in their order
          */
         this.toString = function(){
             return this.toStringArray().join(", ");
         };
-        
-        return this;
-    };
+    })();
     
     /*
      * Houses all the portlets (subreddits)
      * - needs to be initialized
      */
-    this.subreddits = function(){
+    this.subreddits = new (function(){
         // private variables
         var SubReddits = this;
         var portlets = ko.observableArray();
@@ -384,8 +413,6 @@ var settings = new (function(){
                     
                     return true;
                 };
-                
-                return this;
             };
             
             this.buttons = new (function(){
@@ -407,8 +434,6 @@ var settings = new (function(){
                     activeButton(button);
                     load(button);
                 };
-                
-                return this;
             })();
             
             // attributes
@@ -466,8 +491,6 @@ var settings = new (function(){
             }.bind(this);
             
             load();
-            
-            return this;
         };
         
         /*
@@ -511,7 +534,7 @@ var settings = new (function(){
          * Return all the portlets (subreddits) in a Array of Strings
          */
         this.toStringArray = function(){
-            return portlets().map(function(item){ 
+            return portlets().map(function(item){
                 return item.name;
             });
         };
@@ -527,9 +550,7 @@ var settings = new (function(){
         for(var index in arguments) {
             this.addPortlet(arguments[index]);
         }
-        
-        return this;
-    };
+    })();
     
     /*
      * Houses all the user preference code
@@ -589,15 +610,15 @@ var settings = new (function(){
                 }.bind(this));
                 
                 //Populate the cookie variable into the settings.imageBar variable
-                $.each(settings.imageBar, function(i, o){
-                    this.addImageBar(o);
+                $.each(settings.imageBar,function(i, o){
+                    this.imageBar.addButton(o);
                 }.bind(this));
             } else {
                 // load default subreddits
                 this.getSubreddits().addPortlet(SUBREDDITS);
                 
                 $.each(IMAGE_BAR,function(i, o){
-                    this.addImageBar(o);
+                    this.imageBar.addButton(o);
                 }.bind(this));
                 
                 // there was no cookie set, save it.
@@ -630,13 +651,11 @@ var settings = new (function(){
                 image: this.getBackgroundImage()
             },
             subreddits: this.getSubreddits().toStringArray(),
-            imageBar: this.getImageBarNames(),
+            imageBar: this.imageBar.toStringArray(),
             visitedLinks: this.visitedLinks.toString()
         });
     };
-    
-    return this;
-})(); 
+})();
 
 //connect items with observableArrays
 ko.bindingHandlers.sortableList = {
