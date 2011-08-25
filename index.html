@@ -88,7 +88,7 @@
 
     <script id="loadMetaButtonTemplate" type="text/html">
       {{each ['active','over18','new','self','media','Favorites']}}
-      <button id="${$value}" class="fg-button ui-state-default ui-priority-primary " data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
+      <button id="${$value}" class="changePic fg-button" data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
       {{/each}} 
     </script>
 
@@ -119,7 +119,7 @@
         <a onclick="jQuery('#customizeDialog').fadeIn(); return false;" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
         <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
           <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.getFrontPage() }"></span>
-          <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').dialog('open')">Meta</button>
+          <button class="changePic fg-button ui-corner-right" onclick="$('#metaRedditDialog').toggle()">Meta</button>
           <button data-bind="click: imageBar.showMenu, visible: imageBar.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
           <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.getMenu() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
         </div>
@@ -128,21 +128,21 @@
 
       <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: getSubreddits().getPortlets() }, sortableList: getSubreddits().getPortlets()"></div>
     </div>
-
-    <div id="metaRedditDialog" title="MetaReddit Picker" style="display:none;">
-
-      <p>
-      [<img class="metaAdd" src="images/fileTypes/add.png" align="absmiddle" width="16" height="16"> Add  |
-      <img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"> View In Image Bar |
-      (Word) View In Reddit]
-      </p>
-
-      <div class="fg-buttonset fg-buttonset-single" style="width:100%;" data-bind="template: { name: 'loadMetaButtonTemplate' }"></div>
-
-      <div style="clear:both">&nbsp;</div>
-
-      <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>
-
+    
+    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="left:8%; position:absolute; top:99px; width:530px; display:none; border:1px solid #ffdab9;" id="metaRedditDialog" style="display:none;">
+      <div class="portlet-header ui-widget-header ui-corner-all">
+        <span class="ui-icon ui-icon-closethick" onClick="$(this).parent().parent().hide()"></span>
+        <a>Add New Section</a>
+        <input type="Text" name="feedName" size="30" class="ui-state-defalt">
+        <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="mra.locationPicker.show(this,$('input[name=feedName]').val())" width="16" height="16">
+      </div>
+      <div class="portlet-content">
+        <div class="fg-buttonset fg-buttonset-single" style="width:100%;" data-bind="template: { name: 'loadMetaButtonTemplate' }"></div>
+        
+        <div style="clear:both">&nbsp;</div>
+        
+        <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>
+      </div>
     </div>
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="" id="newsTemplate" style="display:none;">
@@ -188,11 +188,6 @@
             <td class="cufonize">Color </td>
             <td>
               <div id="colorSelector"><div></div></div>
-            </td>
-            <td class="cufonize">Search Sub Reddits</td>
-            <td>
-              <input type="Text" name="feedName" size="30" class="ui-state-defalt">
-              <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="mra.locationPicker.show(this,$('input[name=feedName]').val())" width="16" height="16">
             </td>
           </tr>
         </table>

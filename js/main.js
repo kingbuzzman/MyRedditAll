@@ -229,7 +229,7 @@ var settings = new (function(){
             }.bind(this));
             
             this.select = function(e){
-                mra.imageBar.changePic(e); // DELETE THIS!
+                mra.imageBar.changePic(this.name); 
                 selected(this);
             }
             
@@ -257,12 +257,13 @@ var settings = new (function(){
         };
         
         this.showMenu = function(){
-            // TODO: REDO THIS ASAP
-            var morePos = jQuery("#showMore").position();
-            $("#showMoreList")
-                .css({ "position": "absolute", "top": (morePos.top + 31) })
-                .css({ left: (morePos.left + 32) - $("#showMoreList").width() })
-                .toggle();
+			$("#showMoreList").position({
+				of: $("#showMore"),
+				my: "right top",
+				at: "right bottom",
+				offset: 0, 
+				collision: "flip flip"
+			}).toggle();
         };
 		
         /* Returns the buttons for the top right imagebar buttons */
@@ -303,7 +304,7 @@ var settings = new (function(){
         var SubReddits = this;
         var portlets = ko.observableArray();
         var NEWS_BUTTONS = ['hot','new','top','controversial'];
-        var NEWS_ITEMS_PER_REQUEST = 10;
+        var NEWS_ITEMS_PER_REQUEST = 30;
         
         // private class (individual portlets)
         var Portlet = function(name){
@@ -333,7 +334,7 @@ var settings = new (function(){
             }.bind(this);
             
             var NewsItem = function(item){
-                var MAX_TITLE_LENGTH = 100;
+                var MAX_TITLE_LENGTH = 95;
                 
                 this.id = item.id;
                 this.title = item.title;
@@ -381,7 +382,7 @@ var settings = new (function(){
             };
             
             this.buttons = new (function(){
-                var activeButton = ko.observable('hot');
+                var activeButton = ko.observable(NEWS_BUTTONS[0]);
                 
                 // public constants
                 this.NEWS_BUTTONS = NEWS_BUTTONS;
@@ -405,7 +406,8 @@ var settings = new (function(){
             this.name = name;
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
             this.last = ko.observable();
-            
+            this.amountVisible = ko.observable(10);
+			
             this.requestURL = function(){
                 return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
             };
@@ -413,7 +415,7 @@ var settings = new (function(){
             this.getNewsItems = function(){
                 return ko.utils.arrayFilter(newsItems(), function(newsItem){
                     return newsItem.isVisible() ? newsItem: null;
-                });
+                }).slice(0,this.amountVisible());
             };
             
             /*
@@ -655,8 +657,7 @@ var redditURL = "http://www.reddit.com";
 
 var mra = {
     init: function(){
-        return; //kill this fucking thing!
-        currentImageBar = settings.getImageBar();
+		//not yet
         //all hover and click logic for buttons
         $(".fg-button:not(.ui-state-disabled)")
         .hover(
@@ -677,13 +678,13 @@ var mra = {
                 $(this).removeClass("ui-state-active");
             }
         });
-        mra.imageBar.init(); 
+        //mra.imageBar.init(); 
         //TODO move this to the portlet class
-        mra.timer.init(); 
+        //mra.timer.init(); 
 		mra.customize.init();
         /* This is the actual binding to the popupAdd container that decides what to do based on what is clicked */
         $("button[name=btnColumn]").bind("click",function(){
-            (this.value == 3) ? settings.addImageBar(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
+            (this.value == 3) ? settings.imageBar.addButton(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
             settings.preferences.save();
             mra.locationPicker.hide();
         }); 
@@ -847,25 +848,16 @@ var mra = {
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
             }, mra.imageBar.currentImageBar, 100); 
-    
-            mra.imageBar.oDialog = $("#metaRedditDialog").dialog({
-                title: "MetaReddit",
-                width: 900,
-                height: 400,
-                autoOpen: false
-            });
-    
-            mra.imageBar.loadMeta('Favorites'); 
         },
         loadMeta: function(metaSection){
-            if (metaSection == 'Favorites'){
+            /*if (metaSection == 'Favorites'){
                 settings.metaReddits(currentImageBar);
             }
-            else {
+            else {*/
                 sql = "select * from html where url=\"http://metareddit.com/reddits/" + metaSection + "/list\" and xpath='//*[@class=\"subreddit\"]'";
                 reqURL = "http://query.yahooapis.com/v1/public/yql?format=json&callback=mra.imageBar.processMeta&q=" + escape(sql);
                 mra.jsonpRequest(reqURL);    
-            } 
+            //} 
         },
         processMeta: function(data){ 
             settings.metaReddits(
@@ -873,13 +865,6 @@ var mra = {
                     return { NAME: o.content, SECTION: o.href.split('/')[2] };
                 })
             );
-        },
-        showMore: function(){
-            morePos = jQuery("#showMore").position(); 
-            $("#showMoreList")
-                .css({ "position": "absolute", "top": (morePos.top + 31) })
-                .css({ left: (morePos.left + 32) - $("#showMoreList").width() })
-                .toggle();
         },
         viewComments: function(){
             mra.imageBar.popupWindow(
@@ -1147,3 +1132,4 @@ var mra = {
         }
     }
 }
+$(document).ready(mra.init);

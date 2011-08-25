@@ -92,13 +92,12 @@ a { border:0; }
 .portlet-header { background:none !important; border:none !important; }
 div.portlet-header a { font-size:24px; color:#EEE; font-weight:bold; }
 .ui-corner-all { -moz-border-radius: 6px !important; -webkit-border-radius: 6px !important; border-radius: 6px !important; }
-#metaRedditList, #showMoreList { list-style:none; margin:0; padding:0; }
-#showMoreList li { cursor:pointer; padding:4px 0; }
+#metaRedditList, #showMoreList { list-style:none; margin:0 0 0 20px; padding:0; }
+#showMoreList { margin:0; padding:0; }
+#showMoreList li { cursor:pointer; padding:4px 0; font-size:16px; text-align:right; }
 #moreTemplate li { white-space:nowrap; }
-#metaRedditList li { cursor:pointer;
-float:left;
-padding:3px;
-width:200px; }
+#metaRedditDialog .fg-button { float:none; }
+#metaRedditList li { cursor:pointer; float:left; padding:3px; width:200px; text-align:left; }
 #popupAdd {
 	display:inline-block; 
 	padding:2px; 
