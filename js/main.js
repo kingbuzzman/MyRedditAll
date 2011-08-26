@@ -850,16 +850,12 @@ var mra = {
             }, mra.imageBar.currentImageBar, 100); 
         },
         loadMeta: function(metaSection){
-            /*if (metaSection == 'Favorites'){
-                settings.metaReddits(currentImageBar);
-            }
-            else {*/
-                sql = "select * from html where url=\"http://metareddit.com/reddits/" + metaSection + "/list\" and xpath='//*[@class=\"subreddit\"]'";
-                reqURL = "http://query.yahooapis.com/v1/public/yql?format=json&callback=mra.imageBar.processMeta&q=" + escape(sql);
-                mra.jsonpRequest(reqURL);    
-            //} 
+			sql = "select * from html where url=\"http://metareddit.com/reddits/" + metaSection + "/list\" and xpath='//*[@class=\"subreddit\"]'";
+			reqURL = "http://query.yahooapis.com/v1/public/yql?format=json&callback=mra.imageBar.processMeta&q=" + escape(sql);
+			mra.jsonpRequest(reqURL);    
         },
         processMeta: function(data){ 
+			if (data.query.count > 0)
             settings.metaReddits(
                 jQuery.map(data.query.results.a,function(o,i){
                     return { NAME: o.content, SECTION: o.href.split('/')[2] };
@@ -874,11 +870,7 @@ var mra = {
         changePic: function(evt){
             $(".ad-gallery").hide();
             $(".ad-gallery-loading").show();
-            //$(".ad-controls").html(""); 
-            if (typeof evt == "object" && typeof evt.currentTarget != "undefined")   
-                mra.imageBar.currentImageBar = (evt.currentTarget.id.split("_")[1] || evt.currentTarget.id);  
-            else if (typeof evt == "string")
-                mra.imageBar.currentImageBar = evt;   
+            mra.imageBar.currentImageBar = evt;
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
             }, mra.imageBar.currentImageBar, 100);
@@ -902,18 +894,17 @@ var mra = {
                          pic.url = pic.url + ".jpg";
                     }
                     if (regex.exec( pic.url )){
-                        settings.images.push(pic);
-                        //filtered.push(pic);   
-                        //sElements += mra.imageBar.makeHTML(pic);
+                        settings.images.push(pic); 
                     }
                     else {
                         mra.imageBar.getHeaders(pic);
                     }
                 }
-            }
-            //return filtered;
+            } 
         },
         getHeaders: function(a){
+			//TODO recreate <execute> tag for the missing javascript.xml file
+			return;
             var curPic = a;
             var sql = "USE 'http://javarants.com/yql/javascript.xml' AS j;\
                                select content-type from j where code='response.object = y.rest(\"" + curPic.url + "\").followRedirects(false).get().headers';";
