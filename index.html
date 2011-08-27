@@ -43,13 +43,23 @@
         ${ name } <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ name }" data-bind="click: remove">
       </li>
     </script>
-
-    <script type="text/html" id="newsItemTemplate">
+    
+	<script type="text/html" id="newsItemTemplate">
+		<li title="${ title }" data-bind="visible: isVisible()">
+			<div class="itemLICenter">
+				<a target="_blank" class="link" href="${ url }" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
+			</div>
+			<div class="itemLIRight">
+				<a target="_blank" class="comment" href="${ permalink }" title="${ scoreTitle }">${ score }</a>
+			</div>
+		</li>
+    </script>
+    <!--<script type="text/html" id="newsItemTemplate">
       <li title="${ title }" data-bind="visible: isVisible()">
         <a target="_blank" href="${ url }" class="link" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
         <a target="_blank" href="${ permalink }" class="comment" title="${ scoreTitle }">${ score }</a>
       </li>
-    </script>
+    </script>-->
 
     <!-- TODO: STOP the FLOAT:RIGHT madness  -->
     <script type="text/html" id="newsButton">
