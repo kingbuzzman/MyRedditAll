@@ -1042,7 +1042,7 @@ var mra = {
 				//ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
 				clip = new ZeroClipboard.Client();
 				clip.setHandCursor( true );
-				clip.addEventListener( 'onComplete', function() { afterCopy() } );				
+				clip.addEventListener( 'onComplete', function() { mra.imageBar.clipboard.after() } );				
 			},
 			after: function(){
 				 $("#"+mra.imageBar.clipboard.curObj).html('copied');

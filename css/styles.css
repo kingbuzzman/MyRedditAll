@@ -1,4 +1,4 @@
-body { font-size:0.8em; font-family:Verdana, Geneva, sans-serif; color:#9FA8A8; margin:2px; padding:0; }
+body { font-size:0.8em; font-family:Helvetica; color:#9FA8A8; margin:2px; padding:0; }
 a { text-decoration:none; }
 h2 { padding:0px 5px; }
 #newsSection { width:100%; }
@@ -90,12 +90,31 @@ a { border:0; }
 .ui-icon-more:hover > div { width:100%; }
 .ui-dialog .ui-dialog-content { overflow:visible; }
 .portlet-header { background:none !important; border:none !important; }
-div.portlet-header a { font-size:24px; color:#EEE; font-weight:bold; }
+div.portlet-header a { font-size:24px; color:#EEE; font-weight:normal; }
 .ui-corner-all { -moz-border-radius: 6px !important; -webkit-border-radius: 6px !important; border-radius: 6px !important; }
 #metaRedditList, #showMoreList { list-style:none; margin:0 0 0 20px; padding:0; }
 #showMoreList { margin:0; padding:0; }
 #showMoreList li { cursor:pointer; padding:4px 0; font-size:16px; text-align:right; }
 #moreTemplate li { white-space:nowrap; }
+#metaRedditDialog { 
+    border: 0 none;
+    width:530px; 
+	border:1px solid #ffdab9; 
+    left: 50%;
+    margin: -50px 0 0 -250px;
+    overflow: hidden;
+    position: absolute;
+    top: 50%;
+    z-index: 20000;	
+}
+#loadingOverlay {
+    background-color: #111111;
+    height: 100%;
+    opacity: 0.7;
+    position: absolute;
+    width: 100%;
+    z-index: 10000;
+}
 #metaRedditDialog .fg-button { float:none; }
 #metaRedditList li { cursor:pointer; float:left; padding:3px; width:200px; text-align:left; }
 #popupAdd {
