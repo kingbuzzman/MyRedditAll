@@ -853,16 +853,12 @@ var mra = {
             }, mra.imageBar.currentImageBar, 100); 
         },
         loadMeta: function(metaSection){
-            /*if (metaSection == 'Favorites'){
-                settings.metaReddits(currentImageBar);
-            }
-            else {*/
-                sql = "select * from html where url=\"http://metareddit.com/reddits/" + metaSection + "/list\" and xpath='//*[@class=\"subreddit\"]'";
-                reqURL = "http://query.yahooapis.com/v1/public/yql?format=json&callback=mra.imageBar.processMeta&q=" + escape(sql);
-                mra.jsonpRequest(reqURL);    
-            //} 
+			sql = "select * from html where url=\"http://metareddit.com/reddits/" + metaSection + "/list\" and xpath='//*[@class=\"subreddit\"]'";
+			reqURL = "http://query.yahooapis.com/v1/public/yql?format=json&callback=mra.imageBar.processMeta&q=" + escape(sql);
+			mra.jsonpRequest(reqURL);    
         },
         processMeta: function(data){ 
+			if (data.query.count > 0)
             settings.metaReddits(
                 jQuery.map(data.query.results.a,function(o,i){
                     return { NAME: o.content, SECTION: o.href.split('/')[2] };
@@ -877,11 +873,7 @@ var mra = {
         changePic: function(evt){
             $(".ad-gallery").hide();
             $(".ad-gallery-loading").show();
-            //$(".ad-controls").html(""); 
-            if (typeof evt == "object" && typeof evt.currentTarget != "undefined")   
-                mra.imageBar.currentImageBar = (evt.currentTarget.id.split("_")[1] || evt.currentTarget.id);  
-            else if (typeof evt == "string")
-                mra.imageBar.currentImageBar = evt;   
+            mra.imageBar.currentImageBar = evt;
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
             }, mra.imageBar.currentImageBar, 100);
@@ -905,18 +897,17 @@ var mra = {
                          pic.url = pic.url + ".jpg";
                     }
                     if (regex.exec( pic.url )){
-                        settings.images.push(pic);
-                        //filtered.push(pic);   
-                        //sElements += mra.imageBar.makeHTML(pic);
+                        settings.images.push(pic); 
                     }
                     else {
                         mra.imageBar.getHeaders(pic);
                     }
                 }
-            }
-            //return filtered;
+            } 
         },
         getHeaders: function(a){
+			//TODO recreate <execute> tag for the missing javascript.xml file
+			return;
             var curPic = a;
             var sql = "USE 'http://javarants.com/yql/javascript.xml' AS j;\
                                select content-type from j where code='response.object = y.rest(\"" + curPic.url + "\").followRedirects(false).get().headers';";
@@ -990,10 +981,10 @@ var mra = {
                 maxHeight: function(){ return (window.innerHeight * 0.9) }, 
                 maxWidth: function(){ return (window.innerWidth * 0.9) },
                 onComplete:function(){ 
-                    var largeMode = $("img.cboxPhoto").width() > 400;
+                    var largeMode = $("img.cboxPhoto").width() > 420;
                     $("#cboxCurrent span").toggle(largeMode);
                     if (!largeMode){
-                        $.colorbox.resize({ width: 400 })
+                        $.colorbox.resize({ width: 420 })
                     }
                     $("#cboxTitle").show();
                     mra.imageBar.clipboard.addCopy(document.getElementById('copyLink2'));
@@ -1009,10 +1000,12 @@ var mra = {
                 current: function(){ 
                     var comment = '<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16"><span>View Comments</span>';    
                     var image = '<img src="images/fileTypes/image_link.png" align="absmiddle" width="16" height="16"><span>New Tab</span>';
-                    var cts = '<img src="images/fileTypes/link.png" align="absmiddle" width="16" height="16"><span>Copy To Share</span>';
+                    var cts = '<img src="images/fileTypes/link.png" align="absmiddle" width="16" height="16"><span>Copy</span>';
+					var fb = '<img src="images/facebook.jpg" align="absmiddle" width="16" height="16"><span>Share</span>';
                     var markup = '<a href="'+ $(this).attr('commentLink') + '" onclick="mra.imageBar.viewComments(); return false;" class="cufonize">' + comment + '</a>\
                     | <a href="' + this.href + '" onclick="mra.imageBar.popupWindow($(\'img.cboxPhoto\').attr(\'src\')); return false;" class="cufonize">' + image + '</a>\
-                    | <a id="copyLink2" title="' + this.title + '" href="' + this.href + '" onclick="return false;" class="cufonize copyLink2">' + cts + '</a>'; /**/
+                    | <a id="copyLink2" title="' + this.title + '" href="' + this.href + '" onclick="return false;" class="cufonize copyLink2">' + cts + '</a>\
+					| <a title="' + this.title + '" href="' + this.href + '" onclick="streamPublish(this); return false;" class="cufonize">' + fb + '</a>'; 
                     return markup;
                 },
                 slideshow: true,
@@ -1040,6 +1033,15 @@ var mra = {
         /* this initializes the copy to share functionality for the overlay */
 		clipboard: {
 			init: function(){
+
+				window.fbAsyncInit = function() { FB.init({appId: "148360715252023", status: true, cookie: true, xfbml: true}); }; 
+				
+				(function() { 
+					var e = document.createElement("script"); e.async = true; 
+					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js"; 
+					document.getElementById("fb-root").appendChild(e); 
+				}());
+					
 				mra.imageBar.clipboard.curObj = "";
 				$("#cboxContent").hover(
 					function(){
@@ -1054,7 +1056,7 @@ var mra = {
 				//ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
 				clip = new ZeroClipboard.Client();
 				clip.setHandCursor( true );
-				clip.addEventListener( 'onComplete', function() { afterCopy() } );				
+				clip.addEventListener( 'onComplete', function() { mra.imageBar.clipboard.after() } );				
 			},
 			after: function(){
 				 $("#"+mra.imageBar.clipboard.curObj).html('copied');
@@ -1134,5 +1136,39 @@ var mra = {
 
         }
     }
+}
+function streamPublish(curObj){       
+	FB.ui({
+			method: 'stream.publish',
+			display: 'popup',
+			message: 'gettingeducatedaboutFacebookConnect',
+			attachment: {
+				name: 'MyRedditAll.com',
+				caption: curObj.title,
+				description: "",
+				'media': [
+					{
+						'type': 'image',
+						'src': curObj.href,
+						'href': curObj.href
+					}
+				],
+				href:  curObj.href
+			},
+			action_links: [
+				{
+					text: 'Code',
+					href: curObj.href
+				}
+			]
+		},
+		function(response){
+			if(response&&response.post_id){
+				//alert('Postwaspublished.');
+			}else{
+				//alert('Postwasnotpublished.');
+			}
+		}
+	);
 }
 $(document).ready(mra.init);

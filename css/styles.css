@@ -1,6 +1,6 @@
-body { font-size:0.8em; font-family:Verdana, Geneva, sans-serif; color:#9FA8A8; margin:2px; padding:0; }
-a { text-decoration:none; }
-h2 { padding:0px 5px; }
+body { font-size:0.8em; font-family:Helvetica; color:#9FA8A8; margin:2px; padding:0; }
+a { text-decoration:none; border:0; }
+h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
 #newsSection { width:100%; }
 #newsSection > .portlet { width:97%; float:left; }
 @media screen and (min-width: 900px) {
@@ -19,23 +19,21 @@ h2 { padding:0px 5px; }
 div.loader { text-align:center; }
 ul.portlet-content { list-style-type:none; padding:0; margin:0; }
 ul.portlet-content > li { overflow:hidden; text-align:left; border-bottom:1px solid #3d3d3d; }
-ul.portlet-content > li > a.link { float:left; width:86%; margin: 2px; padding: 0 0 0 5px; }
-ul.portlet-content > li > a.comment { float:right; width:8%; font-size: 12px; padding: 3px 8px 0 0; }
-ul.portlet-content > li > a.link:visited, ul.portlet-content > li > a.link.visited { color: #666; }
-ul.portlet-content > li > a.comment:visited { color: #666; }
+ul.portlet-content > li div { border-bottom: 1px solid #3D3D3D; display: table-cell; vertical-align: middle; }
+ul.portlet-content > li div.itemLICenter { width:100%; }
+ul.portlet-content > li a { opacity: 0.7; padding: 0 5px; color: #D9D9D9; margin: 2px; display:block; }
+ul.portlet-content > li a:hover { opacity:1; color:#FFF; }
+ul.portlet-content > li a:visited  { color: #666; }
+ul.portlet-content > li > a.link { font-size:inherit; }
+ul.portlet-content > li > a.comment { font-size: 12px; }
+
 .portlet { margin: 6px;  }
 .portlet-header { margin: 0 0.2em 0.2em 0.2em; padding-left:7px; }
 .portlet-header .ui-icon { float: right; }
 .portlet-content {  text-align:center; border-top:1px solid #3D3D3D; }
 .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }
 .ui-sortable-placeholder * { visibility: hidden; }
-.srItems img { cursor:pointer; vertical-align:middle; }
 .portlet.ui-widget-content { background:url(../images/trans_black.png) repeat scroll 50% top transparent; border:1px solid #3D3D3D; color:#D9D9D9; }
-
-.newsItem:visited { color: #666; }
-.newsItem { display:block; width:100%; }
-a.newsItem, a.link, a.comment  { color: #D9D9D9; opacity:0.7; }
-a.newsItem:hover {opacity:1; color:#FFF; }
 
 .fg-button { outline: 0; margin:0 4px 0 0; padding: .4em 0.8em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1;  font-size:14px; }
 .fg-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
@@ -58,44 +56,44 @@ button.fg-button { width:auto; overflow:visible; }
 .fg-toolbar { padding: .5em; margin: 0;  }
 .fg-toolbar .fg-buttonset { margin-right:1.5em; padding-left: 1px; }
 .fg-toolbar .fg-button { font-size: 1em;  }
-
-/*demo page css*/
-h2 { clear: both; padding-top:1.5em; margin-top:0; }  
+ 
 
 /**
  * Overwrite for having a carousel with dynamic width.
  */
 .ui-dialog .ui-dialog-content { overflow:visible; }
 .ui-dialog-titlebar  { padding:0 !important; padding-left:0.3em !important; }
-a { border:0; }
-.itemUL div {
-	/* display:inline-block; */
-	border-bottom:1px solid #3d3d3d; 
-	display:table-cell;
-	vertical-align:middle;
-	text-shadow:rgba(0,0,0,0.01) 0 0 0;
-}
-.itemLICenter {
-	width:100%;
-}
-.itemLIRight {
-	width:auto;	
-	font-size:14px;
-	text-shadow: 0 0 10px #999,  0 0 40px #555, 0 0 70px #555, 0 0 80px #555, 0 0 100px #555;
-}
 
-.itemUL:hover { background-color:#333; opacity:1; }
 .ui-icon { display:inline-block; }
 .ui-icon-more > div { width:17px; overflow:hidden; cursor:pointer; height:16px; font-size:13px; }
 .ui-icon-more:hover > div { width:100%; }
 .ui-dialog .ui-dialog-content { overflow:visible; }
 .portlet-header { background:none !important; border:none !important; }
-div.portlet-header a { font-size:24px; color:#EEE; font-weight:bold; }
+div.portlet-header a { font-size:24px; color:#EEE; font-weight:normal; }
 .ui-corner-all { -moz-border-radius: 6px !important; -webkit-border-radius: 6px !important; border-radius: 6px !important; }
 #metaRedditList, #showMoreList { list-style:none; margin:0 0 0 20px; padding:0; }
 #showMoreList { margin:0; padding:0; }
 #showMoreList li { cursor:pointer; padding:4px 0; font-size:16px; text-align:right; }
 #moreTemplate li { white-space:nowrap; }
+#metaRedditDialog { 
+    border: 0 none;
+    width:530px; 
+	border:1px solid #ffdab9; 
+    left: 50%;
+    margin: -50px 0 0 -250px;
+    overflow: hidden;
+    position: absolute;
+    top: 50%;
+    z-index: 20000;	
+}
+#loadingOverlay {
+    background-color: #111111;
+    height: 100%;
+    opacity: 0.7;
+    position: absolute;
+    width: 100%;
+    z-index: 10000;
+}
 #metaRedditDialog .fg-button { float:none; }
 #metaRedditList li { cursor:pointer; float:left; padding:3px; width:200px; text-align:left; }
 #popupAdd {
