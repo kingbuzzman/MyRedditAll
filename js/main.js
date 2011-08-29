@@ -1,3 +1,4 @@
+/* Allows the browser to continue if firebug/console is not open */
 if (typeof console == "undefined") {
     console = { log: function(){} };
 }
@@ -266,7 +267,7 @@ var settings = new (function(){
 			}).toggle();
         };
 		
-        /* Returns the buttons for the top right imagebar buttons */
+        /* Returns the first four for the top right imagebar buttons */
         this.getFrontPage = ko.dependentObservable(function(){
             return buttons().slice(0, MAX_IMAGE_BAR_BUTTONS);
         }.bind(this));
@@ -339,10 +340,12 @@ var settings = new (function(){
                 this.id = item.id;
                 this.title = item.title;
                 this.text = item.title.substring(0, MAX_TITLE_LENGTH) + ((item.title.length > MAX_TITLE_LENGTH)? "...": "");
+				/* This is a special url by reddit that allows the user to view the article with it in the iFrame */
                 this.redditURL = BASE_URL + "/tb/" + item.id;
                 this.url = item.url;
                 this.score =  parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
                 this.scoreTitle = this.score + " of People Like It";
+				/* Reddit removes their own domain name from the permalink to save space so append it back in */
                 this.permalink = BASE_URL + item.permalink;
                 this.visited = ko.observable(settings.visitedLinks.visited(this.id));
                 
