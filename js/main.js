@@ -266,17 +266,12 @@ var settings = new (function(){
 				collision: "flip flip"
 			}).toggle();
         };
-<<<<<<< HEAD
         
         /*
          * Returns the buttons for the top right imagebar buttons
          *
          * returns string[] of names
          */
-=======
-		
-         /* Returns the buttons for the top right imagebar buttons */
->>>>>>> 5d987e83032f49c5324120337467e4cad991f132
         this.getFrontPage = ko.dependentObservable(function(){
             return buttons().slice(0, MAX_IMAGE_BAR_BUTTONS);
         }.bind(this));
