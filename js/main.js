@@ -228,8 +228,8 @@ var settings = new (function(){
                 return (selected() == this);
             }.bind(this));
             
-            this.select = function(e){
-                mra.imageBar.changePic(this.name); 
+            this.select = function(){
+                mra.imageBar.changePic(this.name);
                 selected(this);
             }
             
@@ -257,6 +257,7 @@ var settings = new (function(){
         };
         
         this.showMenu = function(){
+            // TODO: this is still not fixed, css option?
 			$("#showMoreList").position({
 				of: $("#showMore"),
 				my: "right top",
@@ -265,22 +266,38 @@ var settings = new (function(){
 				collision: "flip flip"
 			}).toggle();
         };
-		
-        /* Returns the buttons for the top right imagebar buttons */
+        
+        /*
+         * Returns the buttons for the top right imagebar buttons
+         *
+         * returns string[] of names
+         */
         this.getFrontPage = ko.dependentObservable(function(){
             return buttons().slice(0, MAX_IMAGE_BAR_BUTTONS);
         }.bind(this));
-        /* this is an observeable that decides whether to show the extended menu icon */
+        
+        /*
+         * Evaluates whether or not to show the extended menu icon
+         *
+         * returns boolean true if the icon should be shown
+         */
         this.populatedMenu = ko.dependentObservable(function(){
             return buttons().length > MAX_IMAGE_BAR_BUTTONS;
         }.bind(this));
-        /* This shows the extended menu of items */
+        
+        /*
+         * Returns the extended menu of items
+         *
+         * returns string[] of those buttons that should appear in the drop-down list
+         */
         this.getMenu = ko.dependentObservable(function(){
             return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
         }.bind(this));
         
         /*
          * Return all the image bar buttons in a Array of Strings
+         *
+         * returns string[] of all the buttons
          */
         this.toStringArray = function(){
             return buttons().map(function(item){
