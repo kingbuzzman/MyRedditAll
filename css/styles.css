@@ -2,20 +2,12 @@ body { font-size:0.8em; font-family:Helvetica; color:#9FA8A8; margin:2px; paddin
 a { text-decoration:none; border:0; }
 h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
 #newsSection { width:100%; }
-#newsSection > .portlet { width:97%; float:left; }
+#newsSection > .portlet { width:97%; display:inline-block; } 
 @media screen and (min-width: 900px) {
-	#newsSection  > .portlet { 	
-		 width: 32% !important;
+	#newsSection { 	
+		-moz-column-count: 3; -webkit-column-count: 3;
     }
 }
-#newsSection { display:table; width:100%; table-layout:initial; }
-#newsSection  > .column { display: table-cell; float: left; min-width: 300px; width:100%; }
-@media screen and (min-width: 900px) {
-	#newsSection  > .column { 	
-		 width: 33%;
-    }
-}
-
 div.loader { text-align:center; }
 ul.portlet-content { list-style-type:none; padding:0; margin:0; }
 ul.portlet-content > li { overflow:hidden; text-align:left; border-bottom:1px solid #3d3d3d; }
