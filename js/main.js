@@ -191,8 +191,9 @@ var settings = new (function(){
          * @links string list of visited links in a long array ie "link1,link2" NOT: ["link1","link2"]
          */
         this.load = function(links){
-            links = links.split(",");
-            
+		try {
+	            links = links.split(",");
+            	}catch(e){ settings.preferences.erase() }
             for(var index in links)
                 this.add(links[index]);
         };
