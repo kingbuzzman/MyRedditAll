@@ -1,5 +1,5 @@
-if (typeof console == "undefined") {
-    console = { log: function(){} };
+if (typeof console == "undefined"){
+    console = { log: function(){}, error: function(){}, info: function(){} };
 }
 
 /*
@@ -191,9 +191,7 @@ var settings = new (function(){
          * @links string list of visited links in a long array ie "link1,link2" NOT: ["link1","link2"]
          */
         this.load = function(links){
-		try {
-	            links = links.split(",");
-            	}catch(e){ settings.preferences.erase() }
+            links = links.split(",");
             for(var index in links)
                 this.add(links[index]);
         };
@@ -591,19 +589,25 @@ var settings = new (function(){
             // load the cookie if its available
             if(cookie){
                 settings = $.parseJSON(cookie);
-                this.background.color(settings.background.color);
-                this.background.image(settings.background.image);
                 
-                this.visitedLinks.load(settings['visitedLinks']);
-                this.getSubreddits().removeAllPortlets();
-                settings.subreddits.map(function(item){
-                    this.getSubreddits().addPortlet(item);
-                }.bind(this));
-                
-                //Populate the cookie variable into the settings.imageBar variable
-                $.each(settings.imageBar,function(i, o){
-                    this.imageBar.addButton(o);
-                }.bind(this));
+                try {
+                    this.background.color(settings.background.color);
+                    this.background.image(settings.background.image);
+                    
+                    this.visitedLinks.load(settings['visitedLinks']);
+                    this.getSubreddits().removeAllPortlets();
+                    settings.subreddits.map(function(item){
+                        this.getSubreddits().addPortlet(item);
+                    }.bind(this));
+                    
+                    //Populate the cookie variable into the settings.imageBar variable
+                    $.each(settings.imageBar,function(i, o){
+                        this.imageBar.addButton(o);
+                    }.bind(this));
+                } catch(e){
+                    console.error("Error loading settings..");
+                    this.preferences.erase();
+                }
             } else {
                 // load default subreddits
                 this.getSubreddits().addPortlet(SUBREDDITS);
@@ -615,7 +619,6 @@ var settings = new (function(){
                 // there was no cookie set, save it.
                 this.preferences.save();
             }
-
         }.bind(settings);
         
         /*

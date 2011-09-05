@@ -14,7 +14,7 @@ ul.portlet-content > li { text-align:left; border-bottom:1px solid #3d3d3d; }
 ul.portlet-content > li div { border-bottom: 1px solid #3D3D3D; display: table-cell; vertical-align: middle; }
 ul.portlet-content > li div.itemLICenter { width:100%; }
 ul.portlet-content > li a { opacity: 0.7; padding: 0 5px; color: #D9D9D9; margin: 2px; display:block; }
-ul.portlet-content > li a:hover { opacity:1; color:#FFF; }
+ul.portlet-content > li a:hover { color:#FFF; }
 ul.portlet-content > li a:visited  { color: #666; }
 ul.portlet-content > li > a.link { font-size:inherit; }
 ul.portlet-content > li > a.comment { font-size: 12px; }
