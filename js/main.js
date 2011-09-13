@@ -87,19 +87,6 @@ var settings = new (function(){
         var activeConnections = [];
         var queued = [];
         
-        // TODO: redo, map-filter?
-        var cleanData = function(data){
-            var arrData = [];
-            data.sort(function(a,b){
-                return b.created - a.created;
-            }); 
-            for (i in data){
-                arrData.push(data[i].data);
-            }
-            
-            return arrData;
-        };
-        
         /*
          * Calls the next request
          */
@@ -136,10 +123,7 @@ var settings = new (function(){
                 jsonp: 'jsonp',
                 timeout: 20000, // 2 seconds timeout
                 success: function(data){
-                    var redditData = cleanData(data.data.children);
-                    if (redditData.length > 0){
-                        callback(redditData);
-                    }
+                    callback(data.data.children);
                 },
                 error: function(){
                     // stick it on the queue
@@ -343,9 +327,15 @@ var settings = new (function(){
                 
                 // load the complete feed
                 loader.call(url, function(data){
-                    for(var index in data)
-                        newsItems.push(new NewsItem(data[index]));
+                    if(data.length == 0)
+                        return;
                     
+                    // populate each of the news item inside the portlet
+                    for(var index in data)
+                        newsItems.push(new NewsItem(data[index].data));
+                    
+                    // set the last item field
+                    // used for the next call; we continue loading content from this point on
                     this.last(newsItems()[newsItems().length-1]);
                 }.bind(this));
             }.bind(this);
