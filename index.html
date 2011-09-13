@@ -53,19 +53,6 @@
 			</div>
 		</li>
     </script>
-    <!--<script type="text/html" id="newsItemTemplate">
-      <li title="${ title }" data-bind="visible: isVisible()">
-        <a target="_blank" href="${ url }" class="link" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
-        <a target="_blank" href="${ permalink }" class="comment" title="${ scoreTitle }">${ score }</a>
-      </li>
-    </script>-->
-
-    <!-- TODO: STOP the FLOAT:RIGHT madness  -->
-    <script type="text/html" id="newsButton">
-      {{each(index, name) buttons.NEWS_BUTTONS}}
-      <span title="${ name }" rel="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
-      {{/each}}
-    </script>
 
     <script id="subredditTemplate" type="text/html">
       <div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
@@ -74,7 +61,12 @@
           <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
           <span class="ui-icon toggleView" title="Toggle visited links" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'ui-icon-pin-w': showVisited(), 'ui-icon-pin-s': !showVisited() }"></span>
           <a href="${ url }" target="_blank">${ name }</a>
-          <span data-bind="template: { name: 'newsButton', value: buttons }, visible: !isMinimized()"></span>
+          <span data-bind="visible: !isMinimized()">
+            <!-- TODO: STOP the FLOAT:RIGHT madness  -->
+            {{each(index, name) buttons.NEWS_BUTTONS}}
+            <span title="${ name }" rel="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
+            {{/each}}
+          </span>
         </div>
         <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
         <div class="loader" data-bind="visible: getShowLoadingBar()"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
@@ -91,11 +83,13 @@
       <li id="metaSection">
       <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: mra.locationPicker.passEvent ">
       <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ $data.SECTION }" data-bind="click: mra.imageBar.changePic" >
+      <!-- TODO: move the function() out of here -->
       <span class="metaText" data-bind="click: function(){ mra.imageBar.popupWindow( baseurl + '/r/$data.SECTION' ) }">${$data.NAME}</span>
       </li>
     </script>
 
     <script id="loadMetaButtonTemplate" type="text/html">
+      <!-- TODO: move the function() out of here -->
       {{each ['active','over18','new','self','media','Favorites']}}
       <button id="${$value}" class="changePic fg-button" data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
       {{/each}} 
@@ -127,7 +121,7 @@
             <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>
           </div>
         </div>
-    </div>  
+    </div>
     <div id="container">
       <div class="ad-gallery-loading" style="display:none">
         <div style="height:150px; line-height:150px;" class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
