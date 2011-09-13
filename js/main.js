@@ -213,6 +213,7 @@ var settings = new (function(){
             }.bind(this));
             
             this.select = function(){
+                $(".ad-thumbs > .vertical > .loader").show(); // TODO: remove this ASAP, as soon as the imagebar loader is redone
                 mra.imageBar.changePic(this.name);
                 selected(this);
             }
@@ -905,8 +906,7 @@ var mra = {
             );
         },
         changePic: function(evt){
-            $(".ad-gallery").hide();
-            $(".ad-gallery-loading").show();
+            settings.images.removeAll();
             mra.imageBar.currentImageBar = evt;
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
@@ -1131,9 +1131,7 @@ var mra = {
         processItems: function(pics, subReddit){ 
             var sImageBar = "";  
             window.arrPics = pics;
-            $(".ad-gallery").show();
-            $(".ad-gallery-loading").hide(); 
-            settings.images.removeAll(); 
+            $(".ad-thumbs > .vertical > .loader").hide(); 
             mra.imageBar.filterElements(pics);    
             window.adGallery = $("div.ad-gallery")    
                 .attr("id", "imagebar_" + mra.imageBar.currentImageBar)
