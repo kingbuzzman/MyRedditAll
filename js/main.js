@@ -328,7 +328,7 @@ var settings = new (function(){
                 
                 // load the complete feed
                 loader.call(url, function(data){
-                    if(data.length == 0){
+                    if(data.length === 0){
                         message("No results...");
                         return;
                     }
@@ -406,8 +406,9 @@ var settings = new (function(){
                 this.reloadSection = function(i,e,o){
                     var button = $(i.target).html();
                     
-                    newsItems.removeAll();
-                    message("");
+                    portlet.last(null); // reset the last item (for the ajax call)
+                    newsItems.removeAll(); // remove all the news items
+                    message(""); // reset the messages
                     
                     activeButton(button);
                     load(); // redo this
