@@ -146,19 +146,6 @@
       </h2>
 
       <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: getSubreddits().getPortlets() }, sortableList: getSubreddits().getPortlets()"></div>
-    </div> 
-
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="" id="newsTemplate" style="display:none;">
-      <div class="portlet-header ui-widget-header ui-corner-all">
-        <span class="ui-icon ui-icon-closethick ui-close-display"></span>
-        <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
-        <a href="http://www.reddit.com/r/" target="_blank"></a>
-        <span class="ui-icon toggleView ui-icon-bullet" rel="hot" title="View hot articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">hot</span>
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="new" title="View new articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">new</span>
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="controversial" title="View controversial articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">controversial</span>                        
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="top" title="View top articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">top</span>
-      </div>
-      <div class="portlet-content"><img src="images/ajaxLoader.gif" width="126" height="22" align="middle"></div>
     </div>
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="popupAdd">
