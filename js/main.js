@@ -312,6 +312,7 @@ var settings = new (function(){
             var newsItems = ko.observableArray();
             var portlet = this;
             var minimized = ko.observable(false);
+            var message = ko.observable("");
             
             this.showVisited = ko.observable(false);
             
@@ -327,8 +328,10 @@ var settings = new (function(){
                 
                 // load the complete feed
                 loader.call(url, function(data){
-                    if(data.length == 0)
+                    if(data.length == 0){
+                        message("No results...");
                         return;
+                    }
                     
                     // populate each of the news item inside the portlet
                     for(var index in data)
@@ -399,10 +402,12 @@ var settings = new (function(){
                     return activeButton();
                 };
                 
+                // TODO: create an object out of each button and redo this
                 this.reloadSection = function(i,e,o){
-                    var button = $(i.target).attr("rel");
+                    var button = $(i.target).html();
                     
                     newsItems.removeAll();
+                    message("");
                     
                     activeButton(button);
                     load(); // redo this
@@ -415,10 +420,15 @@ var settings = new (function(){
             this.last = ko.observable();
             this.amountVisible = ko.observable(10);
             
+            /*
+             * Returns the full request URL to call reddit.com
+             * - append the last item on the list so it doenst need to reload the full pannel
+             */
             this.requestURL = function(){
                 return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
             };
             
+            // TODO: document this! (thanks richard)
             this.getNewsItems = function(){
                 return ko.utils.arrayFilter(newsItems(), function(newsItem){
                     return newsItem.isVisible() ? newsItem: null;
@@ -441,11 +451,24 @@ var settings = new (function(){
                 // ie. false ^ true -> true
                 minimized((minimized() ^ true) === 1);
             };
+            
             /*
-             * Triggers the display of the load bar to the user
+             * Triggers the display of the load bar to the user if there are no items.
+             * - its ignored if there is a message
+             *
+             * returns boolean: true if there are no items and no massage out for display
              */
             this.getShowLoadingBar = function(){
-                return !(newsItems().length > 0);
+                return !(newsItems().length > 0) && message() === "";
+            };
+            
+            /*
+             * Message display for the user (error, info, etc)
+             *
+             * returns string message description
+             */
+            this.getMessage = function(){
+                return message();
             };
             
             /*

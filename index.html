@@ -64,12 +64,13 @@
           <span data-bind="visible: !isMinimized()">
             <!-- TODO: STOP the FLOAT:RIGHT madness  -->
             {{each(index, name) buttons.NEWS_BUTTONS}}
-            <span title="${ name }" rel="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
+            <span title="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
             {{/each}}
           </span>
         </div>
         <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
         <div class="loader" data-bind="visible: getShowLoadingBar()"></div>
+        <div class="message" data-bind="text: getMessage()"></div>
         <div class="ui-icon-more" data-bind="click: populateNext, visible: !isMinimized()">
           <div>
             <span class="ui-icon ui-icon-carat-1-s"></span>
