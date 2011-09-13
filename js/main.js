@@ -12,7 +12,7 @@ var settings = new (function(){
     var BACKGROUND_IMAGE = "images/spacestorm.jpg";
     var SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
     var SUBREDDIT_ITEMS = 10;
-    var IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
+    var IMAGE_BAR = ["Pics","WTF","NSFW","Funny","RageComics","Bacon"];
     
     var BASE_URL = "http://www.reddit.com";
     
@@ -377,8 +377,9 @@ var settings = new (function(){
                 this.visitPage = function(evt){
                     var element = $(evt.target);
                     
-                    // replace link with reddit's link for it
-                    element.attr('href', this.redditURL)
+                    // replace link with reddit's link for it only if its not Youtube.com which has a glitch with reddit's frame
+					if (this.url.indexOf("youtube.com") == -1)
+	                    element.attr('href', this.redditURL)
                     
                     setTimeout(function(){
                             // swap back the original link
@@ -908,13 +909,21 @@ var mra = {
             var regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif)$");
             var sElements = "";
             var filtered = [];
+			var size = "m" //s-small, m-medium, l-large
             for (i in arrElems){
                 var pic = arrElems[i];
                 pic.permalink = redditURL + pic.permalink;
+				pic.thumbnail = pic.url;
                 if (pic.url != ''){
+					//normalize the urls
                     if (  pic.url.indexOf("http://imgur.com/") >= 0 ){
                          pic.url = pic.url + ".jpg";
                     }
+					//change the url to thumbnails
+					if ( pic.url.indexOf("imgur.com/") >= 0 ){
+						var file = pic.url.split("/")[pic.url.split("/").length - 1].split(".");
+						pic.thumbnail = "http://imgur.com/" + file[0].substring(0,5) + size + "." + (file[1] || "jpg");
+					}
                     if (regex.exec( pic.url )){
                         settings.images.push(pic); 
                     }
@@ -925,8 +934,7 @@ var mra = {
             } 
         },
         getHeaders: function(a){
-			//TODO recreate <execute> tag for the missing javascript.xml file
-			return;
+			//javascript.xml also found in the git repo
             var curPic = a;
             var sql = "USE 'http://javarants.com/yql/javascript.xml' AS j;\
                                select content-type from j where code='response.object = y.rest(\"" + curPic.url + "\").followRedirects(false).get().headers';";
