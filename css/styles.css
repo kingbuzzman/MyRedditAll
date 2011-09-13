@@ -57,6 +57,8 @@ button.fg-button { width:auto; overflow:visible; }
 .ui-dialog-titlebar  { padding:0 !important; padding-left:0.3em !important; }
 
 .ui-icon { display:inline-block; }
+.ui-icon-more > div > span { float:left; }
+.ui-icon-more > div > span.more-results { float:right; padding-right:5px; }
 .ui-icon-more > div { width:17px; overflow:hidden; cursor:pointer; height:16px; font-size:13px; }
 .ui-icon-more:hover > div { width:100%; }
 .ui-dialog .ui-dialog-content { overflow:visible; }
