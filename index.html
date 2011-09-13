@@ -69,8 +69,8 @@
           </span>
         </div>
         <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
-        <div class="loader" data-bind="visible: getShowLoadingBar()"></div>
-        <div class="message" data-bind="text: getMessage()"></div>
+        <div class="loader" data-bind="visible: getShowLoadingBar() && !isMinimized()"></div>
+        <div class="message" data-bind="visible: !isMinimized(), text: getMessage()"></div>
         <div class="ui-icon-more" data-bind="click: populateNext, visible: !isMinimized()">
           <div>
             <span class="ui-icon ui-icon-carat-1-s"></span>
