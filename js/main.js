@@ -71,6 +71,7 @@ var settings = new (function(){
     
     //sorters
     this.sortImagesByDate = function(desc){
+        // TODO: remove settings reference
         settings.images(settings.images().sort(function(a,b){
             return (desc || true) ? b.created - a.created : b.created - a.created;
         }));
@@ -355,26 +356,23 @@ var settings = new (function(){
                 this.id = item.id;
                 this.title = item.title;
                 this.text = item.title.substring(0, MAX_TITLE_LENGTH) + ((item.title.length > MAX_TITLE_LENGTH)? "...": "");
-				/* This is a special url by reddit that allows the user to view the article with it in the iFrame */				
-                this.redditURL = BASE_URL + "/tb/" + item.id;
+                this.redditURL = BASE_URL + "/tb/" + item.id; // nicer link with comments, upvote.. etc at the top (iframed)
                 this.url = item.url;
                 this.score =  parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
                 this.scoreTitle = this.score + " of People Like It";
-                /* Reddit removes their own domain name from the permalink to save space so append it back in */
-				this.permalink = BASE_URL + item.permalink;
-                this.visited = ko.observable(settings.visitedLinks.visited(this.id));
+                this.permalink = BASE_URL + item.permalink; // full link to the news item
+                this.visited = ko.observable(settings.visitedLinks.visited(this.id)); // TODO: remove settings reference
                 
                 /*
                  * Observable that checks whether or not the link is visible
                  */
                 this.isVisible = ko.dependentObservable(function(){
-                    // TODO: remove the settings reference
                     // checks the the link to see if its been visited, or if all the news items are visible
                     return !this.visited() || portlet.showVisited();
                 }.bind(this));
                 
                 /*
-                 * Marks the page as seem/visited
+                 * Marks the page as seen/visited
                  */
                 this.visitPage = function(evt){
                     var element = $(evt.target);
@@ -425,7 +423,7 @@ var settings = new (function(){
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
             this.last = ko.observable();
             this.amountVisible = ko.observable(10);
-			
+            
             this.requestURL = function(){
                 return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
             };
@@ -509,7 +507,7 @@ var settings = new (function(){
          */
         this.removePortlet = function(portlet){
             portlets.remove(portlet);
-            settings.preferences.save();
+            settings.preferences.save(); // TODO: remove settings reference
         };
         
         /*
@@ -536,7 +534,7 @@ var settings = new (function(){
         };
         
         // initializes all the portlets
-        for(var index in arguments) {
+        for(var index in arguments){
             this.addPortlet(arguments[index]);
         }
     })();
