@@ -1,4 +1,4 @@
-if (typeof console == "undefined"){
+if(typeof console == "undefined"){
     console = { log: function(){}, error: function(){}, info: function(){} };
 }
 
