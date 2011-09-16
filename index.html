@@ -106,7 +106,7 @@
     </script>
   </head>
 
-  <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
+  <body data-bind="style: { backgroundColor: background.isColorSet()? background.color(): '', backgroundImage: !background.isColorSet()? 'url(' + background.image() + ')': '' }">
     <div id="loadingOverlay" style="display:none;">
         <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" id="metaRedditDialog">
           <div class="portlet-header ui-widget-header ui-corner-all">

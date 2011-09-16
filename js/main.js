@@ -16,10 +16,25 @@ var settings = new (function(){
     
     var BASE_URL = "http://www.reddit.com";
     
-    this.background = {
-        color: ko.observable(BACKGROUND_COLOR),
-        image: ko.observable(BACKGROUND_IMAGE)
-    };
+    this.background = new (function(){
+        this.color = ko.observable(BACKGROUND_COLOR);
+        this.image = ko.observable(BACKGROUND_IMAGE);
+        
+        /*
+         * Checks whether or not the color is set or not
+         * - only gets executed when either image or color changes; thus nulls out the other [eliminates the need to have subscribe()r]
+         */
+        this.isColorSet = ko.dependentObservable(function(){
+            var colorSet = this.color() !== null;
+            
+            if(colorSet)
+                this.image(null);
+            else
+                this.color(null);
+            
+            return colorSet;
+        }, this)
+    })();
     
     this.images = ko.observableArray();
     this.activeImage = function(){
@@ -37,37 +52,9 @@ var settings = new (function(){
     };
     
     // getters
-    this.getBackgroundColor = function(color){
-        return this.background.color();
-    };
-    this.getBackgroundImage = function(){
-        return this.background.image();
-    };
     this.getSubreddits = function(){
         return this.subreddits;
     };
-    
-    // setters
-    this.setBackgroundColor = function(color){
-        this.background.color(color);
-        this.background.image(null);
-    };
-
-    this.setBackgroundImage = function(image){
-        this.background.color(null);
-        this.background.image(image);
-    };
-    
-    // shortcuts
-    this.saveBackgroundColor = function(color){
-        this.setBackgroundColor(color);
-        this.preferences.save();
-    };
-    this.saveBackgroundImage = function(image){
-        this.setBackgroundImage(image);
-        this.preferences.save();
-    };
-    
     
     //sorters
     this.sortImagesByDate = function(desc){
@@ -701,8 +688,8 @@ var settings = new (function(){
     this.toString = function(){
         return ko.toJSON({
             background: {
-                color: this.getBackgroundColor(),
-                image: this.getBackgroundImage()
+                color: this.background.color(),
+                image: this.background.image()
             },
             subreddits: this.getSubreddits().toStringArray(),
             imageBar: this.imageBar.toStringArray(),
@@ -864,7 +851,7 @@ var mra = {
 				},
 				onHide: function (colpkr) {
 					$(colpkr).fadeOut(500);
-					settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
+					settings.background.color(jQuery('#colorSelector div').css('backgroundColor'));
 					settings.preferences.save();
 					return false;
 				},
@@ -889,7 +876,9 @@ var mra = {
 			mra.customize.saveWallpaper();	
 		},
 		saveWallpaper: function(){
-			settings.saveBackgroundImage(mra.customize.wallpapers[mra.customize.wallpaperIndex]); 
+            // TODO: move this out of here
+			settings.background.image(mra.customize.wallpapers[mra.customize.wallpaperIndex]);
+            settings.preferences.save();
 		},
 		closeDialog: function(){
 			jQuery('#customizeDialog').fadeOut();
