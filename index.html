@@ -25,7 +25,7 @@
     <script src="js/ZeroClipboard.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.topzindex.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.ad.gallery.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script> 
+    <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.colorbox.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/new_contextMenu.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
@@ -42,8 +42,8 @@
         ${ name } <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ name }" data-bind="click: remove">
       </li>
     </script>
-    
-	<script type="text/html" id="newsItemTemplate">
+
+    <script type="text/html" id="newsItemTemplate">
 		<li title="${ title }" data-bind="visible: isVisible()">
 			<div class="itemLICenter">
 				<a target="_blank" class="link" href="${ url }" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
@@ -93,14 +93,13 @@
       <!-- TODO: move the function() out of here -->
       {{each ['active','over18','new','self','media','Favorites']}}
       <button id="${$value}" class="changePic fg-button" data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
-      {{/each}} 
+      {{/each}}
     </script>
 
-    <!-- TODO: remove the onerror()-->
     <script type="text/html" id="imageBarTemplate">
       <li>
         <a id="${id}" href="${url}" title="${title}" commentLink="${permalink}" rel="prettyPhoto[reddit]" target="_blank">
-          <img height="150" src="${thumbnail}" onerror="$(this).parent().parent().remove();">
+          <img class="image" height="150" src="${thumbnail}">
         </a>
       </li>
     </script>
@@ -165,7 +164,7 @@
         <button name="btnColumn" value="2" class="fg-button ui-state-default ui-priority-primary" title="Add To The Third Column News Blocks">3rd</button>
         <button name="btnColumn" value="3" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
       </div>
-    </div> 
+    </div>
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="customizeDialog">
       <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
@@ -200,7 +199,7 @@
       <li class="link separator" id="copyLink"><a href="#copy">Copy To Share</a></li>
     </ul>
 
-    <input type="hidden" id="clipboardContents"> 
+    <input type="hidden" id="clipboardContents">
     <iframe src="" frameborder="0" height="1" width="1"></iframe>
     <div id="fb-root"></div>
   </body>

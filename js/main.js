@@ -2,6 +2,15 @@ if(typeof console == "undefined"){
     console = { log: function(){}, error: function(){}, info: function(){} };
 }
 
+$(document).ready(function(){
+    settings.init();
+    mra.init();
+    
+    $(".image").error(function(){
+         $(this).parent().parent().remove();
+    });
+});
+
 /*
  * Setting wrapper
  * - handles all the that needs to persist
@@ -22,7 +31,7 @@ var settings = new (function(){
         
         /*
          * Checks whether or not the color is set or not
-         * - only gets executed when either image or color changes; thus nulls out the other [eliminates the need to have subscribe()r]
+         * - only gets executed when either image or color changes; thus nulls out the other [eliminates the need to have subscribe()rs]
          */
         this.isColorSet = ko.dependentObservable(function(){
             var colorSet = this.color() !== null;
@@ -718,12 +727,7 @@ ko.bindingHandlers.sortableList = {
             }
         });
     }
-}; 
-
-$(document).ready(function(){
-    settings.init();
-    // $("#newsSection").sortable().disableSelection();
-});
+};
 
 var redditURL = "http://www.reddit.com";
 
@@ -1254,4 +1258,3 @@ function streamPublish(curObj){
 		}
 	);
 }
-$(document).ready(mra.init);
