@@ -33,38 +33,38 @@
 
     <!-- TODO: you can delete this? and if you can why not do it in the same place as moreImageButtonTemplate -->
     <script id="imageButtonTemplate" type="text/html">
-      <button class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }" id="${ name }">${ name }</button>
+      <button class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }" id="${name}">${name}</button>
     </script>
 
     <!-- TODO: remove the X (remove) from here and add a better UI for this -->
     <script id="moreImageButtonTemplate" type="text/html">
       <li class="ui-state-default" data-bind="click: select">
-        ${ name } <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ name }" data-bind="click: remove">
+        ${name} <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${name}" data-bind="click: remove">
       </li>
     </script>
 
     <script type="text/html" id="newsItemTemplate">
-		<li title="${ title }" data-bind="visible: isVisible()">
+		<li title="${title}" data-bind="visible: isVisible()">
 			<div class="itemLICenter">
-				<a target="_blank" class="link" href="${ url }" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
+				<a target="_blank" class="link" href="${url}" data-bind="click: visitPage, css: { visited: visited }">${text}</a>
 			</div>
 			<div class="itemLIRight">
-				<a target="_blank" class="comment" href="${ permalink }" title="${ scoreTitle }">${ score }</a>
+				<a target="_blank" class="comment" href="${permalink}" title="${scoreTitle}">${score}</a>
 			</div>
 		</li>
     </script>
 
     <script id="subredditTemplate" type="text/html">
-      <div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
+      <div class="portlet ui-widget ui-widget-content ui-corner-all" title="${name}">
         <div class="portlet-header ui-widget-header ui-corner-all">
           <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: remove"></span>
           <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
           <span class="ui-icon toggleView" title="Toggle visited links" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'ui-icon-pin-w': showVisited(), 'ui-icon-pin-s': !showVisited() }"></span>
-          <a href="${ url }" target="_blank">${ name }</a>
+          <a href="${url}" target="_blank">${name}</a>
           <span data-bind="visible: !isMinimized()">
             <!-- TODO: STOP the FLOAT:RIGHT madness  -->
             {{each(index, button) buttons.all()}}
-            <span title="${ name }" class="ui-icon toggleView" data-bind="click: setActive, css: { 'ui-icon-bullet': isActive(), 'ui-icon-radio-on': !isActive() }">${ name }</span>
+            <span title="${name}" class="ui-icon toggleView" data-bind="click: setActive, css: { 'ui-icon-bullet': isActive(), 'ui-icon-radio-on': !isActive() }">${name}</span>
             {{/each}}
           </span>
         </div>
@@ -82,17 +82,17 @@
 
     <script type="text/html" id="metaTemplate">
       <li id="metaSection">
-      <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: mra.locationPicker.passEvent ">
-      <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ $data.SECTION }" data-bind="click: mra.imageBar.changePic" >
-      <!-- TODO: move the function() out of here -->
-      <span class="metaText" data-bind="click: function(){ mra.imageBar.popupWindow( baseurl + '/r/$data.SECTION' ) }">${$data.NAME}</span>
+        <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ SECTION }" data-bind="click: mra.locationPicker.passEvent">
+        <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ SECTION }" data-bind="click: mra.imageBar.changePic">
+        <!-- TODO: move the function() out of here -->
+        <span class="metaText" data-bind="click: function(){ mra.imageBar.popupWindow( redditURL + '/r/SECTION' ) }">${NAME}</span>
       </li>
     </script>
 
     <script id="loadMetaButtonTemplate" type="text/html">
       <!-- TODO: move the function() out of here -->
       {{each ['active','over18','new','self','media','Favorites']}}
-      <button id="${$value}" class="changePic fg-button" data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
+        <button id="${$value}" class="changePic fg-button" data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
       {{/each}}
     </script>
 
