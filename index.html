@@ -99,7 +99,7 @@
     <script type="text/html" id="imageBarTemplate">
       <li>
         <a id="${id}" href="${url}" title="${title}" commentLink="${permalink}" rel="prettyPhoto[reddit]" target="_blank">
-          <img class="image" height="150" src="${thumbnail}">
+          <img class="image" height="150" src="${thumbnail}" onerror="$(this).parent().parent().remove();">
         </a>
       </li>
     </script>

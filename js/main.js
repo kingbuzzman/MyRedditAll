@@ -5,10 +5,6 @@ if(typeof console == "undefined"){
 $(document).ready(function(){
     settings.init();
     mra.init();
-    
-    $(".image").error(function(){
-         $(this).parent().parent().remove();
-    });
 });
 
 /*
