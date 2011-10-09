@@ -1069,13 +1069,11 @@ var mra = {
                     if (!largeMode){
                         $.colorbox.resize({ width: 430 })
                     }
-                    $("#cboxTitle").show();
                     mra.imageBar.clipboard.addCopy(document.getElementById('copyLink2'));
                     $("iframe").attr("src",$("img.cboxPhoto").attr("src"));
                 }, 
                 onLoad: function(){
                     mra.imageBar.loadMoreImages();
-                    $("#cboxTitle").show();
                 },
                 transition: "elastic",
                 opacity: 0.7,
@@ -1126,14 +1124,6 @@ var mra = {
 				}());
 					
 				mra.imageBar.clipboard.curObj = "";
-				$("#cboxContent").hover(
-					function(){
-						$("#cboxTitle").stop(true).fadeTo("normal",0); 
-					},
-					function(){  
-						$("#cboxTitle").stop(true).fadeTo("normal",0.85); 
-					}
-				);
 				$("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
 				ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
 				//ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
