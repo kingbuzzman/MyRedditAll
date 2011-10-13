@@ -7,6 +7,8 @@ if (typeof console == "undefined") {
  * - handles all the that needs to persist
  */
 var settings = new (function(){
+	//this is how to remove the references to settings everywhere
+	var self = this;
     // default cookie settings
     var BACKGROUND_COLOR = null;
     var BACKGROUND_IMAGE = "images/spacestorm.jpg";
@@ -30,10 +32,14 @@ var settings = new (function(){
      
     this.init = function(){
         // initialize complex object
-        this.preferences = new this.preferences(this);
-        
-        this.preferences.load();
-        ko.applyBindings(this);
+        //this.preferences = new this.preferences(this);
+        //this.preferences.load();
+		
+		$.get("templates.html", function(r){
+		    $("head").append(r);
+        	ko.applyBindings(this);
+			this.preferences.load();
+		}.bind(this));	
     };
     
     // getters
@@ -71,10 +77,10 @@ var settings = new (function(){
     
     //sorters
     this.sortImagesByDate = function(desc){
-        settings.images(settings.images().sort(function(a,b){
+        this.images(this.images().sort(function(a,b){
             return (desc || true) ? b.created - a.created : b.created - a.created;
         }));
-    };
+    }.bind(this);
     
     /*
      * Request manager
@@ -193,7 +199,7 @@ var settings = new (function(){
         this.load = function(links){
 		try {
 	            links = links.split(",");
-            	}catch(e){ settings.preferences.erase() }
+            	}catch(e){ self.preferences.erase() }
             for(var index in links)
                 this.add(links[index]);
         };
@@ -364,7 +370,7 @@ var settings = new (function(){
                 this.scoreTitle = this.score + " of People Like It";
                 /* Reddit removes their own domain name from the permalink to save space so append it back in */
 				this.permalink = BASE_URL + item.permalink;
-                this.visited = ko.observable(settings.visitedLinks.visited(this.id));
+                this.visited = ko.observable(self.visitedLinks.visited(this.id));
                 
                 /*
                  * Observable that checks whether or not the link is visible
@@ -392,8 +398,8 @@ var settings = new (function(){
                             this.visited(true);
                             
                             // TODO: this needs to GO, should not reference settings like that
-                            settings.visitedLinks.add(this.id);
-                            settings.preferences.save();
+                            self.visitedLinks.add(this.id);
+                            self.preferences.save();
                         }.bind(this), 1000
                     );
                     
@@ -511,7 +517,7 @@ var settings = new (function(){
          */
         this.removePortlet = function(portlet){
             portlets.remove(portlet);
-            settings.preferences.save();
+            self.preferences.save();
         };
         
         /*
@@ -547,7 +553,7 @@ var settings = new (function(){
      * Houses all the user preference code
      * - needs to be initialized
      */
-    this.preferences = function(settings){
+    this.preferences = new (function(settings){
         var currentTime = (new Date()).getTime();
         
         var COOKIE_NAME = "settings";
@@ -616,7 +622,7 @@ var settings = new (function(){
                 this.preferences.save();
             }
 
-        }.bind(settings);
+        }.bind(self);
         
         /*
          * Erase the cookie
@@ -631,8 +637,8 @@ var settings = new (function(){
          */
         this.save = function(){
             document.cookie = COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + COOKIE_EXPIRATION + "; path=/";
-        }.bind(settings);
-    };
+        }.bind(this);
+    })(this);
     
     this.toString = function(){
         return ko.toJSON({
@@ -669,10 +675,7 @@ ko.bindingHandlers.sortableList = {
     }
 }; 
 
-$(document).ready(function(){
-    settings.init();
-    // $("#newsSection").sortable().disableSelection();
-});
+$(document).ready(settings.init);
 
 var redditURL = "http://www.reddit.com";
 
