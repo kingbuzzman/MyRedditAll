@@ -25,14 +25,14 @@
     <script src="js/ZeroClipboard.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.topzindex.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.ad.gallery.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script> 
+    <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.colorbox.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/new_contextMenu.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/iScroll.js" type="text/javascript" charset="ISO-8859-1"></script>
+	<script src="js/iScroll.js" type="text/javascript" charset="ISO-8859-1"></script>
   </head>
 
-  <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
+  <body data-bind="style: { backgroundColor: background.isColorSet()? background.color(): '', backgroundImage: !background.isColorSet()? 'url(' + background.image() + ')': '' }">
     <div id="loadingOverlay" style="display:none;">
         <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" id="metaRedditDialog">
           <div class="portlet-header ui-widget-header ui-corner-all">
@@ -91,7 +91,7 @@
         <button name="btnColumn" value="2" class="fg-button ui-state-default ui-priority-primary" title="Add To The Third Column News Blocks">3rd</button>
         <button name="btnColumn" value="3" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
       </div>
-    </div> 
+    </div>
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="customizeDialog">
       <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
@@ -126,7 +126,7 @@
       <li class="link separator" id="copyLink"><a href="#copy">Copy To Share</a></li>
     </ul>
 
-    <input type="hidden" id="clipboardContents"> 
+    <input type="hidden" id="clipboardContents">
     <iframe src="" frameborder="0" height="1" width="1"></iframe>
     <div id="fb-root"></div>
   </body>

@@ -2,6 +2,11 @@ if(typeof console == "undefined"){
     console = { log: function(){}, error: function(){}, info: function(){} };
 }
 
+$(document).ready(function(){
+    settings.init();
+    mra.init();
+});
+
 /*
  * Setting wrapper
  * - handles all the that needs to persist
@@ -18,10 +23,25 @@ var settings = new (function(){
     
     var BASE_URL = "http://www.reddit.com";
     
-    this.background = {
-        color: ko.observable(BACKGROUND_COLOR),
-        image: ko.observable(BACKGROUND_IMAGE)
-    };
+    this.background = new (function(){
+        this.color = ko.observable(BACKGROUND_COLOR);
+        this.image = ko.observable(BACKGROUND_IMAGE);
+        
+        /*
+         * Checks whether or not the color is set or not
+         * - only gets executed when either image or color changes; thus nulls out the other [eliminates the need to have subscribe()rs]
+         */
+        this.isColorSet = ko.dependentObservable(function(){
+            var colorSet = this.color() !== null;
+            
+            if(colorSet)
+                this.image(null);
+            else
+                this.color(null);
+            
+            return colorSet;
+        }, this)
+    })();
     
     this.images = ko.observableArray();
     this.activeImage = function(){
@@ -43,37 +63,9 @@ var settings = new (function(){
     };
     
     // getters
-    this.getBackgroundColor = function(color){
-        return this.background.color();
-    };
-    this.getBackgroundImage = function(){
-        return this.background.image();
-    };
     this.getSubreddits = function(){
         return this.subreddits;
     };
-    
-    // setters
-    this.setBackgroundColor = function(color){
-        this.background.color(color);
-        this.background.image(null);
-    };
-
-    this.setBackgroundImage = function(image){
-        this.background.color(null);
-        this.background.image(image);
-    };
-    
-    // shortcuts
-    this.saveBackgroundColor = function(color){
-        this.setBackgroundColor(color);
-        this.preferences.save();
-    };
-    this.saveBackgroundImage = function(image){
-        this.setBackgroundImage(image);
-        this.preferences.save();
-    };
-    
     
     //sorters
     this.sortImagesByDate = function(desc){
@@ -369,6 +361,7 @@ var settings = new (function(){
                 /* Reddit removes their own domain name from the permalink to save space so append it back in */
 				this.permalink = BASE_URL + item.permalink;
                 this.visited = ko.observable(self.visitedLinks.visited(this.id));
+
                 
                 /*
                  * Observable that checks whether or not the link is visible
@@ -709,8 +702,8 @@ var settings = new (function(){
     this.toString = function(){
         return ko.toJSON({
             background: {
-                color: this.getBackgroundColor(),
-                image: this.getBackgroundImage()
+                color: this.background.color(),
+                image: this.background.image()
             },
             subreddits: this.getSubreddits().toStringArray(),
             imageBar: this.imageBar.toStringArray(),
@@ -739,9 +732,7 @@ ko.bindingHandlers.sortableList = {
             }
         });
     }
-}; 
-
-$(document).ready(settings.init);
+};
 
 var redditURL = "http://www.reddit.com";
 /*
@@ -868,7 +859,7 @@ var mra = {
 				},
 				onHide: function (colpkr) {
 					$(colpkr).fadeOut(500);
-					settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
+					settings.background.color(jQuery('#colorSelector div').css('backgroundColor'));
 					settings.preferences.save();
 					return false;
 				},
@@ -893,7 +884,9 @@ var mra = {
 			mra.customize.saveWallpaper();	
 		},
 		saveWallpaper: function(){
-			settings.saveBackgroundImage(mra.customize.wallpapers[mra.customize.wallpaperIndex]); 
+            // TODO: move this out of here
+			settings.background.image(mra.customize.wallpapers[mra.customize.wallpaperIndex]);
+            settings.preferences.save();
 		},
 		closeDialog: function(){
 			jQuery('#customizeDialog').fadeOut();
@@ -1080,13 +1073,11 @@ var mra = {
                     if (!largeMode){
                         $.colorbox.resize({ width: 430 })
                     }
-                    $("#cboxTitle").show();
                     mra.imageBar.clipboard.addCopy(document.getElementById('copyLink2'));
                     $("iframe").attr("src",$("img.cboxPhoto").attr("src"));
                 }, 
                 onLoad: function(){
                     mra.imageBar.loadMoreImages();
-                    $("#cboxTitle").show();
                 },
                 transition: "elastic",
                 opacity: 0.7,
@@ -1136,14 +1127,6 @@ var mra = {
 				}());
 					
 				mra.imageBar.clipboard.curObj = "";
-				$("#cboxContent").hover(
-					function(){
-						$("#cboxTitle").stop(true).fadeTo("normal",0); 
-					},
-					function(){  
-						$("#cboxTitle").stop(true).fadeTo("normal",0.85); 
-					}
-				);
 				$("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
 				ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
 				//ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
@@ -1266,4 +1249,3 @@ function streamPublish(curObj){
 		}
 	);
 }
-//$(document).ready(mra.init);
