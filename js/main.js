@@ -733,13 +733,10 @@ ko.bindingHandlers.sortableList = {
     }
 }; 
 
-$(document).ready(function(){
-    settings.init();
-    // $("#newsSection").sortable().disableSelection();
-});
+$(document).ready(settings.init);
 
 var redditURL = "http://www.reddit.com";
-
+/*
 var mra = {
     init: function(){
 		//not yet
@@ -767,7 +764,6 @@ var mra = {
         //TODO move this to the portlet class
         //mra.timer.init(); 
 		mra.customize.init();
-        /* This is the actual binding to the popupAdd container that decides what to do based on what is clicked */
         $("button[name=btnColumn]").bind("click",function(){
             (this.value == 3) ? settings.imageBar.addButton(selectedReddit) : mra.news.loadNewSection(selectedReddit,this.value);
             settings.preferences.save();
@@ -898,7 +894,6 @@ var mra = {
 
 	},
     locationPicker: {
-        /*this is the little popup you see when you click on meta and customize this so u can pick 1|2|3|image*/
         passEvent: function(evt){
             var curObj = $(evt.target); 
             mra.locationPicker.show( curObj, curObj.attr("id").split("_")[1] );
@@ -948,9 +943,6 @@ var mra = {
             );
         },
         viewComments: function(){
-            /*mra.imageBar.popupWindow(
-                $("a[rel^='prettyPhoto'] img[src='" + $("img.cboxPhoto").attr('src') + "']").parent().attr("commentLink")
-            );*/
 			//TODO improve once the imageBar gets knocked out
 			theImg =  $("img.cboxPhoto").attr('src');
 			$.each(settings.images(), function(i,o){
@@ -990,6 +982,7 @@ var mra = {
 						var file = pic.url.split("/")[pic.url.split("/").length - 1].split(".");
 						pic.thumbnail = "http://imgur.com/" + file[0].substring(0,5) + size + "." + (file[1] || "jpg");
 					}
+					console.log(pic.url);
                     if (regex.exec( pic.url )){
                         settings.images.push(pic); 
                     }
@@ -1068,7 +1061,6 @@ var mra = {
             });    
             
         },
-        /* This is the main module that inits the image overlay for the imageBar*/
         applyLightBox: function(){
             $("#container div.ad-gallery a").colorbox({ 
 				//href: function(){ return this.href },
@@ -1124,7 +1116,6 @@ var mra = {
                 },1000);                    
             } 
         },
-        /* this initializes the copy to share functionality for the overlay */
 		clipboard: {
 			init: function(){
 
@@ -1231,6 +1222,8 @@ var mra = {
         }
     }
 }
+*/
+
 function streamPublish(curObj){       
 	FB.ui({
 			method: 'stream.publish',
@@ -1265,4 +1258,4 @@ function streamPublish(curObj){
 		}
 	);
 }
-$(document).ready(mra.init);
+//$(document).ready(mra.init);
