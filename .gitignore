@@ -1,7 +1,7 @@
 # mac
 .DS_Store
 *.orig
-
+*.tmp_*
 # windows 
 *.bak
 *.cfm
