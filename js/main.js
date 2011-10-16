@@ -175,7 +175,7 @@ var settings = new (function(){
         this.load = function(links){
 			try {
 	            links = links.split(",");
-        	}catch(e){ self.preferences.erase() }
+			}catch(e){ self.preferences.erase() }
             for(var index in links)
                 this.add(links[index]);
         };
@@ -682,7 +682,6 @@ var settings = new (function(){
                 this.preferences.save();
             }
         }.bind(self);
-        
         /*
          * Erase the cookie
          */
