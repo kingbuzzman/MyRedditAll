@@ -1,6 +1,11 @@
-if (typeof console == "undefined"){
+if(typeof console == "undefined"){
     console = { log: function(){}, error: function(){}, info: function(){} };
 }
+
+$(document).ready(function(){
+    settings.init();
+    mra.init();
+});
 
 /*
  * Setting wrapper
@@ -14,14 +19,29 @@ var settings = new (function(){
     var BACKGROUND_IMAGE = "images/spacestorm.jpg";
     var SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
     var SUBREDDIT_ITEMS = 10;
-    var IMAGE_BAR = ["Pics","WTF","NSFW","Funny"];
+    var IMAGE_BAR = ["Pics","WTF","NSFW","Funny","RageComics","Bacon"];
     
     var BASE_URL = "http://www.reddit.com";
     
-    this.background = {
-        color: ko.observable(BACKGROUND_COLOR),
-        image: ko.observable(BACKGROUND_IMAGE)
-    };
+    this.background = new (function(){
+        this.color = ko.observable(BACKGROUND_COLOR);
+        this.image = ko.observable(BACKGROUND_IMAGE);
+        
+        /*
+         * Checks whether or not the color is set or not
+         * - only gets executed when either image or color changes; thus nulls out the other [eliminates the need to have subscribe()rs]
+         */
+        this.isColorSet = ko.dependentObservable(function(){
+            var colorSet = this.color() !== null;
+            
+            if(colorSet)
+                this.image(null);
+            else
+                this.color(null);
+            
+            return colorSet;
+        }, this)
+    })();
     
     this.images = ko.observableArray();
     this.activeImage = function(){
@@ -43,37 +63,9 @@ var settings = new (function(){
     };
     
     // getters
-    this.getBackgroundColor = function(color){
-        return this.background.color();
-    };
-    this.getBackgroundImage = function(){
-        return this.background.image();
-    };
     this.getSubreddits = function(){
         return this.subreddits;
     };
-    
-    // setters
-    this.setBackgroundColor = function(color){
-        this.background.color(color);
-        this.background.image(null);
-    };
-
-    this.setBackgroundImage = function(image){
-        this.background.color(null);
-        this.background.image(image);
-    };
-    
-    // shortcuts
-    this.saveBackgroundColor = function(color){
-        this.setBackgroundColor(color);
-        this.preferences.save();
-    };
-    this.saveBackgroundImage = function(image){
-        this.setBackgroundImage(image);
-        this.preferences.save();
-    };
-    
     
     //sorters
     this.sortImagesByDate = function(desc){
@@ -91,19 +83,6 @@ var settings = new (function(){
         var MAX_CONNECTIONS = 10;
         var activeConnections = [];
         var queued = [];
-        
-        // TODO: redo, map-filter?
-        var cleanData = function(data){
-            var arrData = [];
-            data.sort(function(a,b){
-                return b.created - a.created;
-            }); 
-            for (i in data){
-                arrData.push(data[i].data);
-            }
-            
-            return arrData;
-        };
         
         /*
          * Calls the next request
@@ -141,10 +120,7 @@ var settings = new (function(){
                 jsonp: 'jsonp',
                 timeout: 20000, // 2 seconds timeout
                 success: function(data){
-                    var redditData = cleanData(data.data.children);
-                    if (redditData.length > 0){
-                        callback(redditData);
-                    }
+                    callback(data.data.children);
                 },
                 error: function(){
                     // stick it on the queue
@@ -236,6 +212,7 @@ var settings = new (function(){
             }.bind(this));
             
             this.select = function(){
+                $(".ad-thumbs > .vertical > .loader").show(); // TODO: remove this ASAP, as soon as the imagebar loader is redone
                 mra.imageBar.changePic(this.name);
                 selected(this);
             }
@@ -335,6 +312,7 @@ var settings = new (function(){
             var newsItems = ko.observableArray();
             var portlet = this;
             var minimized = ko.observable(false);
+            var message = ko.observable("");
             
             this.showVisited = ko.observable(false);
             
@@ -348,11 +326,24 @@ var settings = new (function(){
             var load = function(){
                 var url = this.requestURL();
                 
+                if(!url){
+                    message("Please select a category");
+                    return;
+                }
+                
                 // load the complete feed
                 loader.call(url, function(data){
-                    for(var index in data)
-                        newsItems.push(new NewsItem(data[index]));
+                    if(data.length === 0){
+                        message("No results...");
+                        return;
+                    }
                     
+                    // populate each of the news item inside the portlet
+                    for(var index in data)
+                        newsItems.push(new NewsItem(data[index].data));
+                    
+                    // set the last item field
+                    // used for the next call; we continue loading content from this point on
                     this.last(newsItems()[newsItems().length-1]);
                 }.bind(this));
             }.bind(this);
@@ -363,32 +354,32 @@ var settings = new (function(){
                 this.id = item.id;
                 this.title = item.title;
                 this.text = item.title.substring(0, MAX_TITLE_LENGTH) + ((item.title.length > MAX_TITLE_LENGTH)? "...": "");
-				/* This is a special url by reddit that allows the user to view the article with it in the iFrame */				
-                this.redditURL = BASE_URL + "/tb/" + item.id;
+                this.redditURL = BASE_URL + "/tb/" + item.id; // nicer link with comments, upvote.. etc at the top (iframed)
                 this.url = item.url;
                 this.score =  parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
                 this.scoreTitle = this.score + " of People Like It";
                 /* Reddit removes their own domain name from the permalink to save space so append it back in */
 				this.permalink = BASE_URL + item.permalink;
                 this.visited = ko.observable(self.visitedLinks.visited(this.id));
+
                 
                 /*
                  * Observable that checks whether or not the link is visible
                  */
                 this.isVisible = ko.dependentObservable(function(){
-                    // TODO: remove the settings reference
                     // checks the the link to see if its been visited, or if all the news items are visible
                     return !this.visited() || portlet.showVisited();
                 }.bind(this));
                 
                 /*
-                 * Marks the page as seem/visited
+                 * Marks the page as seen/visited
                  */
                 this.visitPage = function(evt){
                     var element = $(evt.target);
                     
-                    // replace link with reddit's link for it
-                    element.attr('href', this.redditURL)
+                    // replace link with reddit's link for it only if its not Youtube.com which has a glitch with reddit's frame
+					if (this.url.indexOf("youtube.com") == -1)
+	                    element.attr('href', this.redditURL)
                     
                     setTimeout(function(){
                             // swap back the original link
@@ -407,37 +398,86 @@ var settings = new (function(){
                 };
             };
             
-            this.buttons = new (function(){
-                var activeButton = ko.observable(NEWS_BUTTONS[0]);
-                
-                // public constants
-                this.NEWS_BUTTONS = NEWS_BUTTONS;
-                
-                // TODO: create an object out of each button and make a property inside of it with isActive()
-                this.getActiveButton = function(){
-                    return activeButton();
-                };
-                
-                this.reloadSection = function(i,e,o){
-                    var button = $(i.target).attr("rel");
-                    
-                    newsItems.removeAll();
-                    
-                    activeButton(button);
-                    load(); // redo this
-                };
-            })();
-            
             // attributes
             this.name = name;
             this.url = BASE_URL + "/r/" + decodeURIComponent(name);
             this.last = ko.observable();
             this.amountVisible = ko.observable(10);
-			
+            
+            /*
+             * Houses the navigaton button for the pannel (ie. "top", "new", .. etc)
+             */
+            this.buttons = new (function(){
+                var DEFAULT_ACTIVE_BUTTON = "hot";
+                
+                var buttons = ko.observableArray();
+                var activeButton = ko.observable();
+                
+                /*
+                 * Button specifics
+                 */
+                var Button = function(name, active){
+                    this.init = function(name, active){
+                        this.name = name;
+                        if(active) this.setActive();
+                    };
+                    
+                    this.setActive = function(event){
+                        activeButton(this);
+                        
+                        portlet.last(null); // reset the last item (for the ajax call)
+                        newsItems.removeAll(); // remove all the news items
+                        message(""); // reset the messages
+                        
+                        // if it was clicked then make request
+                        if(event)
+                            load(); // redo this
+                    }.bind(this);
+                    
+                    this.isActive = ko.dependentObservable(function(){
+                        return activeButton() === this;
+                    }.bind(this));
+                    
+                    // initialize the object
+                    this.init(name, active);
+                };
+                
+                this.init = function(){
+                    var name;
+                    
+                    for(var index in NEWS_BUTTONS){
+                        name = NEWS_BUTTONS[index];
+                        
+                        buttons.push(new Button(name, (name === DEFAULT_ACTIVE_BUTTON)));
+                    }
+                };
+                
+                this.activeButton = activeButton;
+                
+                this.all = function(){
+                    return buttons();
+                };
+                
+                // initialize the object
+                this.init();
+            })();
+            
+            /*
+             * Returns the full request URL to call reddit.com
+             * - append the last item on the list so it doenst need to reload the full pannel
+             */
             this.requestURL = function(){
-                return this.url + "/" + this.buttons.getActiveButton() + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
+                var activeButton = this.buttons.activeButton();
+                
+                if(!activeButton){
+                    console.error("No active catetegory found for " + this.name);
+                    return;
+                }
+                
+                return this.url + "/" + activeButton.name + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last())? "&after=" + this.last().id: "");
             };
             
+            // TODO: document this! (thanks richard)
             this.getNewsItems = function(){
                 return ko.utils.arrayFilter(newsItems(), function(newsItem){
                     return newsItem.isVisible() ? newsItem: null;
@@ -460,17 +500,31 @@ var settings = new (function(){
                 // ie. false ^ true -> true
                 minimized((minimized() ^ true) === 1);
             };
+            
             /*
-             * Triggers the display of the load bar to the user
+             * Triggers the display of the load bar to the user if there are no items.
+             * - its ignored if there is a message
+             *
+             * returns boolean: true if there are no items and no massage out for display
              */
             this.getShowLoadingBar = function(){
-                return !(newsItems().length > 0);
+                return !(newsItems().length > 0) && message() === "";
+            };
+            
+            /*
+             * Message display for the user (error, info, etc)
+             *
+             * returns string message description
+             */
+            this.getMessage = function(){
+                return message();
             };
             
             /*
              * Populates the portlet with 10 more items
              */
             this.populateNext = function(){
+				this.amountVisible(this.amountVisible()+10);
                 load();
             };
             
@@ -544,7 +598,7 @@ var settings = new (function(){
         };
         
         // initializes all the portlets
-        for(var index in arguments) {
+        for(var index in arguments){
             this.addPortlet(arguments[index]);
         }
     })();
@@ -628,6 +682,7 @@ var settings = new (function(){
                 this.preferences.save();
             }
         }.bind(self);
+
         /*
          * Erase the cookie
          */
@@ -647,8 +702,8 @@ var settings = new (function(){
     this.toString = function(){
         return ko.toJSON({
             background: {
-                color: this.getBackgroundColor(),
-                image: this.getBackgroundImage()
+                color: this.background.color(),
+                image: this.background.image()
             },
             subreddits: this.getSubreddits().toStringArray(),
             imageBar: this.imageBar.toStringArray(),
@@ -677,9 +732,7 @@ ko.bindingHandlers.sortableList = {
             }
         });
     }
-}; 
-
-$(document).ready(settings.init);
+};
 
 var redditURL = "http://www.reddit.com";
 
@@ -807,7 +860,7 @@ var mra = {
 				},
 				onHide: function (colpkr) {
 					$(colpkr).fadeOut(500);
-					settings.setBackgroundColor(jQuery('#colorSelector div').css('backgroundColor'));
+					settings.background.color(jQuery('#colorSelector div').css('backgroundColor'));
 					settings.preferences.save();
 					return false;
 				},
@@ -832,7 +885,9 @@ var mra = {
 			mra.customize.saveWallpaper();	
 		},
 		saveWallpaper: function(){
-			settings.saveBackgroundImage(mra.customize.wallpapers[mra.customize.wallpaperIndex]); 
+            // TODO: move this out of here
+			settings.background.image(mra.customize.wallpapers[mra.customize.wallpaperIndex]);
+            settings.preferences.save();
 		},
 		closeDialog: function(){
 			jQuery('#customizeDialog').fadeOut();
@@ -891,13 +946,17 @@ var mra = {
             );
         },
         viewComments: function(){
-            mra.imageBar.popupWindow(
+            /*mra.imageBar.popupWindow(
                 $("a[rel^='prettyPhoto'] img[src='" + $("img.cboxPhoto").attr('src') + "']").parent().attr("commentLink")
-            );
+            );*/
+			//TODO improve once the imageBar gets knocked out
+			theImg =  $("img.cboxPhoto").attr('src');
+			$.each(settings.images(), function(i,o){
+				if (theImg == o.url) mra.imageBar.popupWindow(o.permalink)
+			});
         },
         changePic: function(evt){
-            $(".ad-gallery").hide();
-            $(".ad-gallery-loading").show();
+            settings.images.removeAll();
             mra.imageBar.currentImageBar = evt;
             mra.fetchContentFromRemote(function(arrItems){
                 mra.imageBar.processItems(arrItems,mra.imageBar.currentImageBar);
@@ -914,13 +973,21 @@ var mra = {
             var regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif)$");
             var sElements = "";
             var filtered = [];
+			var size = "m" //s-small, m-medium, l-large
             for (i in arrElems){
                 var pic = arrElems[i];
                 pic.permalink = redditURL + pic.permalink;
+				pic.thumbnail = pic.url;
                 if (pic.url != ''){
+					//normalize the urls
                     if (  pic.url.indexOf("http://imgur.com/") >= 0 ){
                          pic.url = pic.url + ".jpg";
                     }
+					//change the url to thumbnails
+					if ( pic.url.indexOf("imgur.com/") >= 0 ){
+						var file = pic.url.split("/")[pic.url.split("/").length - 1].split(".");
+						pic.thumbnail = "http://imgur.com/" + file[0].substring(0,5) + size + "." + (file[1] || "jpg");
+					}
                     if (regex.exec( pic.url )){
                         settings.images.push(pic); 
                     }
@@ -931,8 +998,7 @@ var mra = {
             } 
         },
         getHeaders: function(a){
-			//TODO recreate <execute> tag for the missing javascript.xml file
-			return;
+			//javascript.xml also found in the git repo
             var curPic = a;
             var sql = "USE 'http://javarants.com/yql/javascript.xml' AS j;\
                                select content-type from j where code='response.object = y.rest(\"" + curPic.url + "\").followRedirects(false).get().headers';";
@@ -1003,21 +1069,20 @@ var mra = {
         /* This is the main module that inits the image overlay for the imageBar*/
         applyLightBox: function(){
             $("#container div.ad-gallery a").colorbox({ 
+				//href: function(){ return this.href },
                 maxHeight: function(){ return (window.innerHeight * 0.9) }, 
                 maxWidth: function(){ return (window.innerWidth * 0.9) },
                 onComplete:function(){ 
-                    var largeMode = $("img.cboxPhoto").width() > 420;
+                    var largeMode = $("img.cboxPhoto").width() > 430;
                     $("#cboxCurrent span").toggle(largeMode);
                     if (!largeMode){
-                        $.colorbox.resize({ width: 420 })
+                        $.colorbox.resize({ width: 430 })
                     }
-                    $("#cboxTitle").show();
                     mra.imageBar.clipboard.addCopy(document.getElementById('copyLink2'));
                     $("iframe").attr("src",$("img.cboxPhoto").attr("src"));
                 }, 
                 onLoad: function(){
                     mra.imageBar.loadMoreImages();
-                    $("#cboxTitle").show();
                 },
                 transition: "elastic",
                 opacity: 0.7,
@@ -1068,14 +1133,6 @@ var mra = {
 				}());
 					
 				mra.imageBar.clipboard.curObj = "";
-				$("#cboxContent").hover(
-					function(){
-						$("#cboxTitle").stop(true).fadeTo("normal",0); 
-					},
-					function(){  
-						$("#cboxTitle").stop(true).fadeTo("normal",0.85); 
-					}
-				);
 				$("#cboxTopRight").html('<img src="images/maximize.png" onclick="mra.imageBar.fullscreenLightbox()">');        
 				ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
 				//ZeroClipboard is a flash plugin that lets you put text into the user's clipboard
@@ -1110,14 +1167,12 @@ var mra = {
                 $.colorbox.resize({ innerWidth: this.width, innerHeight: this.height });
                 $(".cboxPhoto").css({ 'width': this.width, 'height': this.height })
             };
-            i.src = $.colorbox.element().children().attr('src')
+            i.src = $.colorbox.element()[0].href;
         },
         processItems: function(pics, subReddit){ 
             var sImageBar = "";  
             window.arrPics = pics;
-            $(".ad-gallery").show();
-            $(".ad-gallery-loading").hide(); 
-            settings.images.removeAll(); 
+            $(".ad-thumbs > .vertical > .loader").hide(); 
             mra.imageBar.filterElements(pics);    
             window.adGallery = $("div.ad-gallery")    
                 .attr("id", "imagebar_" + mra.imageBar.currentImageBar)
@@ -1198,4 +1253,3 @@ function streamPublish(curObj){
 		}
 	);
 }
-$(document).ready(mra.init);

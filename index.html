@@ -25,20 +25,22 @@
     <script src="js/ZeroClipboard.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.topzindex.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.ad.gallery.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script> 
+    <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.colorbox.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/new_contextMenu.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/iScroll.js" type="text/javascript" charset="ISO-8859-1"></script>
   </head>
 
-  <body data-bind="style: { backgroundColor: getBackgroundColor()? getBackgroundColor(): '', backgroundImage: getBackgroundImage()? 'url(' + getBackgroundImage() + ')': '' }">
+  <body data-bind="style: { backgroundColor: background.isColorSet()? background.color(): '', backgroundImage: !background.isColorSet()? 'url(' + background.image() + ')': '' }">
     <div id="loadingOverlay" style="display:none;">
         <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" id="metaRedditDialog">
           <div class="portlet-header ui-widget-header ui-corner-all">
+            <!-- TODO: remove this onclick -->
             <span class="ui-icon ui-icon-closethick" onClick="$(this).parent().parent().parent().hide()"></span>
             <a>Add New Section</a>
             <input type="Text" name="feedName" size="30" class="ui-state-defalt">
+            <!-- TODO: remove this onclick -->
             <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="mra.locationPicker.show(this,$('input[name=feedName]').val())" width="16" height="16">
           </div>
           <div class="portlet-content">
@@ -49,14 +51,12 @@
             <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>
           </div>
         </div>
-    </div>  
+    </div>
     <div id="container">
-      <div class="ad-gallery-loading" style="display:none">
-        <div style="height:150px; line-height:150px;" class="portlet-content"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
-      </div>
-      <div class="ad-gallery" id="">
+      <div class="ad-gallery">
         <div class="ad-nav">
           <div class="ad-thumbs">
+            <div class="vertical"><div class="loader"></div></div>
             <ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: images }"></ul>
           </div>
         </div>
@@ -64,9 +64,11 @@
 
       <h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
         <span class="cufonize">Live Dangerously?</span>
+        <!-- TODO: remove this onclick -->
         <a onclick="jQuery('#customizeDialog').fadeIn(); return false;" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
         <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
           <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.getFrontPage() }"></span>
+          <!-- TODO: remove this onclick -->
           <button class="changePic fg-button ui-corner-right" onclick="$('#loadingOverlay').toggle()">Meta</button>
           <button data-bind="click: imageBar.showMenu, visible: imageBar.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
           <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.getMenu() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
@@ -75,23 +77,11 @@
       </h2>
 
       <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: getSubreddits().getPortlets() }, sortableList: getSubreddits().getPortlets()"></div>
-    </div> 
-
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" title="" id="newsTemplate" style="display:none;">
-      <div class="portlet-header ui-widget-header ui-corner-all">
-        <span class="ui-icon ui-icon-closethick ui-close-display"></span>
-        <span class="ui-icon ui-icon-minusthick ui-toggle-display"></span>
-        <a href="http://www.reddit.com/r/" target="_blank"></a>
-        <span class="ui-icon toggleView ui-icon-bullet" rel="hot" title="View hot articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">hot</span>
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="new" title="View new articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">new</span>
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="controversial" title="View controversial articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">controversial</span>                        
-        <span class="ui-icon toggleView ui-icon-radio-on" rel="top" title="View top articles" onclick="mra.news.reloadSection($(this).parent().parent().attr('title'), $(this).attr('rel'))">top</span>
-      </div>
-      <div class="portlet-content"><img src="images/ajaxLoader.gif" width="126" height="22" align="middle"></div>
     </div>
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="popupAdd">
       <div class="portlet-header ui-widget-header ui-corner-all">
+        <!-- TODO: remove this onclick -->
         <span class="ui-icon ui-icon-closethick" onClick="$('#popupAdd').fadeOut()" style="margin-top:2px;"></span>
         <a style="font-size:16px;">Add To Column or Image Bar</a>
       </div>
@@ -101,10 +91,11 @@
         <button name="btnColumn" value="2" class="fg-button ui-state-default ui-priority-primary" title="Add To The Third Column News Blocks">3rd</button>
         <button name="btnColumn" value="3" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
       </div>
-    </div> 
+    </div>
 
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="left:8%; position:absolute; top:99px; width:80%; display:none; border:1px solid #ffdab9;" id="customizeDialog">
+    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="customizeDialog">
       <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
+        <!-- TODO: remove this onclick -->
         <span class="ui-icon ui-icon-closethick" onClick="mra.customize.closeDialog()"></span>
         <a>Customize MyRedditAll</a>
       </div>
@@ -113,10 +104,11 @@
           <tr>
             <td class="cufonize">Pick Wallpaper </td>
             <td colspan="3" style="text-align:left;">
+              <!-- TODO: remove this onclick -->
               <input type="button" value="Previous" class="ui-state-default" onClick="mra.customize.prevWallpaper()">
+              <!-- TODO: remove this onclick -->
               <input type="button" value="Next" class="ui-state-default" onClick="mra.customize.nextWallpaper()">
             </td>
-            <td><span class="cufonize">Hide Viewed</span> <input type="checkbox" data-bind="checked: settings.isNewsItemVisible, attr: { checked: settings.isNewsItemVisible }"></td>
             <td class="cufonize">Color </td>
             <td>
               <div id="colorSelector"><div></div></div>
@@ -134,7 +126,7 @@
       <li class="link separator" id="copyLink"><a href="#copy">Copy To Share</a></li>
     </ul>
 
-    <input type="hidden" id="clipboardContents"> 
+    <input type="hidden" id="clipboardContents">
     <iframe src="" frameborder="0" height="1" width="1"></iframe>
     <div id="fb-root"></div>
   </body>

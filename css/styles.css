@@ -1,19 +1,21 @@
 body { font-size:0.8em; font-family:Helvetica; color:#9FA8A8; margin:2px; padding:0; }
 a { text-decoration:none; border:0; }
 h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
-#newsSection { width:100%; }
-#newsSection > .portlet { width:97%; display:inline-block; } 
+#newsSection > div { width:100%; display:inline-block; } 
 @media screen and (min-width: 900px) {
 	#newsSection { 	
 		-moz-column-count: 3; -webkit-column-count: 3;
     }
 }
-div.loader { text-align:center; }
+
+#cboxContent:hover #cboxTitle { display:none!important; }
+
+div.loader { background-image: url(/images/ajaxLoader.gif); width:126px; height:22px; margin:0px auto; }
 ul.portlet-content { list-style-type:none; padding:0; margin:0; }
 ul.portlet-content > li { text-align:left; border-bottom:1px solid #3d3d3d; }
 ul.portlet-content > li div { border-bottom: 1px solid #3D3D3D; display: table-cell; vertical-align: middle; }
 ul.portlet-content > li div.itemLICenter { width:100%; }
-ul.portlet-content > li a { opacity: 0.7; padding: 0 5px; color: #D9D9D9; margin: 2px; display:block; }
+ul.portlet-content > li a { padding: 0 5px; color: #D9D9D9; margin: 2px; display:block; }
 ul.portlet-content > li a:hover { color:#FFF; }
 ul.portlet-content > li a:visited  { color: #666; }
 ul.portlet-content > li > a.link { font-size:inherit; }
@@ -57,6 +59,8 @@ button.fg-button { width:auto; overflow:visible; }
 .ui-dialog-titlebar  { padding:0 !important; padding-left:0.3em !important; }
 
 .ui-icon { display:inline-block; }
+.ui-icon-more > div > span { float:left; }
+.ui-icon-more > div > span.more-results { float:right; padding-right:5px; }
 .ui-icon-more > div { width:17px; overflow:hidden; cursor:pointer; height:16px; font-size:13px; }
 .ui-icon-more:hover > div { width:100%; }
 .ui-dialog .ui-dialog-content { overflow:visible; }
@@ -81,10 +85,10 @@ div.portlet-header a { font-size:24px; color:#EEE; font-weight:normal; }
 #loadingOverlay {
     background-color: #111111;
     height: 100%;
-    opacity: 0.7;
     position: absolute;
     width: 100%;
     z-index: 10000;
+	opacity:0.8;
 }
 #metaRedditDialog .fg-button { float:none; }
 #metaRedditList li { cursor:pointer; float:left; padding:3px; width:200px; text-align:left; }
@@ -95,8 +99,11 @@ div.portlet-header a { font-size:24px; color:#EEE; font-weight:normal; }
 	position:absolute;	
 	z-index:10001;
 }
+.ad-thumbs { height:150px; }
+.vertical { position:absolute; top:5em; width:100%; z-index:100; }
+.vertical > .loader { z-index:100; }
 .ad-thumb-list {
-	height:150px;	
+	height:100%;
 }
 #colorSelector {
 	background:url("../images/select.png") repeat scroll 0 0 transparent;
@@ -136,3 +143,14 @@ div.portlet-header a { font-size:24px; color:#EEE; font-weight:normal; }
 }
 #searchField { float:left; }
 #showMoreList {z-index: 5000;}
+#customizeDialog { 
+    border: 0 none;
+    width:530px; 
+	border:1px solid #ffdab9; 
+    left: 50%;
+    margin: -50px 0 0 -250px;
+    overflow: hidden;
+    position: absolute;
+    top: 50%;
+    z-index: 20000;		
+}
