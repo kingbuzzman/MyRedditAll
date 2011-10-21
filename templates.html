@@ -70,10 +70,10 @@
       {{/each}} 
     </script>
 
-    <script type="text/html" id="imageBarTemplate">
-      <li>
-      <a data-bind="attr:{ id: $data.id, title: $data.title, href: $data.url, commentLink: $data.permalink }" rel="prettyPhoto[reddit]" target="_blank">
-        <img height="150" data-bind="attr: { src: $data.url }" onerror="$(this).parent().parent().remove()">
-      </a>
-      </li>
-    </script>
+	<script type="text/html" id="imageBarTemplate">
+		<li>
+			<a data-bind="attr:{ title: $data.title, href: $data.url }" rel="prettyPhoto[reddit]" target="_blank">
+				<img height="150" data-bind="attr: { src: $data.thumbnail }" onerror="$(this).parent().parent().remove()">
+			</a>
+		</li>
+	</script>
