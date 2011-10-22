@@ -28,11 +28,14 @@
     <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/jquery.colorbox.js" type="text/javascript" charset="ISO-8859-1"></script>
     <script src="js/new_contextMenu.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
-	<script src="js/iScroll.js" type="text/javascript" charset="ISO-8859-1"></script>
+    <script src="js/iScroll.js" type="text/javascript" charset="ISO-8859-1"></script>
+	<script src="js/jquery.json.js" type="text/javascript" charset="ISO-8859-1"></script>
+	<script src="js/jquery.jStorage.js" type="text/javascript" charset="ISO-8859-1"></script>
+	<script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
+	
   </head>
 
-  <body data-bind="style: { backgroundColor: background.isColorSet()? background.color(): '', backgroundImage: !background.isColorSet()? 'url(' + background.image() + ')': '' }">
+  <body data-bind="style: { backgroundColor: settings.background.isColorSet()? settings.background.color(): '', backgroundImage: !settings.background.isColorSet()? 'url(' + settings.background.image() + ')': '' }">
     <div id="loadingOverlay" style="display:none;">
         <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" id="metaRedditDialog">
           <div class="portlet-header ui-widget-header ui-corner-all">
@@ -48,7 +51,7 @@
             
             <div style="clear:both">&nbsp;</div>
             
-            <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>
+            <!--<ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metaReddits }"></ul>-->
           </div>
         </div>
     </div>
@@ -67,16 +70,16 @@
         <!-- TODO: remove this onclick -->
         <a onclick="jQuery('#customizeDialog').fadeIn(); return false;" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
         <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
-          <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.getFrontPage() }"></span>
+          <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.buttons.getFrontPage() }"></span>
           <!-- TODO: remove this onclick -->
           <button class="changePic fg-button ui-corner-right" onclick="$('#loadingOverlay').toggle()">Meta</button>
-          <button data-bind="click: imageBar.showMenu, visible: imageBar.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
-          <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.getMenu() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
+          <button data-bind="click: imageBar.showMenu, visible: imageBar.menu.buttons.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
+          <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.menu.buttons.getMenu() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
         </div>
         <div class="ad-controls" style="display:none;"> </div>
       </h2>
 
-      <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: getSubreddits().getPortlets() }, sortableList: getSubreddits().getPortlets()"></div>
+      <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getSubreddits().getPortlets() }, sortableList: subreddits.getSubreddits().getPortlets()"></div>
     </div>
 
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="popupAdd">

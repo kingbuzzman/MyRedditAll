@@ -2,71 +2,80 @@ if(typeof console == "undefined"){
     console = { log: function(){}, error: function(){}, info: function(){} };
 }
 
-$(document).ready(function(){
-    settings.init();
-});
-
 /*
  * Setting wrapper
  * - handles all the that needs to persist
  */
-var settings = new (function(){
-	//this is how to remove the references to settings everywhere
+var App = new (function(){
+	/*
+	 * this is how to remove the references to itself everywhere, also to avoid not needed .bind(this)
+	 */
 	var self = this;
-    // default cookie settings
-    var BACKGROUND_COLOR = null;
-    var BACKGROUND_IMAGE = "images/spacestorm.jpg";
-    var SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
-    var SUBREDDIT_ITEMS = 10;
     var IMAGE_BAR = ["Pics","WTF","NSFW","Funny","RageComics","Bacon"];
     var BASE_URL = "http://www.reddit.com";
     
-    this.background = new (function(){
-        this.color = ko.observable(BACKGROUND_COLOR);
-        this.image = ko.observable(BACKGROUND_IMAGE);
-        
-        /*
-         * Checks whether or not the color is set or not
-         * - only gets executed when either image or color changes; thus nulls out the other [eliminates the need to have subscribe()rs]
-         */
-        this.isColorSet = ko.dependentObservable(function(){
-            var colorSet = this.color() !== null;
-            
-            if(colorSet)
-                this.image(null);
-            else
-                this.color(null);
-            
-            return colorSet;
-        }, this)
-    })();
-    
-
-    this.metaReddits = ko.observableArray();
-     
     this.init = function(){
-        // initialize complex object
-        //this.preferences = new this.preferences(this);
-        //this.preferences.load();
-		
 		$.get("templates.html", function(r){
 		    $("head").append(r);
-        	ko.applyBindings(this);
-			this.preferences.load();
-		}.bind(this));	
+		    ko.applyBindings(self);
+		    console.log('init2')
+		});
     };
     
-    // getters
-    this.getSubreddits = function(){
-        return this.subreddits;
-    };
-    
-    //sorters
-    this.sortImagesByDate = function(desc){
-        this.images(this.images().sort(function(a,b){
-            return (desc || true) ? b.created - a.created : b.created - a.created;
-        }));
-    }.bind(this);
+    this.settings = new (function(){
+    	var STORAGE_KEY_NAME = "settings";
+    	var DEFAULT_BACKGROUND_COLOR = null;
+        var DEFAULT_BACKGROUND_IMAGE = "images/spacestorm.jpg";
+        var DEFAULT_SETTINGS ={
+        	background: {
+        		color: DEFAULT_BACKGROUND_COLOR,
+        		image: DEFAULT_BACKGROUND_IMAGE
+        	}
+        }
+        var savedSettings = $.jStorage.get(STORAGE_KEY_NAME, DEFAULT_SETTINGS);
+       
+        var load = function(){
+        	this.background.color(savedSettings.background.color);
+            this.background.image(savedSettings.background.image);
+        }.bind(this);
+        
+        this.background = new (function(){
+            this.color = ko.observable();
+            this.image = ko.observable();
+            
+            /*
+             * Checks whether or not the color is set or not
+             * - only gets executed when either image or color changes; thus nulls out the other [eliminates the need to have subscribe()rs]
+             */
+            this.isColorSet = ko.dependentObservable(function(){
+                var colorSet = this.color() !== null;
+                
+                if(colorSet)
+                    this.image(null);
+                else
+                    this.color(null);
+                
+                return colorSet;
+            }, this)
+        })();
+        
+        /*
+         * Erase the settings
+         */
+        this.erase = function(){
+            $.jStorage.deleteKey(STORAGE_KEY_NAME);
+        };
+        
+        /*
+         * Save all the current settings
+         */
+        this.save = function(){
+        	$.jStorage.set(STORAGE_KEY_NAME, this.toString());
+        }
+
+        load();
+    })();
+
     /*
      * Request manager
      * - keeps track of all outgoing remote calls
@@ -277,24 +286,73 @@ var settings = new (function(){
         /*
          * The idea is that the menu holds the buttons 
          */
-    	this.menu = new (function(){
-    		var MAX_IMAGE_BAR_BUTTONS = 4;
+    	this.menu = new (function(){ 
     		var selected = ko.observable();
-    		    		
+
     		this.buttons = new (function(){
         		var MAX_IMAGE_BAR_BUTTONS = 4;
         		var buttons = ko.observableArray();
+	            
+                this.addButton = function(name){
+                    if(name.push){
+                        for(var index in name){
+                            this.addButton(name[index]);
+                        }
+                    } else {
+                        buttons.push(new ImageButton(name));
+                    }
+                    
+                    // TODO: redo this.. it sucks
+                    if(buttons().length === 1)
+                        buttons()[0].select(buttons()[0].name);
+                };
         		
-        	})(); 
+        		/*
+	             * Returns the buttons for the top right imagebar buttons
+	             *
+	             * returns string[] of names
+	             */
+	            this.getFrontPage = ko.dependentObservable(function(){
+	                return buttons().slice(0, MAX_IMAGE_BAR_BUTTONS);
+	            }.bind(this)); 
+	            
+	            /*
+	             * Evaluates whether or not to show the extended menu icon
+	             *
+	             * returns boolean true if the icon should be shown
+	             */
+	            this.populatedMenu = ko.dependentObservable(function(){
+	                return buttons().length > MAX_IMAGE_BAR_BUTTONS;
+	            }.bind(this));
+	            
+	            /*
+	             * Returns the extended menu of items
+	             *
+	             * returns string[] of those buttons that should appear in the drop-down list
+	             */
+	            this.getMenu = ko.dependentObservable(function(){
+	                return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
+	            }.bind(this));
+	            
+        	})();     		
     		
     		this.activeButton = function(){
     			return selected();
-    		}
+    		} 
+    		
     	})();
         
+    	
     	this.getImages = function(){
     		return images();
     	}
+    	
+        //sorters
+        this.sortImagesByDate = function(desc){
+            this.images(this.images().sort(function(a,b){
+                return (desc || true) ? b.created - a.created : b.created - a.created;
+            }));
+        }.bind(this);
     	
     	load();
     })();
@@ -305,9 +363,22 @@ var settings = new (function(){
     this.subreddits = new (function(){
         // private variables
         var SubReddits = this;
+        var STORAGE_KEY_NAME = "subreddits";
         var portlets = ko.observableArray();
         var NEWS_BUTTONS = ['hot','new','top','controversial'];
         var NEWS_ITEMS_PER_REQUEST = 30;
+        var SUBREDDIT_ITEMS = 10;
+        var DEFAULT_SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
+        var saved_subreddits = $.jStorage.get(STORAGE_KEY_NAME, DEFAULT_SUBREDDITS);
+        
+        // getters
+        this.getSubreddits = function(){
+            return this;
+        };
+        
+        var load = function(){
+        	this.addPortlet(saved_subreddits);
+        }.bind(this);
         
         // private class (individual portlets)
         var Portlet = function(name){
@@ -558,6 +629,7 @@ var settings = new (function(){
                     this.addPortlet(portlet[index]);
                 }
             } else {
+            	console.log('adding portlet ' + portlet)
                 portlets.push(new Portlet(portlet));
             }
         };
@@ -575,7 +647,7 @@ var settings = new (function(){
          */
         this.removePortlet = function(portlet){
             portlets.remove(portlet);
-			self.preferences.save();
+			//self.preferences.save();
         };
         
         /*
@@ -601,108 +673,12 @@ var settings = new (function(){
             return this.toStringArray().join(", ");
         };
         
-        // initializes all the portlets
-        for(var index in arguments){
-            this.addPortlet(arguments[index]);
-        }
+        load();
     })();
     
-    /*
-     * Houses all the user preference code
-     * - needs to be initialized
-     */
-    this.preferences = new (function(settings){
-        var currentTime = (new Date()).getTime();
-        
-        var COOKIE_NAME = "settings";
-        var COOKIE_EXPIRE_NOW = (new Date(currentTime - 2*24*60*60*1000)).toGMTString(); // 2 days ago
-        var COOKIE_EXPIRATION = (new Date(currentTime + 999*24*60*60*1000)).toGMTString(); // 999 days from now
-        
-        /*
-         * Get cookie value (private function)
-         * - loops over all the cookies and returns the one that maches
-         * @param cookie name of the cookie
-         * @return the content of the cookie [escaped]
-         */
-        var getCookieValue = function(cookie){
-            var rawCookies = document.cookie.split(";");
-            var rawCookieData = null;
-            
-            // leave if theres nothing worth searching for
-            if(typeof(cookie) === 'undefined' || cookie === "") { return; }
-            
-            // loop over all the cookies
-            for(var i in rawCookies) {
-                rawCookieData = rawCookies[i].split("=");
-                
-                // if the cookie name matches return the value of the cookie [escaped]
-                if(rawCookieData[0].replace(/(^\s+|\s+$)/g, "") == cookie) {
-                    return unescape(rawCookieData[1]);
-                }
-            }
-            
-            // nothing found
-            return;
-        };
-        
-        /*
-         * Load all the current settings from the cookie
-         */
-        this.load = function(){
-            var cookie = getCookieValue(COOKIE_NAME);
-            var settings = {};
-            
-            // load the cookie if its available
-            if(cookie){
-                settings = $.parseJSON(cookie);
-                
-                try {
-                    this.background.color(settings.background.color);
-                    this.background.image(settings.background.image);
-                    
-                    this.visitedLinks.load(settings['visitedLinks']);
-                    this.getSubreddits().removeAllPortlets();
-                    settings.subreddits.map(function(item){
-                        this.getSubreddits().addPortlet(item);
-                    }.bind(this));
-                    
-                    //Populate the cookie variable into the settings.imageBar variable
-                    $.each(settings.imageBar,function(i, o){
-                        this.imageBar.addButton(o);
-                    }.bind(this));
-                } catch(e){
-                    console.error("Error loading settings..");
-                    this.preferences.erase();
-                }
-            } else {
-                // load default subreddits
-                this.getSubreddits().addPortlet(SUBREDDITS);
-                
-                $.each(IMAGE_BAR,function(i, o){
-                    this.imageBar.addButton(o);
-                }.bind(this));
-                
-                // there was no cookie set, save it.
-                this.preferences.save();
-            }
-        }.bind(self);
-        /*
-         * Erase the cookie
-         */
-        this.erase = function(){
-            document.cookie = COOKIE_NAME + "=; expires=" + COOKIE_EXPIRE_NOW + "; path=/";
-            document.location.href = document.location.href;
-        };
-        
-        /*
-         * Save all the current settings into the cookie
-         */
-        this.save = function(){
-            document.cookie = COOKIE_NAME + "=" + escape(this.toString()) + "; expires=" + COOKIE_EXPIRATION + "; path=/";
-        }.bind(this);
-    })(this);
+   
     
-    this.toString = function(){
+    /*this.toString = function(){
         return ko.toJSON({
             background: {
                 color: this.background.color(),
@@ -712,29 +688,31 @@ var settings = new (function(){
             imageBar: this.imageBar.toStringArray(),
             visitedLinks: this.visitedLinks.toString()
         });
-    };
+    };*/
 })();
+
 
 //connect items with observableArrays
 ko.bindingHandlers.sortableList = {
-    init: function(element, valueAccessor) {
-        var list = valueAccessor();
-        $(element).sortable({
-            update: function(event, ui) {
-                //retrieve our actual data item
-                var item = ui.item.tmplItem().data;
-                //figure out its new position
-                var position = ko.utils.arrayIndexOf(ui.item.parent().children(), ui.item[0]);
-                
-                //remove the item and add it back in the right spot
-                if (position >= 0) {
-                    list.remove(item);
-                    list.splice(position, 0, item);
-                }
-                
-            }
-        });
-    }
+  init: function(element, valueAccessor) {
+      var list = valueAccessor();
+      $(element).sortable({
+          update: function(event, ui) {
+              //retrieve our actual data item
+              var item = ui.item.tmplItem().data;
+              //figure out its new position
+              var position = ko.utils.arrayIndexOf(ui.item.parent().children(), ui.item[0]);
+              
+              //remove the item and add it back in the right spot
+              if (position >= 0) {
+                  list.remove(item);
+                  list.splice(position, 0, item);
+              }
+              
+          }
+      });
+  }
 };
 
-var redditURL = "http://www.reddit.com";
+$(document).ready(App.init);
+
