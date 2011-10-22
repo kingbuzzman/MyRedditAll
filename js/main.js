@@ -18,7 +18,6 @@ var App = new (function(){
 		$.get("templates.html", function(r){
 		    $("head").append(r);
 		    ko.applyBindings(self);
-		    console.log('init2')
 		});
     };
     
@@ -152,6 +151,18 @@ var App = new (function(){
      */
     this.visitedLinks = new (function(){
         var links = {};
+        var STORAGE_KEY_NAME = "visitedLinks";
+        var DEAFULT_LINKS = "";
+        var saved_links = $.jStorage.get(STORAGE_KEY_NAME, DEAFULT_LINKS);
+        /*
+         * Loads the current visited links
+         * @links string list of visited links in a long array ie "link1,link2" NOT: ["link1","link2"]
+         */
+        var load = function(links){
+        	saved_links = saved_links.split(",");
+            for(var index in links)
+                this.add(links[index]);
+        };
         
         /*
          * Append a visited link
@@ -171,18 +182,6 @@ var App = new (function(){
         };
         
         /*
-         * Loads the current visited links
-         * @links string list of visited links in a long array ie "link1,link2" NOT: ["link1","link2"]
-         */
-        this.load = function(links){
-			try {
-	            links = links.split(",");
-			}catch(e){ self.preferences.erase() }
-            for(var index in links)
-                this.add(links[index]);
-        };
-        
-        /*
          * Returns all the visited links separeted by a comma
          */
         this.toString = function(){
@@ -194,6 +193,8 @@ var App = new (function(){
             
             return keys.join(",");
         };
+        
+        load();
     })();
     
     /*
@@ -287,54 +288,50 @@ var App = new (function(){
          * The idea is that the menu holds the buttons 
          */
     	this.menu = new (function(){ 
-    		var selected = ko.observable();
-
-    		this.buttons = new (function(){
-        		var MAX_IMAGE_BAR_BUTTONS = 4;
-        		var buttons = ko.observableArray();
+    		var selected = ko.observable(); 
+    		var MAX_IMAGE_BAR_BUTTONS = 4;
+    		var buttons = ko.observableArray();
 	            
-                this.addButton = function(name){
-                    if(name.push){
-                        for(var index in name){
-                            this.addButton(name[index]);
-                        }
-                    } else {
-                        buttons.push(new ImageButton(name));
+            this.addButton = function(name){
+                if(name.push){
+                    for(var index in name){
+                        this.addButton(name[index]);
                     }
-                    
-                    // TODO: redo this.. it sucks
-                    if(buttons().length === 1)
-                        buttons()[0].select(buttons()[0].name);
-                };
-        		
-        		/*
-	             * Returns the buttons for the top right imagebar buttons
-	             *
-	             * returns string[] of names
-	             */
-	            this.getFrontPage = ko.dependentObservable(function(){
-	                return buttons().slice(0, MAX_IMAGE_BAR_BUTTONS);
-	            }.bind(this)); 
-	            
-	            /*
-	             * Evaluates whether or not to show the extended menu icon
-	             *
-	             * returns boolean true if the icon should be shown
-	             */
-	            this.populatedMenu = ko.dependentObservable(function(){
-	                return buttons().length > MAX_IMAGE_BAR_BUTTONS;
-	            }.bind(this));
-	            
-	            /*
-	             * Returns the extended menu of items
-	             *
-	             * returns string[] of those buttons that should appear in the drop-down list
-	             */
-	            this.getMenu = ko.dependentObservable(function(){
-	                return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
-	            }.bind(this));
-	            
-        	})();     		
+                } else {
+                    buttons.push(new ImageButton(name));
+                }
+                
+                // TODO: redo this.. it sucks
+                if(buttons().length === 1)
+                    buttons()[0].select(buttons()[0].name);
+            };
+    		
+    		/*
+             * Returns the buttons for the top right imagebar buttons
+             *
+             * returns string[] of names
+             */
+            this.getFrontPage = ko.dependentObservable(function(){
+                return buttons().slice(0, MAX_IMAGE_BAR_BUTTONS);
+            }.bind(this)); 
+            
+            /*
+             * Evaluates whether or not to show the extended menu icon
+             *
+             * returns boolean true if the icon should be shown
+             */
+            this.populatedMenu = ko.dependentObservable(function(){
+                return buttons().length > MAX_IMAGE_BAR_BUTTONS;
+            }.bind(this));
+            
+            /*
+             * Returns the extended menu of items
+             *
+             * returns string[] of those buttons that should appear in the drop-down list
+             */
+            this.getMenu = ko.dependentObservable(function(){
+                return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
+            }.bind(this));   		
     		
     		this.activeButton = function(){
     			return selected();
@@ -629,7 +626,6 @@ var App = new (function(){
                     this.addPortlet(portlet[index]);
                 }
             } else {
-            	console.log('adding portlet ' + portlet)
                 portlets.push(new Portlet(portlet));
             }
         };
