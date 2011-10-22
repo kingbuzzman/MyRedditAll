@@ -47,7 +47,8 @@
 			#cboxTitle img { vertical-align:middle; padding:2px; }
         #cboxCurrent{position:absolute; bottom:-25px; left:58px; color:#7C7C7C;}
 			#cboxCurrent a { color:#666; font-size:14px; }
-        	#cboxCurrent img { border:0; vertical-align:middle }
+        	#cboxCurrent img { border:0; vertical-align:middle; cursor:pointer }
+        	#cboxCurrent span { cursor:pointer; }
         #cboxPrevious, #cboxNext, #cboxClose, #cboxSlideshow{position:absolute; bottom:-29px; background:url(../images/controls.png) no-repeat 0px 0px; width:23px; height:23px; text-indent:-9999px;}
         #cboxPrevious{left:0px; background-position: -51px -25px;}
         #cboxPrevious.hover{background-position:-51px 0px;}

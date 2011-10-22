@@ -55,7 +55,7 @@
       </div>
       </div>
     </script>
-
+   
     <script type="text/html" id="metaTemplate">
       <li id="metaSection">
       <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: mra.locationPicker.passEvent ">
@@ -71,8 +71,8 @@
     </script>
 
 	<script type="text/html" id="imageBarTemplate">
-		<li>
-			<a data-bind="attr:{ title: $data.title, href: $data.url }" rel="prettyPhoto[reddit]" target="_blank">
+		<li>  
+			<a data-bind="attr:{ title: $data.title, href: $data.url }, click: open" rel="prettyPhoto[reddit]" target="_blank">
 				<img height="150" data-bind="attr: { src: $data.thumbnail }" onerror="$(this).parent().parent().remove()">
 			</a>
 		</li>

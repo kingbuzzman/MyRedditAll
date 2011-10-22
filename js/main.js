@@ -205,13 +205,59 @@ var App = new (function(){
     	/*
     	 * Always store one array at a time of the images for the active button
     	 */
+    	var imagebar = this;
     	var images = ko.observableArray();
     	var IMAGES_PER_REQUEST = 50;
+    	var colorbox = {
+            maxHeight: function(){ return (window.innerHeight * 0.9) }, 
+            maxWidth: function(){ return (window.innerWidth * 0.9) },
+            onComplete:function(){ 
+                var largeMode = $("img.cboxPhoto").width() > 430;
+                $("#cboxCurrent span").toggle(largeMode);
+                if (!largeMode){
+                    $.colorbox.resize({ width: 430 })
+                }
+            }, 
+            transition: "elastic",
+            opacity: 0.7,
+            preloading: false,
+            current: function(){  
+                var comment = '<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16"><span>View Comments</span>';    
+                var image = '<img src="images/fileTypes/image_link.png" align="absmiddle" width="16" height="16"><span>New Tab</span>';
+                var cts = '<img src="images/fileTypes/link.png" align="absmiddle" width="16" height="16"><span>Copy</span>';
+				var fb = '<img src="images/facebook.jpg" align="absmiddle" width="16" height="16"><span>Share</span>';
+                var markup = '<a data-bind="attr: { href: App.imageBar.activeImage().permalink }" title="View comments" onclick="App.imageBar.activeImage().viewComment(); return false;" class="cufonize">' + comment + '</a>\
+                | <a data-bind="attr: { href: App.imageBar.activeImage().src }" title="View Original" onclick="App.imageBar.activeImage().viewOriginal(); return false;" class="cufonize">' + image + '</a>\
+                | <a title="Copy Link To Clipboard" onclick="return false;" class="cufonize copyLink">' + cts + '</a>\
+				| <a data-bind="attr: { title: App.imageBar.activeImage().title, href: App.imageBar.activeImage().src }" onclick="streamPublish(this); return false;" class="cufonize">' + fb + '</a>'; 
+                return markup;
+            },
+            slideshow: false,
+            slideshowAuto: false,
+            slideshowSpeed: function(){ return 2000 + (this.title.length * 50) }
+    	}
+    	$.colorbox.settings = $.extend($.colorbox.settings, colorbox);
     	
-    	var ImageBox = function(item){
+    	this.activeImage = ko.observable();
+    	
+    	var ImageBox = function(item, settings){
     		this.src = item.url;
     		this.title = item.title;
     		this.thumbnail = item.thumbnail;
+    		this.permalink = BASE_URL + item.permalink;
+    		this.open = function(){
+    			$.colorbox({ href: this.src, title: this.title });
+    			imagebar.activeImage(this);
+    		}
+    		this.viewComment = function(){ 
+    			window.open(this.permalink, '_blank');
+    		}
+    		this.viewOriginal = function(){ 
+    			window.open(this.src, '_blank');
+    		}
+    		this.copyToClipboard = function(){
+    			clip.setText( this.title + ": " + this.src ); 			 
+    		}
     	}
         /*
          * Loads the content for the active image button
@@ -225,10 +271,21 @@ var App = new (function(){
                 // populate each of the images into the imageBar
                 for(var index in data)
                 	isImage(data[index].data, function(cleanItem){
-                		images.push(new ImageBox(cleanItem));
+                		images.push(new ImageBox(cleanItem, colorbox));
                 	}) 
 
             }.bind(this));
+            
+            $(".copyLink").live("click",function(){
+            	console.log(this);
+    			window.clip = new ZeroClipboard.Client();
+				clip.setHandCursor( true );
+    			clip.addEventListener( 'onComplete', function() { 
+    				$(this).html('copied'); 
+    			});               	
+            	this.activeImage().copyToClipboard();
+            }.bind(this));
+            
         }.bind(this);
 
         var isImage = function(pic, callback){ 
