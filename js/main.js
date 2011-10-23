@@ -11,7 +11,6 @@ var App = new (function(){
 	 * this is how to remove the references to itself everywhere, also to avoid not needed .bind(this)
 	 */
 	var self = this;
-    var IMAGE_BAR = ["Pics","WTF","NSFW","Funny","RageComics","Bacon"];
     var BASE_URL = "http://www.reddit.com";
     
     this.init = function(){
@@ -36,6 +35,7 @@ var App = new (function(){
         var load = function(){
         	this.background.color(savedSettings.background.color);
             this.background.image(savedSettings.background.image);
+            this.save();
         }.bind(this);
         
         this.background = new (function(){
@@ -72,6 +72,14 @@ var App = new (function(){
         	$.jStorage.set(STORAGE_KEY_NAME, this.toString());
         }
 
+        this.toString = function(){
+        	return {
+        		background: {
+                    color: this.background.color(),
+                    image: this.background.image()
+                }
+        	}
+        }
         load();
     })();
 
@@ -206,9 +214,11 @@ var App = new (function(){
     	 * Always store one array at a time of the images for the active button
     	 */
     	var imagebar = this;
+        var DEFAULT_IMAGE_BAR = "Pics,WTF,NSFW,Funny,RageComics,Bacon";
+        var STORAGE_KEY_NAME = "imagebar";
     	var images = ko.observableArray();
     	var IMAGES_PER_REQUEST = 15;
-    	
+    	var saved_imagebar = $.jStorage.get(STORAGE_KEY_NAME, DEFAULT_IMAGE_BAR); 
     	/*
     	 * this keeps track of the active image in the overlay
     	 */
@@ -266,6 +276,8 @@ var App = new (function(){
         	 * Loads the default image section
         	 */
         	this.loadImages();
+        	this.menu.addButton(saved_imagebar.split(","));
+        	this.save();
         	
             /*
              * This provides the copy to share functionality
@@ -363,7 +375,30 @@ var App = new (function(){
     		var selected = ko.observable(); 
     		var MAX_IMAGE_BAR_BUTTONS = 4;
     		var buttons = ko.observableArray();
-	            
+	          
+    		/*
+    		 *  Imagebar individual buttons
+    		 */
+            var ImageButton = function(name){
+                this.name = name;
+                
+                this.selected = ko.dependentObservable(function(){
+                    return (selected() == this);
+                }.bind(this));
+                
+                this.select = function(){
+                    selected(this);
+                }
+                
+                this.remove = function(){
+                    buttons.remove(this);
+                };
+                
+                this.toString = function(){
+                    return this.name;
+                };
+            }
+            
             this.addButton = function(name){
                 if(name.push){
                     for(var index in name){
@@ -409,6 +444,10 @@ var App = new (function(){
     			return selected();
     		} 
     		
+    		this.getButtons = function(){
+    			return buttons();
+    		}
+    		
     	})();
         
     	this.getActiveIndex = function(){
@@ -426,6 +465,26 @@ var App = new (function(){
             }));
         }.bind(this);
     	
+        /*
+         * Return all the portlets (subreddits) in a Array of Strings
+         */
+        this.toStringArray = function(){
+            return this.menu.getButtons().map(function(item){
+                return item.name;
+            });
+        };
+        
+        this.save = function(){
+        	$.jStorage.set(STORAGE_KEY_NAME, this.toString());
+        }
+        
+        /*
+         * Return all the portlets (subreddits) in their order
+         */
+        this.toString = function(){
+            return this.toStringArray().join(",");
+        };
+        
     	load();
     })();
     
@@ -440,7 +499,7 @@ var App = new (function(){
         var NEWS_BUTTONS = ['hot','new','top','controversial'];
         var NEWS_ITEMS_PER_REQUEST = 30;
         var SUBREDDIT_ITEMS = 10;
-        var DEFAULT_SUBREDDITS = ["Gadgets", "Funny", "Reddit.com", "Javascript","WTF","Programming"];
+        var DEFAULT_SUBREDDITS = "Gadgets,Funny,Reddit.com,Javascript,WTF,Programming";
         var saved_subreddits = $.jStorage.get(STORAGE_KEY_NAME, DEFAULT_SUBREDDITS);
         
         // getters
@@ -448,8 +507,9 @@ var App = new (function(){
             return this;
         };
         
-        var load = function(){
-        	this.addPortlet(saved_subreddits);
+        var load = function(){ 
+        	this.addPortlet(saved_subreddits.split(","));
+        	this.save();
         }.bind(this);
         
         // private class (individual portlets)
@@ -737,11 +797,15 @@ var App = new (function(){
             });
         };
         
+        this.save = function(){
+        	$.jStorage.set(STORAGE_KEY_NAME, this.toString());
+        }
+        
         /*
          * Return all the portlets (subreddits) in their order
          */
         this.toString = function(){
-            return this.toStringArray().join(", ");
+            return this.toStringArray().join(",");
         };
         
         load();
