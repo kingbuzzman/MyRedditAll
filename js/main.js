@@ -207,7 +207,7 @@ var App = new (function(){
     	 */
     	var imagebar = this;
     	var images = ko.observableArray();
-    	var IMAGES_PER_REQUEST = 50;
+    	var IMAGES_PER_REQUEST = 15;
     	
     	/*
     	 * this keeps track of the active image in the overlay
@@ -234,22 +234,39 @@ var App = new (function(){
     			clip.setText( this.title + ": " + this.href );
     		}
     	}
-        /*
-         * Loads the content for the active image button
-         */
-        var load = function(){
-            var url = this.requestURL();
+    	
+    	/*
+    	 * removeAll can be used to load a new section
+    	 */
+    	this.loadImages = function(removeAll){
+             var url = this.requestURL();
             
             // load the complete feed
             loader.call(url, function(data){
-
+            	
+            	if (removeAll)
+            		images.removeAll();
+            	
                 // populate each of the images into the imageBar
                 for(var index in data)
                 	isImage(data[index].data, function(cleanItem){
                 		images.push(new ImageBox(cleanItem));
                 	}) 
 
-            }.bind(this));
+            }.bind(this)); 
+            
+    	}
+    	
+        /*
+         * Loads the content for the active image button
+         */
+        var load = function(){
+        	
+        	/*
+        	 * Loads the default image section
+        	 */
+        	this.loadImages();
+        	
             /*
              * This provides the copy to share functionality
              */
@@ -280,7 +297,9 @@ var App = new (function(){
             /*
              * the idea is to have adGallery monitor the selector rather than having to reinit it
              */
-            $("div.ad-gallery").adGallery();
+            $(document).ready(function(){
+            	$("div.ad-gallery").adGallery();
+            })
             
         }.bind(this);
 

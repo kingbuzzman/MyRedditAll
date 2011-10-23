@@ -9,7 +9,9 @@
  */
 (function($) {
   $.fn.adGallery = function(options) {
-    var defaults = { loader_image: 'loader.gif',
+    var defaults = { 
+    				/*modified*/
+    				 loader_image: 'images/ajax-loader_images.gif',
                      start_at_index: 0,
 					 start_at_pixel: 0,
                      description_wrapper: false,
@@ -17,10 +19,12 @@
                      animate_first_image: false,
                      animation_speed: 400,
                      width: false,
-                     height: false,
+                     /*modified*/
+                     height: 150,
                      display_next_and_prev: true,
                      display_back_and_forward: true,
-                     scroll_jump: 0, // If 0, it jumps the width of the container
+                     /*modified*/
+                     scroll_jump: (window.innerWidth / 2), // If 0, it jumps the width of the container
                      slideshow: {
                        enable: true,
                        autostart: false,
@@ -34,7 +38,8 @@
                        onStop: false
                      },
                      effect: 'slide-hori', // or 'slide-vert', 'fade', or 'resize', 'none'
-                     enable_keyboard_move: true,
+                     /*modified*/
+                     enable_keyboard_move: false,
                      cycle: true,
                      callbacks: {
                        init: false,
@@ -268,16 +273,15 @@
       this.images = [];
       var thumb_wrapper_width = 0;
       var thumbs_loaded = 0;
-      var thumbs = this.thumbs_wrapper.find('a');
-      var thumb_count = thumbs.length;
-      if(this.settings.thumb_opacity < 1) {
-        thumbs.find('img').css('opacity', this.settings.thumb_opacity);
-      };
-      thumbs.each(
-        function(i) {
-          var link = $(this);
+      var list = context.nav.find('.ad-thumb-list');
+      
+	$('.ad-thumb-list a').livequery(function(){
+		var link = $(this);
+		var i = $(this).prevAll();
+		//thumb_count += 1; 
           var image_src = link.attr('href');
           var thumb = link.find('img');
+          thumb.css('opacity', context.settings.thumb_opacity);
           // Check if the thumb has already loaded
           if(!context.isImageLoaded(thumb[0])) {
             thumb.load(
@@ -331,16 +335,18 @@
           context.images[i] = { thumb: thumb.attr('src'), image: image_src, error: false,
                                 preloaded: false, desc: desc, title: title, size: false,
                                 link: link };
-        }
-      );
+          list.css('width', thumb_wrapper_width +'px');
+      });
+	
       // Wait until all thumbs are loaded, and then set the width of the ul
-	  var timesCounted = 0;
+	  /*var timesCounted = 0;
       var inter = setInterval(
         function() {
 		  timesCounted++	
           if((thumb_count) == thumbs_loaded) {
             thumb_wrapper_width -= 100;
             var list = context.nav.find('.ad-thumb-list');
+            console.log(list);
             list.css('width', thumb_wrapper_width +'px');
             var i = 1;
             var last_height = list.height();
@@ -359,7 +365,7 @@
 		  }
         },
         200
-      );
+      );*/
     },
     initKeyEvents: function() {
       var context = this;
