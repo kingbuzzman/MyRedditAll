@@ -10,7 +10,7 @@ h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
 
 #cboxContent:hover #cboxTitle { display:none!important; }
 
-div.loader { background-image: url(/images/ajaxLoader.gif); width:126px; height:22px; margin:0px auto; }
+div.loader { background-image: url(../images/bar-loader.gif); width:126px; height:22px; margin:0px auto; }
 ul.portlet-content { list-style-type:none; padding:0; margin:0; }
 ul.portlet-content > li { text-align:left; border-bottom:1px solid #3d3d3d; }
 ul.portlet-content > li div { border-bottom: 1px solid #3D3D3D; display: table-cell; vertical-align: middle; }
@@ -21,7 +21,7 @@ ul.portlet-content > li a:visited  { color: #666; }
 ul.portlet-content > li > a.link { font-size:inherit; }
 ul.portlet-content > li > a.comment { font-size: 12px; }
 
-.portlet { margin: 6px;  }
+.portlet { margin: 1px;  }
 .portlet-header { margin: 0 0.2em 0.2em 0.2em; padding-left:7px; }
 .portlet-header .ui-icon { float: right; }
 .portlet-content {  text-align:center; border-top:1px solid #3D3D3D; }
@@ -120,7 +120,7 @@ div.portlet-header a { font-size:24px; color:#EEE; font-weight:normal; }
 	width:30px;
 }
 .changePic  { background:none !important; border:1px solid #3D3D3D; color:#D9D9D9; }
-#customizeStrip { padding: 0px; margin:5px 0 10px; padding-left:10px; font-size:24px; /*background: transparent url(../images/ui-bg_dots-small_10_383333_2x2.png) 50% 50% repeat; */}
+#customizeStrip { padding: 0px; margin:5px 0 10px; padding-left:10px; font-size:20px; /*background: transparent url(../images/ui-bg_dots-small_10_383333_2x2.png) 50% 50% repeat; */}
 .imgLoader {
 	background:url("../images/ajax-loader_images.gif") no-repeat scroll center center transparent;
 	height:150px;

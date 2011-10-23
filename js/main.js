@@ -244,19 +244,45 @@ var App = new (function(){
     		this.setClipboardText = function(){
     			clip.setText( this.title + ": " + this.href );
     		}
+            this.shareOnFacebook = function(){
+            	FB.ui({
+    				method: 'stream.publish',
+    				display: 'popup',
+    				message: 'gettingeducatedaboutFacebookConnect',
+    				attachment: {
+    					name: 'MyRedditAll.com',
+    					caption: this.title,
+    					description: "",
+    					'media': [
+    						{
+    							'type': 'image',
+    							'src': this.href,
+    							'href': this.href
+    						}
+    					],
+    					href:  this.href
+    				},
+    				action_links: [
+    					{
+    						text: 'Code',
+    						href: this.href
+    					}
+    				]
+    			});
+            }
     	}
     	
     	/*
     	 * removeAll can be used to load a new section
     	 */
     	this.loadImages = function(removeAll){
-             var url = this.requestURL();
+            var url = this.requestURL();  
+            
+            if (removeAll)
+            		images.removeAll();
             
             // load the complete feed
-            loader.call(url, function(data){
-            	
-            	if (removeAll)
-            		images.removeAll();
+            loader.call(url, function(data){ 
             	
                 // populate each of the images into the imageBar
                 for(var index in data)
@@ -284,7 +310,9 @@ var App = new (function(){
              */
             $(".copyLink").live("mouseover",function(e){
             	var copyLink = $(e.target); 
-            	
+            	/*
+            	 * needs to be recraeted everytime the image changes
+            	 */
         		if (typeof clip == "undefined"){
         			ZeroClipboard.setMoviePath( 'ZeroClipboard.swf' );
         			window.clip = new ZeroClipboard.Client();
@@ -306,13 +334,24 @@ var App = new (function(){
         	
             }.bind(this));
             
-            /*
-             * the idea is to have adGallery monitor the selector rather than having to reinit it
-             */
-            $(document).ready(function(){
-            	$("div.ad-gallery").adGallery();
-            })
             
+            $(document).ready(function(){
+            	/*
+	             * the idea is to have adGallery monitor the selector rather than having to reinit it
+	             */
+            	$("div.ad-gallery").adGallery();
+            	 /*
+                 * The following provides Facebook share functionality
+                 */
+				var e = document.createElement("script"); 
+				e.async = true; 
+				e.onload = function(){
+					FB.init({appId: "148360715252023", status: true, cookie: true, xfbml: true});
+				}
+				e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js"; 
+				document.getElementById("fb-root").appendChild(e); 
+            });
+			
         }.bind(this);
 
         var isImage = function(pic, callback){ 
@@ -333,7 +372,7 @@ var App = new (function(){
                         url: reqURL, 
                         dataType: 'jsonp',
                         success: function(data){
-                        	if (data.query.results.result['content-type'].indexOf("image") >= 0){                         
+                        	if ('result' in data.query.results && data.query.results.result['content-type'].indexOf("image") >= 0){                         
                         		callback(pic); 
                         		imagebar.sortImagesByDate();
                             }   
@@ -433,9 +472,19 @@ var App = new (function(){
              *
              * returns string[] of those buttons that should appear in the drop-down list
              */
-            this.getMenu = ko.dependentObservable(function(){
+            this.get = ko.dependentObservable(function(){
                 return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
-            }.bind(this));   		
+            }.bind(this));   
+            
+            this.show = function(){
+    			$("#showMoreList").position({
+    				of: $("#showMore"),
+    				my: "right top",
+    				at: "right bottom",
+    				offset: 0, 
+    				collision: "flip flip"
+    			}).toggle();
+            };
     		
     		this.activeButton = function(){
     			return selected();
@@ -454,6 +503,10 @@ var App = new (function(){
     	this.getImages = function(){
     		return images();
     	}
+    	
+    	this.hasImages = ko.dependentObservable(function(){
+    		return images().length > 0;
+    	}.bind(this));
     	
         //sorters
         this.sortImagesByDate = function(desc){

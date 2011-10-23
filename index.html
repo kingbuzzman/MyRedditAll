@@ -59,7 +59,8 @@
       <div class="ad-gallery">
         <div class="ad-nav">
           <div class="ad-thumbs">
-            <ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: imageBar.getImages() }"></ul>
+          	<div class="vertical" data-bind="visible: !imageBar.hasImages()"><div class="loader"></div></div>
+            <ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: imageBar.getImages(), visible: imageBar.hasImages() }"></ul>
           </div>
         </div>
       </div>
@@ -72,8 +73,8 @@
           <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.getFrontPage() }"></span>
           <!-- TODO: remove this onclick -->
           <button class="changePic fg-button ui-corner-right" onclick="$('#loadingOverlay').toggle()">Meta</button>
-          <button data-bind="click: imageBar.showMenu, visible: imageBar.menu.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
-          <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.menu.getMenu() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
+          <button data-bind="click: imageBar.menu.show, visible: imageBar.menu.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
+          <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.menu.get() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
         </div>
         <div class="ad-controls" style="display:none;"> </div>
       </h2>
