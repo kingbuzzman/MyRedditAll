@@ -217,7 +217,7 @@ var App = new (function(){
         var DEFAULT_IMAGE_BAR = "Pics,WTF,NSFW,Funny,RageComics,Bacon";
         var STORAGE_KEY_NAME = "imagebar";
     	var images = ko.observableArray();
-    	var IMAGES_PER_REQUEST = 15;
+    	var IMAGES_PER_REQUEST = 100;
     	var saved_imagebar = $.jStorage.get(STORAGE_KEY_NAME, DEFAULT_IMAGE_BAR); 
     	/*
     	 * this keeps track of the active image in the overlay
@@ -228,6 +228,7 @@ var App = new (function(){
     		this.href = item.url;
     		this.title = item.title;
     		this.thumbnail = item.thumbnail;
+    		this.created = item.created;
     		this.permalink = BASE_URL + item.permalink;
     		this.open = function(){
     			$.colorbox.setIndex(images.indexOf(this));
@@ -275,7 +276,6 @@ var App = new (function(){
         	/*
         	 * Loads the default image section
         	 */
-        	this.loadImages();
         	this.menu.addButton(saved_imagebar.split(","));
         	this.save();
         	
@@ -335,6 +335,7 @@ var App = new (function(){
                         success: function(data){
                         	if (data.query.results.result['content-type'].indexOf("image") >= 0){                         
                         		callback(pic); 
+                        		imagebar.sortImagesByDate();
                             }   
                         }
                     }
@@ -359,13 +360,8 @@ var App = new (function(){
         } 
         
         this.requestURL = function(){
-        	//for now
-        	//var activeButton = this.menu.activeButton();
-        	var activeButton = {
-        		name: "Pics"
-        	}
-        	
-            return BASE_URL + "/r/" + activeButton.name + "/.json?&limit=" + IMAGES_PER_REQUEST;
+        	var activeButton = this.menu.activeButton();
+        	return BASE_URL + "/r/" + activeButton.name + "/.json?&limit=" + IMAGES_PER_REQUEST;
         }
         
         /*
@@ -388,6 +384,7 @@ var App = new (function(){
                 
                 this.select = function(){
                     selected(this);
+                    imagebar.loadImages(true);
                 }
                 
                 this.remove = function(){
@@ -460,7 +457,7 @@ var App = new (function(){
     	
         //sorters
         this.sortImagesByDate = function(desc){
-            this.images(this.images().sort(function(a,b){
+            images(images().sort(function(a,b){
                 return (desc || true) ? b.created - a.created : b.created - a.created;
             }));
         }.bind(this);
@@ -484,7 +481,7 @@ var App = new (function(){
         this.toString = function(){
             return this.toStringArray().join(",");
         };
-        
+
     	load();
     })();
     
