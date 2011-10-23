@@ -12,11 +12,13 @@
 		width: false,
 		initialWidth: "600",
 		innerWidth: false,
-		maxWidth: false,
 		height: false,
 		initialHeight: "450",
 		innerHeight: false,
-		maxHeight: false,
+		/*modified*/
+		maxHeight: function(){ return (window.innerHeight * 0.9) }, 
+        maxWidth: function(){ return (window.innerWidth * 0.9) },
+        
 		scalePhotos: true,
 		scrolling: true,
 		inline: false,
@@ -27,9 +29,10 @@
 		href: false,
 		title: false,
 		rel: false,
-		opacity: 0.9,
-		preloading: true,
-		current: "image {current} of {total}",
+		/*modified*/
+		opacity: 0.7,
+		/*modified*/
+		preloading: false,
 		previous: "previous",
 		next: "next",
 		close: "close",
@@ -43,7 +46,25 @@
 		slideshowStop: "stop slideshow",
 		onOpen: false,
 		onLoad: false,
-		onComplete: false,
+		/*modified*/
+        onComplete:function(){ 
+            var largeMode = $("img.cboxPhoto").width() > 430;
+            $("#cboxCurrent span").toggle(largeMode);
+            if (!largeMode){
+                $.colorbox.resize({ width: 430 })
+            }
+        },  
+        current: function(){  
+            var comment = '<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16"><span>View Comments</span>';    
+            var image = '<img src="images/fileTypes/image_link.png" align="absmiddle" width="16" height="16"><span>New Tab</span>';
+            var cts = '<img src="images/fileTypes/link.png" align="absmiddle" width="16" height="16"><span>Copy</span>';
+			var fb = '<img src="images/facebook.jpg" align="absmiddle" width="16" height="16"><span>Share</span>';
+            var markup = '<a data-bind="attr: { href: App.imageBar.activeImage().permalink }" title="View comments" onclick="App.imageBar.activeImage().viewComment(); return false;" class="cufonize">' + comment + '</a>\
+            | <a data-bind="attr: { href: App.imageBar.activeImage().href }" title="View Original" onclick="App.imageBar.activeImage().viewOriginal(); return false;" class="cufonize">' + image + '</a>\
+            | <a title="Copy Link To Clipboard" onclick="return false;" class="cufonize copyLink">' + cts + '</a>\
+			| <a data-bind="attr: { title: App.imageBar.activeImage().title, href: App.imageBar.activeImage().href }" onclick="streamPublish(this); return false;" class="cufonize">' + fb + '</a>'; 
+            return markup;
+        },
 		onCleanup: false,
 		onClosed: false,
 		overlayClose: true,		
@@ -142,18 +163,17 @@
 	
 	// Assigns function results to their respective settings.  This allows functions to be used as values.
 	function makeSettings(i) {
-        settings = $.extend({}, $.data(element, colorbox));
         
+		settings = defaults;
+		settings.href = element.href;
+		settings.title = element.title; 
+		
 		for (i in settings) {
 			if ($.isFunction(settings[i]) && i.substring(0, 2) !== 'on') { // checks to make sure the function isn't one of the callbacks, they will be handled at the appropriate time.
 			    settings[i] = settings[i].call(element);
 			}
-		}
-        
-		settings.rel = settings.rel || element.rel || 'nofollow';
-		settings.href = settings.href || $(element).attr('href');
-		settings.title = settings.title || element.title;
-        
+		} 
+		
         if (typeof settings.href === "string") {
             settings.href = $.trim(settings.href);
         }
@@ -216,13 +236,12 @@
 	function launch(target) {
 		if (!closing) {
 			
-			element = target;
+			element = $related()[index];
 			
 			makeSettings();
 			
 			//$related() = $(element);
-			
-			index = 0;
+			//index = 0;
 			/*
 			if (settings.rel !== 'nofollow') {
 				$related() = $('.' + boxElement).filter(function () {
@@ -403,16 +422,16 @@
 		
 		// Set Navigation Key Bindings
 		$(document).bind('keydown.' + prefix, function (e) {
-            var key = e.keyCode;
+            var key = e.keyCode; 
 			if (open && settings.escKey && key === 27) {
 				e.preventDefault();
 				publicMethod.close();
-			}
+			} 
 			if (open && settings.arrowKey && $related()[1]) {
-				if (key === 37) {
+				if (key === 37) { 
 					e.preventDefault();
 					$prev.click();
-				} else if (key === 39) {
+				} else if (key === 39) { 
 					e.preventDefault();
 					$next.click();
 				}
@@ -685,11 +704,9 @@
 		photo = false;
 		
 		element = $related()[index];
-		
 		if (!launched) {
 			makeSettings();
 		}
-		
 		trigger(event_purge);
 		
 		trigger(event_load, settings.onLoad);
@@ -794,7 +811,9 @@
 	// Navigates to the next page/image in a set.
 	publicMethod.next = function () {
 		if (!active && $related()[1] && (index < $related().length - 1 || settings.loop)) {
+			
 			index = index < $related().length - 1 ? index + 1 : 0;
+			App.imageBar.activeImage($related()[index]);
 			publicMethod.load();
 		}
 	};
@@ -805,6 +824,10 @@
 			publicMethod.load();
 		}
 	};
+	
+	publicMethod.setIndex = function(newIndex){
+		index = newIndex;
+	}
 
 	// Note: to use this within an iframe use the following format: parent.$.fn.colorbox.close();
 	publicMethod.close = function () {
