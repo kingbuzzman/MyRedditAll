@@ -58,16 +58,14 @@
    
     <script type="text/html" id="metaTemplate">
       <li id="metaSection">
-      <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: mra.locationPicker.passEvent ">
-      <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ $data.SECTION }" data-bind="click: mra.imageBar.changePic" >
-      <span class="metaText" data-bind="click: function(){ mra.imageBar.popupWindow( baseurl + '/r/$data.SECTION' ) }">${$data.NAME}</span>
+	      <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: add ">
+	      <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ $data.SECTION }" data-bind="click: view" >
+	      <span class="metaText" data-bind="click: open">${$data.name}</span>
       </li>
     </script>
 
     <script id="loadMetaButtonTemplate" type="text/html">
-      {{each ['active','over18','new','self','media','Favorites']}}
-      <button id="${$value}" class="changePic fg-button" data-bind="click: function(){ mra.imageBar.loadMeta($value) }">${$value}</button>
-      {{/each}} 
+		<button id="${$data.name}" class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }">${$data.name}</button>
     </script>
 
 	<script type="text/html" id="imageBarTemplate">

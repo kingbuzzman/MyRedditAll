@@ -273,13 +273,13 @@ var App = new (function(){
     	}
     	
     	/*
-    	 * removeAll can be used to load a new section
+    	 * removeAll can be used to load a new section, accepts parameter name to load a button that isnt in the list 
+    	 * just to preview the section w/o commiting to add it
     	 */
-    	this.loadImages = function(removeAll){
-            var url = this.requestURL();  
+    	this.loadImages = function(name){
+            var url = this.requestURL(name);  
             
-            if (removeAll)
-            		images.removeAll();
+            images.removeAll();
             
             // load the complete feed
             loader.call(url, function(data){ 
@@ -372,10 +372,12 @@ var App = new (function(){
                         url: reqURL, 
                         dataType: 'jsonp',
                         success: function(data){
-                        	if ('result' in data.query.results && data.query.results.result['content-type'].indexOf("image") >= 0){                         
-                        		callback(pic); 
-                        		imagebar.sortImagesByDate();
-                            }   
+                        	try {
+	                        	if (data.query.results.result['content-type'].indexOf("image") >= 0){                         
+	                        		callback(pic); 
+	                        		imagebar.sortImagesByDate();
+	                            }  	
+                        	}catch(e){} 
                         }
                     }
                 );				
@@ -398,9 +400,9 @@ var App = new (function(){
             }
         } 
         
-        this.requestURL = function(){
-        	var activeButton = this.menu.activeButton();
-        	return BASE_URL + "/r/" + activeButton.name + "/.json?&limit=" + IMAGES_PER_REQUEST;
+        this.requestURL = function(name){
+        	var section = name || this.menu.activeButton().name;
+        	return BASE_URL + "/r/" + section + "/.json?&limit=" + IMAGES_PER_REQUEST;
         }
         
         /*
@@ -423,7 +425,7 @@ var App = new (function(){
                 
                 this.select = function(){
                     selected(this);
-                    imagebar.loadImages(true);
+                    imagebar.loadImages();
                 }
                 
                 this.remove = function(){
@@ -861,7 +863,79 @@ var App = new (function(){
         load();
     })();
     
-   
+   this.metareddits = new (function(){
+	   var context = this;
+	   var defaults = ['active','over18','new','self','media','Favorites'];
+	   var metas = ko.observableArray();
+	   var activeReddits = ko.observableArray();
+	   var selected = ko.observable();
+	   
+	   var meta = function(name){
+		   var item = this;
+		   this.name = name;
+		   
+		   this.select = function(){
+			   selected(this);
+			   context.request(item.name);
+		   }.bind(this);
+		   
+		   this.selected = ko.dependentObservable(function(){
+               return (selected() == this);
+           }.bind(this));
+	   }
+	   
+	   var load = function(){
+		   $.each(defaults, function(){
+			   metas.push(new meta(this));
+		   });
+	   } 
+	   
+	   var MAX_IMAGE_BAR_BUTTONS = 4;
+	   var buttons = ko.observableArray();
+     
+           
+		var RedditSection = function(item){
+		   this.name = item.content;
+		   this.section = item.href.split('/')[2];
+		   
+		   this.add = function(){
+			   /*
+			   self.imageBar.menu.addButton(this.section);
+			   */
+		   }
+		   this.view = function(){
+			   self.imageBar.loadImages(this.name);
+		   }
+		   this.open = function(){
+			   window.open( BASE_URL + '/r/' + this.section, "_blank" )
+		   }
+	   }
+	   
+	   this.get = function(){
+		   return metas();
+	   }
+	   
+	   this.activeList = function(){
+		   return activeReddits();
+	   }
+	   
+	   this.request = function(name){
+			var sql = "select * from html where url=\"http://metareddit.com/reddits/" + name + "/list\" and xpath='//*[@class=\"subreddit\"]'"; 		 
+			var script = document.createElement("script"); 
+	        script.setAttribute("type","text/javascript"); 
+	        script.setAttribute("src","http://query.yahooapis.com/v1/public/yql?format=json&callback=App.metareddits.loadList&q=" + escape(sql));
+	        document.body.appendChild(script);
+	   }
+	   
+	   this.loadList = function(data){
+			if (data.query.count > 0) 
+                $.each(data.query.results.a,function(i,o){
+                	activeReddits.push(new RedditSection(o));
+                });
+	   }
+	   
+	   load();
+   })();
     
     /*this.toString = function(){
         return ko.toJSON({
