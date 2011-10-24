@@ -97,7 +97,7 @@ div.portlet-header a { font-size:24px; color:#EEE; font-weight:normal; }
 	padding:2px; 
 	font-size:12px; 
 	position:absolute;	
-	z-index:10001;
+	z-index:20000;
 }
 .ad-thumbs { height:150px; }
 .vertical { position:absolute; top:5em; width:100%; z-index:100; }

@@ -81,17 +81,16 @@
       <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getSubreddits().getPortlets() }, sortableList: subreddits.getSubreddits().getPortlets()"></div>
     </div>
 
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="popupAdd">
+    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" data-bind="visible: adder.isActive" id="popupAdd">
       <div class="portlet-header ui-widget-header ui-corner-all">
-        <!-- TODO: remove this onclick -->
-        <span class="ui-icon ui-icon-closethick" onClick="$('#popupAdd').fadeOut()" style="margin-top:2px;"></span>
+        <span class="ui-icon ui-icon-closethick" data-bind="click: adder.disable" style="margin-top:2px;"></span>
         <a style="font-size:16px;">Add To Column or Image Bar</a>
       </div>
       <div class="portlet-content" style="padding-top:2px;">
-        <button name="btnColumn" value="0" class="fg-button ui-state-default ui-priority-primary ui-corner-left" title="Add To The First Column News Blocks">1st</button>
-        <button name="btnColumn" value="1" class="fg-button ui-state-default ui-priority-primary" title="Add To The Second Column News Blocks">2nd</button>
-        <button name="btnColumn" value="2" class="fg-button ui-state-default ui-priority-primary" title="Add To The Third Column News Blocks">3rd</button>
-        <button name="btnColumn" value="3" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
+        <button name="btnColumn" value="0" data-bind="click: adder.pick" class="fg-button ui-state-default ui-priority-primary ui-corner-left" title="Add To The First Column News Blocks">1st</button>
+        <button name="btnColumn" value="1" data-bind="click: adder.pick" class="fg-button ui-state-default ui-priority-primary" title="Add To The Second Column News Blocks">2nd</button>
+        <button name="btnColumn" value="2" data-bind="click: adder.pick" class="fg-button ui-state-default ui-priority-primary" title="Add To The Third Column News Blocks">3rd</button>
+        <button name="btnColumn" value="3" data-bind="click: adder.pick" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
       </div>
     </div>
 
