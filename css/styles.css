@@ -10,6 +10,7 @@ h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
 .ui-widget {
     font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;;
     font-size: 1.1em;
+    line-height:1.8em;
 }
 #cboxContent:hover #cboxTitle { display:none!important; }
 
@@ -25,7 +26,7 @@ ul.portlet-content > li > a.link { font-size:inherit; }
 ul.portlet-content > li > a.comment { font-size: 12px; }
 
 .portlet { margin: 1px;  }
-.portlet-header { margin: 0 0.2em 0.2em 0.2em; padding-left:7px; }
+.portlet-header { margin: 0.2em; padding-left:7px; }
 .portlet-header .ui-icon { float: right; }
 .portlet-content {  text-align:center; border-top:1px solid #3D3D3D; }
 .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }

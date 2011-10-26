@@ -635,7 +635,6 @@ var App = new(function () {
 		var SubReddits = this;
 		var STORAGE_KEY_NAME = "subreddits";
 		var portlets = ko.observableArray();
-		var NEWS_BUTTONS = ['hot', 'new', 'top', 'controversial'];
 		var NEWS_ITEMS_PER_REQUEST = 30;
 		var SUBREDDIT_ITEMS = 10;
 		var DEFAULT_SUBREDDITS = "Gadgets,Funny,Reddit.com,Javascript,WTF,Programming";
@@ -732,7 +731,7 @@ var App = new(function () {
 
 								// TODO: this needs to GO, should not reference settings like that
 								self.visitedLinks.add(this.id);
-								self.preferences.save();
+								self.settings.save();
 							}.bind(this), 1000);
 
 							return true;
@@ -753,7 +752,7 @@ var App = new(function () {
 				 */
 				this.buttons = new(function () {
 					var DEFAULT_ACTIVE_BUTTON = "hot";
-
+					var NEWS_BUTTONS = ['hot', 'new', 'top', 'controversial'];
 					var buttons = ko.observableArray();
 					var activeButton = ko.observable();
 
@@ -761,28 +760,28 @@ var App = new(function () {
 					 * Button specifics
 					 */
 					var Button = function (name, active) {
-							this.init = function (name, active) {
-								this.name = name;
-								if (active) this.setActive();
-							};
-
-							this.setActive = function (event) {
-								activeButton(this);
-
-								portlet.last(null); // reset the last item (for the ajax call)
-								newsItems.removeAll(); // remove all the news items
-								message(""); // reset the messages
-								// if it was clicked then make request
-								if (event) load(); // redo this
-							}.bind(this);
-
-							this.isActive = ko.dependentObservable(function () {
-								return activeButton() === this;
-							}.bind(this));
-
-							// initialize the object
-							this.init(name, active);
+						this.init = function (name, active) {
+							this.name = name;
+							if (active) this.setActive();
 						};
+
+						this.setActive = function (event) {
+							activeButton(this);
+
+							portlet.last(null); // reset the last item (for the ajax call)
+							newsItems.removeAll(); // remove all the news items
+							message(""); // reset the messages
+							// if it was clicked then make request
+							if (event) load(); // redo this
+						}.bind(this);
+
+						this.isActive = ko.dependentObservable(function () {
+							return activeButton() === this;
+						}.bind(this));
+
+						// initialize the object
+						this.init(name, active);
+					};
 
 					this.init = function () {
 						var name;
@@ -1046,13 +1045,13 @@ var App = new(function () {
 
 		this.pick = function (e) {
 			var section = e.target.value;
-			if (section == "News"){
-				self.imageBar.menu.addButton(this.activeSection());
-				self.imageBar.save();
-			}
-			else if (section == "Pics"){
+			if (section == "News"){ 
 				self.subreddits.addPortlet(this.activeSection());
 				self.subreddits.save();
+			}
+			else if (section == "Pics"){
+				self.imageBar.menu.addButton(this.activeSection());
+				self.imageBar.save();
 			}
 			this.disable();	
 		}.bind(this);

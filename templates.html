@@ -29,8 +29,8 @@
 
     <!-- TODO: STOP the FLOAT:RIGHT madness  -->
     <script type="text/html" id="newsButton">
-      {{each(index, name) buttons.NEWS_BUTTONS}}
-      <span title="${ name }" rel="${ name }" class="ui-icon toggleView {{if buttons.getActiveButton() == name}}ui-icon-bullet{{else}}ui-icon-radio-on{{/if}}" data-bind="click: buttons.reloadSection">${ name }</span>
+      {{each(index, name) buttons.all}}
+      <span title="${ name }" rel="${ name }" class="ui-icon toggleView" data-bind="click: buttons.setActive, css: { 'ui-icon-radio-on': !isActive(), 'ui-icon-bullet' : isActive() }">${ name }</span>
       {{/each}}
     </script>
 
