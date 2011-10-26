@@ -45,7 +45,7 @@
           <span data-bind="template: { name: 'newsButton', value: buttons }, visible: !isMinimized()"></span>
         </div>
         <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
-        <div class="loader" data-bind="visible: getShowLoadingBar()"><img src="images/ajaxLoader.gif" align="middle" width="126" height="22"></div>
+        <div class="loader" data-bind="visible: getShowLoadingBar()">&nbsp;</div>
         <div class="ui-icon-more" data-bind="click: populateNext, visible: !isMinimized()">
           <div>
             <span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>

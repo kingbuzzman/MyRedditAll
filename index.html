@@ -66,7 +66,7 @@
       <h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
         <span class="cufonize">Live Dangerously?</span>
         <a onclick="jQuery('#customizeDialog').fadeIn(); return false;" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
-        <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:3px; margin-right:4px">
+        <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:0px; margin-right:1px">
           <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.getFrontPage() }"></span>
           <button class="changePic fg-button ui-corner-right" onclick="$('#loadingOverlay, #metaRedditDialog').toggle()">Meta</button>
           <button data-bind="click: imageBar.menu.show, visible: imageBar.menu.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
@@ -92,7 +92,7 @@
     <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="customizeDialog">
       <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
         <!-- TODO: remove this onclick -->
-        <span class="ui-icon ui-icon-closethick" onClick="mra.customize.closeDialog()"></span>
+        <span class="ui-icon ui-icon-closethick" onClick="$(this).parent().parent().hide()"></span>
         <a>Customize MyRedditAll</a>
       </div>
       <div class="portlet-content">
