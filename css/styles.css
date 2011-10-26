@@ -74,7 +74,7 @@ div.portlet-header a { font-size:24px; color:#EEE; font-weight:normal; }
 #metaRedditDialog { 
     border: 0 none;
     width:530px; 
-	border:1px solid #ffdab9; 
+	border:1px solid #FFF; 
     left: 50%;
     margin: -50px 0 0 -250px;
     overflow: hidden;

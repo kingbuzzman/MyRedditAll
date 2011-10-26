@@ -27,7 +27,24 @@ var App = new(function () {
 	this.settings = new(function () {
 		var STORAGE_KEY_NAME = "settings";
 		var DEFAULT_BACKGROUND_COLOR = null;
-		var DEFAULT_BACKGROUND_IMAGE = "http://www.dinpattern.com/tiles/prestige-COD.gif";
+		var BACKGROUNDS = [
+			"images/prestige-COD.gif",
+			"images/spacestorm.jpg",
+			"http://www.dinpattern.com/tiles/bones-leather.gif",
+			"http://i.imgur.com/GNUvG.jpg",
+			"http://i.imgur.com/UL45j.jpg",
+			"http://i.imgur.com/vsRWY.jpg",
+			"http://i.imgur.com/FuUYr.jpg",
+			"http://i.imgur.com/SQb2u.jpg", 
+			"http://i.imgur.com/ishzk.jpg",
+			"http://i.imgur.com/I77im.jpg",
+			"http://i.imgur.com/FHV3p.jpg",
+			"http://i.imgur.com/6FDRX.jpg",
+			"http://i.imgur.com/n8bZ8.jpg",
+			"http://i.imgur.com/4zX8q.jpg"
+		];
+		var DEFAULT_BACKGROUND_IMAGE = BACKGROUNDS[0];
+		
 		var DEFAULT_SETTINGS = {
 			background: {
 				color: DEFAULT_BACKGROUND_COLOR,
@@ -37,10 +54,31 @@ var App = new(function () {
 		var savedSettings = $.jStorage.get(STORAGE_KEY_NAME, DEFAULT_SETTINGS);
 
 		var load = function () {
-				this.background.color(savedSettings.background.color);
-				this.background.image(savedSettings.background.image);
-				this.save();
-			}.bind(this);
+			this.background.color(savedSettings.background.color);
+			this.background.image(savedSettings.background.image);
+			this.save();
+			
+			$(document).ready(function(){
+				$('#colorSelector').ColorPicker({
+					color: '#0000ff',
+					onShow: function (colpkr) {
+						$(colpkr).fadeIn(500);
+						return false;
+					},
+					onHide: function (colpkr) {
+						$(colpkr).fadeOut(500);
+						settings.background.color(jQuery('#colorSelector div').css('backgroundColor'));
+						settings.preferences.save();
+						return false;
+					},
+					onChange: function (hsb, hex, rgb) {
+						$('#colorSelector div').css('backgroundColor', '#' + hex);                              
+						$('body').css({"background-color":'#' + hex, "background-image":"none" });
+					}
+				});
+				$( "#customizeDialog" ).draggable({ handle: "#customizeHeader" });				
+			});
+		}.bind(this);
 
 		this.background = new(function () {
 			this.color = ko.observable();
@@ -57,7 +95,21 @@ var App = new(function () {
 				else this.color(null);
 
 				return colorSet;
-			}, this)
+			}, this);
+			
+			this.changeNext = function(){
+				var index = BACKGROUNDS.indexOf(this.image());
+				if (index >= BACKGROUNDS.length - 1)
+					index = -1;
+				this.image(BACKGROUNDS[index+1]);
+			}
+			
+			this.changePrev = function(){
+				var index = BACKGROUNDS.indexOf(this.image());
+				if (index == 0)
+					index = BACKGROUNDS.length;
+				this.image(BACKGROUNDS[index-1]);
+			}
 		})();
 
 		/*
@@ -223,7 +275,7 @@ var App = new(function () {
 		 * Always store one array at a time of the images for the active button
 		 */
 		var imagebar = this;
-		var DEFAULT_IMAGE_BAR = "Pics,WTF,NSFW,Funny,RageComics,Bacon";
+		var DEFAULT_IMAGE_BAR = "Pics,WTF,NSFW,Funny,F7U12,Bacon";
 		var STORAGE_KEY_NAME = "imagebar";
 		var images = ko.observableArray();
 		var IMAGES_PER_REQUEST = 100;
@@ -394,8 +446,11 @@ var App = new(function () {
 						});
 					}
 				pic.thumbnail = pic.url;
-				//normalize the urls
-				if (pic.url.indexOf("imgur.com/") >= 0 && !regex.exec(pic.url)) {
+				/*
+				 * This part finds images that maybe i.imgur.com or imgur.com that dont have an extension and are not /a/ which are for albums
+				 * maybe in the future add support for getting the pics within an album using the official imgur api and retrieving it but for now ignore
+				 */
+				if (pic.url.indexOf("imgur.com/") >= 0 && pic.url.indexOf("imgur.com/a/") == -1 && !regex.exec(pic.url)) {
 					pic.url = pic.url + ".jpg";
 				}
 				//change the url to thumbnails
@@ -662,8 +717,11 @@ var App = new(function () {
 					};
 
 				// attributes
-				this.name = name;
-				this.url = BASE_URL + "/r/" + decodeURIComponent(name);
+				this.name = name 
+				/*
+				 * Reddit.com's frontpage content is found at Reddit.com/hot/.json not reddit.com/r/Reddit.com/hot/.json
+				 */
+				this.url = BASE_URL + (name == "Reddit.com" ? "" : ("/r/" + decodeURIComponent(name)));
 				this.last = ko.observable();
 				this.amountVisible = ko.observable(10);
 
@@ -944,9 +1002,10 @@ var App = new(function () {
 
 	this.adder = new(function () {
 		this.activeSection = ko.observable("");
-		this.isActive = function () {
+		this.isActive = ko.dependentObservable(function () {
 			return this.activeSection() != "";
-		}
+		}.bind(this));
+		
 		this.disable = function () {
 			this.activeSection("");
 		}.bind(this);
@@ -964,8 +1023,16 @@ var App = new(function () {
 
 		this.pick = function (e) {
 			var section = e.target.value;
-
-		}
+			if (section == "News"){
+				self.imageBar.menu.addButton(this.activeSection());
+				self.imageBar.save();
+			}
+			else if (section == "Pics"){
+				self.subreddits.addPortlet(this.activeSection());
+				self.subreddits.save();
+			}
+			this.disable();	
+		}.bind(this);
 	})();
 
 /*this.toString = function(){

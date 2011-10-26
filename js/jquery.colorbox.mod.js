@@ -811,7 +811,6 @@
 	// Navigates to the next page/image in a set.
 	publicMethod.next = function () {
 		if (!active && $related()[1] && (index < $related().length - 1 || settings.loop)) {
-			
 			index = index < $related().length - 1 ? index + 1 : 0;
 			App.imageBar.activeImage($related()[index]);
 			publicMethod.load();
@@ -821,6 +820,7 @@
 	publicMethod.prev = function () {
 		if (!active && $related()[1] && (index || settings.loop)) {
 			index = index ? index - 1 : $related().length - 1;
+			App.imageBar.activeImage($related()[index]);
 			publicMethod.load();
 		}
 	};
