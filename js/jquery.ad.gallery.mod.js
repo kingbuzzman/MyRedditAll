@@ -277,22 +277,20 @@
       
 	$('.ad-thumb-list a').livequery(function(){
 		var link = $(this);
-		var i = $(this).prevAll();
-		//thumb_count += 1; 
+		var i = $(this).prevAll(); 
           var image_src = link.attr('href');
           var thumb = link.find('img');
           thumb.css('opacity', context.settings.thumb_opacity);
           // Check if the thumb has already loaded
-          if(!context.isImageLoaded(thumb[0])) {
-            thumb.load(
-              function() {
-                thumb_wrapper_width += this.parentNode.parentNode.offsetWidth;
-                thumbs_loaded++;
-              }
-            );
-          } else{
+          if(!context.isImageLoaded(thumb[0])){
+			thumb.load(function(){
+				thumb_wrapper_width += this.parentNode.parentNode.offsetWidth;
+				list.css('width', thumb_wrapper_width +'px');
+			});
+          } 
+          else {
             thumb_wrapper_width += thumb[0].parentNode.parentNode.offsetWidth;
-            thumbs_loaded++;
+            list.css('width', thumb_wrapper_width +'px');
           };
           link.addClass('ad-thumb'+ i);
           link/*.click(
@@ -335,7 +333,7 @@
           context.images[i] = { thumb: thumb.attr('src'), image: image_src, error: false,
                                 preloaded: false, desc: desc, title: title, size: false,
                                 link: link };
-          list.css('width', thumb_wrapper_width +'px');
+          
       });
 	
       // Wait until all thumbs are loaded, and then set the width of the ul

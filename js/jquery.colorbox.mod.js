@@ -1,7 +1,7 @@
 // ColorBox v1.3.17.2 - a full featured, light-weight, customizable lightbox based on jQuery 1.3+
 // Copyright (c) 2011 Jack Moore - jack@colorpowered.com
 // Licensed under the MIT license: http://www.opensource.org/licenses/mit-license.php
-
+ 
 (function ($, document, window) {
 	var
 	// ColorBox Default Settings.	
@@ -363,6 +363,7 @@
 				$div("TopLeft"),
 				$topBorder = $div("TopCenter"),
 				$div("TopRight")
+					.append('<img src="images/maximize.png" onclick="App.imageBar.fullscreenLightbox()">')
 			),
 			$div(false, 'clear:left').append(
 				$leftBorder = $div("MiddleLeft"),

@@ -569,10 +569,26 @@ var App = new(function () {
 
 		})();
 
+		
+		/*
+		 * This helps colorbox maintain an index based approach
+		 */
 		this.getActiveIndex = function () {
 			return images.indexOf(this.activeImage());
 		}
 
+		/*
+		 * Another colorbox helper method
+		 */
+		this.fullscreenLightbox = function(){
+			var i = new Image();
+			i.onload = function(){
+			    $.colorbox.resize({ innerWidth: this.width, innerHeight: this.height });
+			    $(".cboxPhoto").css({ 'width': this.width, 'height': this.height })
+			};
+			i.src = $.colorbox.element()[0].href;
+		}
+		
 		this.getImages = function () {
 			return images();
 		}
