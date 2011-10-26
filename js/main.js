@@ -69,7 +69,7 @@ var App = new(function () {
 						$(colpkr).fadeOut(500);
 						self.settings.background.color(jQuery('#colorSelector div').css('backgroundColor'));
 						self.settings.background.image(null);
-						App.settings.save();
+						self.settings.save();
 						return false;
 					},
 					onChange: function (hsb, hex, rgb) {
@@ -103,7 +103,7 @@ var App = new(function () {
 				if (index >= BACKGROUNDS.length - 1)
 					index = -1;
 				this.image(BACKGROUNDS[index+1]);
-				this.color(null);
+				this.saveBackgroundImage();
 			}
 			
 			this.changePrev = function(){
@@ -111,7 +111,11 @@ var App = new(function () {
 				if (index == 0)
 					index = BACKGROUNDS.length;
 				this.image(BACKGROUNDS[index-1]);
+				this.saveBackgroundImage();
+			}
+			this.saveBackgroundImage = function(){
 				this.color(null);
+				self.settings.save();
 			}
 		})();
 
