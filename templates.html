@@ -29,30 +29,28 @@
 
     <!-- TODO: STOP the FLOAT:RIGHT madness  -->
     <script type="text/html" id="newsButton">
-      {{each(index, name) buttons.all}}
-      <span title="${ name }" rel="${ name }" class="ui-icon toggleView" data-bind="click: buttons.setActive, css: { 'ui-icon-radio-on': !isActive(), 'ui-icon-bullet' : isActive() }">${ name }</span>
-      {{/each}}
+		<span title="${ name }" rel="${ name }" class="ui-icon toggleView" data-bind="click: setActive, css: { 'ui-icon-radio-on': !isActive(), 'ui-icon-bullet' : isActive() }">${ name }</span>
     </script>
 
     <script id="subredditTemplate" type="text/html">
       <div>
-      <div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
-        <div class="portlet-header ui-widget-header ui-corner-all">
-          <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: remove"></span>
-          <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
-          <span class="ui-icon toggleView" title="Toggle visited links" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'ui-icon-pin-w': showVisited(), 'ui-icon-pin-s': !showVisited() }"></span>
-          <a href="${ url }" target="_blank">${ name }</a>
-          <span data-bind="template: { name: 'newsButton', value: buttons }, visible: !isMinimized()"></span>
-        </div>
-        <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
-        <div class="loader" data-bind="visible: getShowLoadingBar()">&nbsp;</div>
-        <div class="ui-icon-more" data-bind="click: populateNext, visible: !isMinimized()">
-          <div>
-            <span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
-            <span class="text" style="float:right;">Read More</span>
-          </div>
-        </div>
-      </div>
+	      <div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
+	        <div class="portlet-header ui-widget-header ui-corner-all">
+	          <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: remove"></span>
+	          <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
+	          <span class="ui-icon toggleView" title="Toggle visited links" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'ui-icon-pin-w': showVisited(), 'ui-icon-pin-s': !showVisited() }"></span>
+	          <a href="${ url }" target="_blank">${ name }</a>
+	          <span data-bind="template: { name: 'newsButton', foreach: getButtons() }, visible: !isMinimized()"></span>
+	        </div>
+	        <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
+	        <div class="loader" data-bind="visible: getShowLoadingBar()">&nbsp;</div>
+	        <div class="ui-icon-more" data-bind="click: populateNext, visible: !isMinimized()">
+	          <div>
+	            <span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
+	            <span class="text" style="float:right;">Read More</span>
+	          </div>
+	        </div>
+	      </div>
       </div>
     </script>
    
