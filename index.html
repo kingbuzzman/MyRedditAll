@@ -1,129 +1,90 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>MyRedditAll</title>
-    <meta charset="UTF-8" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="white" />
-    <meta name="format-detection" content="telephone=no" />
-    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
+	<head>
+		<title>MyRedditAll</title>
+		<meta charset="UTF-8" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="white" />
+		<meta name="format-detection" content="telephone=no" />
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0" />
 
-    <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
-    <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.11/themes/dot-luv/jquery-ui.css" type="text/css" rel="stylesheet" media="screen" />
-    <link href="css/autocomplete.css" type="text/css" rel="stylesheet" media="screen" />
-    <link href="css/styles.css" type="text/css" rel="stylesheet" media="screen" />
-    <link href="css/jquery.contextMenu.css" type="text/css" rel="stylesheet" media="screen" />
-    <link href="css/jquery.ad.gallery.css" type="text/css" rel="stylesheet" media="screen" />
-    <link href="css/colorpicker.css" type="text/css" rel="stylesheet" media="screen" />
-    <link href="css/colorbox.css" type="text/css" rel="stylesheet" media="screen" />
+		<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
+		<link href="css/styles.css" type="text/css" rel="stylesheet" media="screen" />
+		<link href="css/jquery.contextMenu.css" type="text/css" rel="stylesheet" media="screen" />
+		<link href="css/jquery.ad.gallery.css" type="text/css" rel="stylesheet" media="screen" />
+		<link href="css/colorpicker.css" type="text/css" rel="stylesheet" media="screen" />
+		<link href="css/colorbox.css" type="text/css" rel="stylesheet" media="screen" />
+		<link href="css/miniTip.css" type="text/css" rel="stylesheet" media="screen" />
+		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.css" />
 
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/jquery.tmpl.min.js" type="text/javascript"></script>
-	<script src="js/jquery.livequery.js" type="text/javascript"></script>
-    <script src="js/knockout-1.2.1.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/autocomplete.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/ZeroClipboard.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/jquery.ad.gallery.mod.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/jquery.colorbox.mod.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/new_contextMenu.js" type="text/javascript" charset="ISO-8859-1"></script>
-    <script src="js/iScroll.js" type="text/javascript" charset="ISO-8859-1"></script>
-	<script src="js/jquery.json.js" type="text/javascript" charset="ISO-8859-1"></script>
-	<script src="js/jquery.jStorage.js" type="text/javascript" charset="ISO-8859-1"></script>
-	<script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.js"></script>
+		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/jquery.tmpl.min.js" type="text/javascript"></script>
+		<script src="js/jquery.livequery.js" type="text/javascript"></script>
+		<script src="js/knockout-1.2.1.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/ZeroClipboard.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/jquery.ad.gallery.mod.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/colorpicker.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/jquery.colorbox.mod.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/jquery.miniTip.min.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/iScroll.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/jquery.json.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/jquery.jStorage.js" type="text/javascript" charset="ISO-8859-1"></script>
+		<script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
 	
-  </head>
+	</head>
 
-  <body data-bind="style: { backgroundColor: settings.background.isColorSet()? settings.background.color(): '', backgroundImage: !settings.background.isColorSet()? 'url(' + settings.background.image() + ')': '' }">
-    <div id="loadingOverlay" style="display:none;"></div>
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" id="metaRedditDialog" style="display:none;">
-      <div class="portlet-header ui-widget-header ui-corner-all" style="padding:5px 5px;">
-        <!-- TODO: remove this onclick -->
-        <span class="ui-icon ui-icon-closethick" onClick="$('#loadingOverlay,#metaRedditDialog').hide()"></span>
-        <a>Add New Section</a>
-        <input type="Text" name="feedName" size="21" class="ui-state-defalt">
-        <img src="images/fileTypes/add.png" class="imgIcon" id="addSubIcon" onClick="App.adder.show(this, $('input[name=feedName]').val())" width="16" height="16">
-      </div>
-      <div class="portlet-content" style="padding-top:5px">
-        <div class="fg-buttonset fg-buttonset-single" style="width:100%;" data-bind="template: { name: 'loadMetaButtonTemplate', foreach: metareddits.get() }"></div>
-        
-        <div style="clear:both">&nbsp;</div>
-        
-        <ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metareddits.activeList() }"></ul>
-      </div>
-    </div>	
-    <div id="container">
-      <div class="ad-gallery">
-        <div class="ad-nav">
-          <div class="ad-thumbs">
-          	<div class="vertical" data-bind="visible: !imageBar.hasImages()"><div class="loader"></div></div>
-            <ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: imageBar.getImages(), visible: imageBar.hasImages() }"></ul>
-          </div>
-        </div>
-      </div>
+	<body data-bind="style: { backgroundColor: settings.background.isColorSet()? settings.background.color(): '', backgroundImage: !settings.background.isColorSet()? 'url(' + settings.background.image() + ')': '' }">
 
-      <h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
-        <span class="cufonize">Live Dangerously?</span>
-        <a onclick="jQuery('#customizeDialog').fadeIn(); return false;" href="javascript:void(0)" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
-        <div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:0px; margin-right:1px">
-          <span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.getFrontPage() }"></span>
-          <button class="changePic fg-button ui-corner-right" onclick="$('#loadingOverlay, #metaRedditDialog').toggle()">Meta</button>
-          <button data-bind="click: imageBar.menu.show, visible: imageBar.menu.populatedMenu()" id="showMore" class="changePic fg-button ui-corner-right"><span class="ui-icon ui-icon-heart" id="heartIcon">&nbsp;</span></button>
-          <ul data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.menu.get() }" id="showMoreList" class="ui-state-default" style="position:absolute; display:none;"></ul>
-        </div>
-        <div class="ad-controls" style="display:none;"> </div>
-      </h2>
+		<div data-role="page" id="main-page">
+			<div id="container">
+				<div class="ad-gallery">
+					<div class="ad-nav">
+						<div class="ad-thumbs">
+						<div class="vertical" data-bind="visible: !imageBar.hasImages()">
+							<div class="loader"></div>
+						</div>
+						<ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: imageBar.getImages(), visible: imageBar.hasImages() }"></ul>
+						</div>
+					</div>
+				</div>
 
-      <div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getSubreddits().getPortlets() }, sortableList: subreddits.getSubreddits().getPortlets()"></div>
-    </div>
+				<h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
+					<span class="cufonize">Live Dangerously?</span>
+					<a href="#customize" data-rel="dialog" data-transition="pop" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
+					<div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:0px; margin-right:1px">
+						<span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.getFrontPage() }"></span>
+						<button class="changePic fg-button ui-corner-right" onclick="$('#loadingOverlay, #metaRedditDialog').toggle()">Meta</button>
+						<div data-bind="click: imageBar.menu.show, visible: imageBar.menu.populatedMenu()" class="buttonBackground" id="showMore">
+							<div style="background-color:#99FF44;">&nbsp;
+							</div>
+						</div>
+					</div>
+				</h2>
+				<div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getPortlets(), afterAdd: function(elem){ console.log(elem) } }"></div>
+			</div>
+		</div>
 
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" data-bind="visible: adder.isActive" id="popupAdd" style="display:none;">
-      <div class="portlet-header ui-widget-header ui-corner-all">
-        <span class="ui-icon ui-icon-closethick" data-bind="click: adder.disable" style="margin-top:2px;"></span>
-        <a style="font-size:16px;">Add To Column or Image Bar</a>
-      </div>
-      <div class="portlet-content" style="padding-top:2px;">
-        <button name="btnColumn" value="News" data-bind="click: adder.pick" class="fg-button ui-state-default ui-priority-primary ui-corner-left" title="Add To The First Column News Blocks">News</button>
-        <button name="btnColumn" value="Pics" data-bind="click: adder.pick" class="fg-button ui-state-default ui-priority-primary ui-corner-right" title="Add To The Image Bar Strip"><img class="metaAdd" src="images/fileTypes/picture.png" align="absmiddle" width="16" height="16"></button>
-      </div>
-    </div>
+		<div data-role="page" id="customize">
+			<div data-role="header" data-theme="e">
+				<h1>Customize Dialog</h1>
+			</div>
 
-    <div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" style="display:none;" id="customizeDialog">
-      <div class="portlet-header ui-widget-header ui-corner-all" id="customizeHeader">
-        <!-- TODO: remove this onclick -->
-        <span class="ui-icon ui-icon-closethick" onClick="$(this).parent().parent().hide()"></span>
-        <a>Customize MyRedditAll</a>
-      </div>
-      <div class="portlet-content">
-        <table border="0" cellpadding="0" cellspacing="3" width="100%">
-          <tr>
-            <td class="cufonize">Pick Wallpaper </td>
-            <td colspan="3" style="text-align:left;">
-              <!-- TODO: remove this onclick -->
-              <input type="button" value="Previous" class="ui-state-default" onClick="App.settings.background.changePrev()">
-              <!-- TODO: remove this onclick -->
-              <input type="button" value="Next" class="ui-state-default" onClick="App.settings.background.changeNext()">
-            </td>
-            <td class="cufonize">Color </td>
-            <td>
-              <div id="colorSelector"><div></div></div>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
+			<div data-role="content" data-theme="d">	
+				<h2>Popup</h2>
+				<p>I have an id of "popup" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
+				<p><a href="#main-page" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "one"</a></p>	
+			</div>
+		</div>
 
-    <ul id="imageMenu" class="contextMenu">
-      <li class="comments"><a href="#comments">View Comments</a></li>
-      <li class="image separator"><a href="#image">View Image</a></li>
-      <li class="link separator"><a href="#source">Find Source</a></li>
-      <li class="link separator"><a href="#analyze">Error Analyze</a></li>
-      <li class="link separator" id="copyLink"><a href="#copy">Copy To Share</a></li>
-    </ul>
-
-    <input type="hidden" id="clipboardContents">
-    <iframe src="" frameborder="0" height="1" width="1"></iframe>
-    <div id="fb-root"></div>
-  </body>
+		<div style="display:none;">
+			<div id="fb-root"></div>
+			<span id="activeImageButtons" data-bind="template: { name: 'imageButtonsTemplate', value: imageBar.activeImage() }">
+			</span>
+			<div id="showMoreList">
+				<ul id="showMoreUL" data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.menu.get() }"></ul>
+			</div>
+		</div>
+	</body>
 </html>

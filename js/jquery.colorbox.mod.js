@@ -55,7 +55,8 @@
             }
         },  
         current: function(){  
-            var comment = '<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16"><span>View Comments</span>';    
+           /*
+        	var comment = '<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16"><span>View Comments</span>';    
             var image = '<img src="images/fileTypes/image_link.png" align="absmiddle" width="16" height="16"><span>New Tab</span>';
             var cts = '<img src="images/fileTypes/link.png" align="absmiddle" width="16" height="16"><span>Copy</span>';
 			var fb = '<img src="images/facebook.jpg" align="absmiddle" width="16" height="16"><span>Share</span>';
@@ -63,7 +64,8 @@
             | <a data-bind="attr: { href: App.imageBar.activeImage().href }" title="View Original" onclick="App.imageBar.activeImage().viewOriginal(); return false;" class="cufonize">' + image + '</a>\
             | <a title="Copy Link To Clipboard" onclick="return false;" class="cufonize copyLink">' + cts + '</a>\
 			| <a data-bind="attr: { title: App.imageBar.activeImage().title, href: App.imageBar.activeImage().href }" onclick="App.imageBar.activeImage().shareOnFacebook(); return false;" class="cufonize">' + fb + '</a>'; 
-            return markup;
+            return markup;*/
+        	return $("#activeImageButtons").html();
         },
 		onCleanup: false,
 		onClosed: false,
@@ -321,7 +323,6 @@
 			$this = $('<a/>');
 			options.open = true; // assume an immediate open
 		}
-		
 		if (callback) {
 			options.onComplete = callback;
 		}

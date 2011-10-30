@@ -1,13 +1,13 @@
- <!-- TODO: you can delete this? and if you can why not do it in the same place as moreImageButtonTemplate -->
     <script id="imageButtonTemplate" type="text/html">
     	<button class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }" id="${ name }">${ name }</button>
     </script>
 
     <!-- TODO: remove the X (remove) from here and add a better UI for this -->
     <script id="moreImageButtonTemplate" type="text/html">
-      <li class="ui-state-default" data-bind="click: select">
-        ${ name } <img class="moreView" src="images/fileTypes/cross.png" width="16" height="16" id="${ name }" data-bind="click: remove">
+      <li data-bind="click: select">
+        ${ name }
       </li>
+	  <hr>
     </script>
     
 	<script type="text/html" id="newsItemTemplate">
@@ -26,21 +26,31 @@
         <a target="_blank" href="${ permalink }" class="comment" title="${ scoreTitle }">${ score }</a>
       </li>
     </script>-->
-
-    <!-- TODO: STOP the FLOAT:RIGHT madness  -->
+	<!--<span data-bind="template: { name: 'newsButton', foreach: getButtons() }, visible: !isMinimized()"></span>
+	<span class="ui-icon ui-icon-closethick ui-close-display"></span>
+	          <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
+	          <span class="ui-icon toggleView" title="Toggle visited links"></span>
+	          
+	-->
     <script type="text/html" id="newsButton">
-		<span title="${ name }" rel="${ name }" class="ui-icon toggleView" data-bind="click: setActive, css: { 'ui-icon-radio-on': !isActive(), 'ui-icon-bullet' : isActive() }">${ name }</span>
+		<span title="${ name }" rel="${ name }" class="ui-icon toggleView" data-bind="click: setActive, css: { 'ui-icon-radio-on': !isActive(), 'ui-icon-bullet' : isActive() }">${ initial }</span>
     </script>
 
     <script id="subredditTemplate" type="text/html">
       <div>
 	      <div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
 	        <div class="portlet-header ui-widget-header ui-corner-all">
-	          <span class="ui-icon ui-icon-closethick ui-close-display" data-bind="click: remove"></span>
-	          <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
-	          <span class="ui-icon toggleView" title="Toggle visited links" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'ui-icon-pin-w': showVisited(), 'ui-icon-pin-s': !showVisited() }"></span>
 	          <a href="${ url }" target="_blank">${ name }</a>
-	          <span data-bind="template: { name: 'newsButton', foreach: getButtons() }, visible: !isMinimized()"></span>
+				<div class="portletButton buttonBackground" title="Remove Section" data-bind="click: remove">
+					<div style="background-color:#990000;">&nbsp;</div>
+				</div>	
+				<div class="portletButton buttonBackground" title="Toggle Visited" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'highlightOff': showVisited(), 'highlightOn': !showVisited() }">
+					<div style="background-color:#3A3A3A;">&nbsp;</div>
+				</div>
+				<div class="portletButton buttonBackground viewMore" title="View More">
+					<div style="background-color:#000066;">&nbsp;
+					</div>
+				</div>			  
 	        </div>
 	        <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
 	        <div class="loader" data-bind="visible: getShowLoadingBar()">&nbsp;</div>
@@ -73,3 +83,31 @@
 			</a>
 		</li>
 	</script>
+	<!-- data-bind="attr: { href: App.imageBar.activeImage().permalink }" -->
+	<!-- data-bind="attr: { href: App.imageBar.activeImage().href }" -->
+	<!-- data-bind="attr: { title: App.imageBar.activeImage().title, href: App.imageBar.activeImage().href }"-->
+	<!--TODO I wish I could bind it to the activeImagebar directly -->
+	<script type="text/html" id="imageButtonsTemplate">
+		<span>
+	        <a
+				title="View comments" onclick="App.imageBar.activeImage().viewComment(); return false;" class="cufonize">
+				<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16">
+				<span data-bind="visible: App.imageBar.overlayOpen()">View Comments</span>
+			</a>
+			<a title="View Original" 
+				onclick="App.imageBar.activeImage().viewOriginal(); return false;" class="cufonize">
+				<img src="images/fileTypes/image_link.png" align="absmiddle" width="16" height="16">
+				<span data-bind="visible: App.imageBar.overlayOpen()">New Tab</span>
+			</a>
+	        <a title="Copy Link To Clipboard" onclick="return false;" class="cufonize copyLink">
+				<img src="images/fileTypes/link.png" align="absmiddle" width="16" height="16">
+				<span data-bind="visible: App.imageBar.overlayOpen()">Copy</span>
+			</a>
+			<a title="Share on Facebook"
+				onclick="App.imageBar.activeImage().shareOnFacebook(); return false;" class="cufonize">
+				<img src="images/facebook.png" align="absmiddle" width="16" height="16">
+				<span data-bind="visible: App.imageBar.overlayOpen()">Share</span>
+			</a>
+		</span>
+	</script>
+	

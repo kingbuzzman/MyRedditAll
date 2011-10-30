@@ -277,7 +277,7 @@
       
 	$('.ad-thumb-list a').livequery(function(){
 		var link = $(this);
-		var i = $(this).prevAll(); 
+		var i = $(this).parent().prevAll().length; 
           var image_src = link.attr('href');
           var thumb = link.find('img');
           thumb.css('opacity', context.settings.thumb_opacity);
@@ -303,6 +303,7 @@
             function() {
               if(!$(this).is('.ad-active') && context.settings.thumb_opacity < 1) {
                 $(this).find('img').fadeTo(300, 1);
+                App.imageBar.activeImage(App.imageBar.getImages()[i]);
               };
               context.preloadImage(i);
             },
@@ -311,7 +312,11 @@
                 $(this).find('img').fadeTo(300, context.settings.thumb_opacity);
               };
             }
-          );
+          ).miniTip({
+              aHide: false,
+          	  anchor: 's',
+          	  title: $("#activeImageButtons").html()
+          });
           var link = false;
           if(thumb.data('ad-link')) {
             link = thumb.data('ad-link');

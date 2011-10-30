@@ -353,10 +353,10 @@ var App = new(function () {
 
 					// populate each of the images into the imageBar
 					for (var index in data)
-					isImage(data[index].data, function (cleanItem) {
-						images.push(new ImageBox(cleanItem));
-					})
-
+						isImage(data[index].data, function (cleanItem) {
+							images.push(new ImageBox(cleanItem));
+						})
+					self.imageBar.sortImagesByDate();
 				}.bind(this));
 
 			}
@@ -375,7 +375,7 @@ var App = new(function () {
 				/*
 				 * This provides the copy to share functionality
 				 */
-				$(".copyLink").live("mouseover", function (e) {
+				$("a.copyLink").live("mouseover", function (e) {
 					var copyLink = $(e.target);
 					/*
 					 * needs to be recraeted everytime the image changes
@@ -385,7 +385,7 @@ var App = new(function () {
 						window.clip = new ZeroClipboard.Client();
 						clip.setHandCursor(true);
 						clip.addEventListener('onComplete', function () {
-							$(".copyLink").html('copied');
+							$("a.copyLink").html('copied');
 						}.bind(this));
 					}
 					/*
@@ -421,6 +421,13 @@ var App = new(function () {
 					}
 					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
 					document.getElementById("fb-root").appendChild(e);
+
+					$("#showMore").miniTip({
+					    title: "More Pics",
+					    content: $("#showMoreList").html(),
+					    event: "click",
+					    aHide: false
+					})
 				});
 
 			}.bind(this);
@@ -446,7 +453,6 @@ var App = new(function () {
 								try {
 									if (data.query.results.result['content-type'].indexOf("image") >= 0) {
 										callback(pic);
-										imagebar.sortImagesByDate();
 									}
 								} catch (e) {}
 							}
@@ -549,16 +555,6 @@ var App = new(function () {
 				return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
 			}.bind(this));
 
-			this.show = function () {
-				$("#showMoreList").position({
-					of: $("#showMore"),
-					my: "right top",
-					at: "right bottom",
-					offset: 0,
-					collision: "flip flip"
-				}).toggle();
-			};
-
 			this.activeButton = function () {
 				return selected();
 			}
@@ -569,7 +565,10 @@ var App = new(function () {
 
 		})();
 
-		
+		/*
+		 * Determine if the overlay is open
+		 */
+		this.overlayOpen = ko.observable(false);
 		/*
 		 * This helps colorbox maintain an index based approach
 		 */
@@ -646,9 +645,17 @@ var App = new(function () {
 		};
 
 		var load = function () {
-				this.addPortlet(saved_subreddits.split(","));
-				this.save();
-			}.bind(this);
+			$("#newsSection div.viewMore").livequery(function(){
+				$(this).miniTip({
+				    title: "View More",
+				    content: "Hot <hr> New <hr> Top <hr> Controversial",
+				    event: "click",
+				    aHide: false
+				})
+			})
+			this.addPortlet(saved_subreddits.split(","));
+			this.save();
+		}.bind(this);
 
 		// private class (individual portlets)
 		var Portlet = function (name) {
@@ -752,22 +759,22 @@ var App = new(function () {
 				 */
 				this.buttons = new(function () {
 					var DEFAULT_ACTIVE_BUTTON = "hot";
-					var NEWS_BUTTONS = ['hot', 'new', 'top', 'controversial'];
-					var buttons = ko.observableArray();
+					var NEWS_BUTTONS = ['hot', 'new', 'top', 'controversial'];					
 					var activeButton = ko.observable();
-
+					
+					this.buttons = ko.observableArray();
 					/*
 					 * Button specifics
 					 */
 					var Button = function (name, active) {
 						this.init = function (name, active) {
 							this.name = name;
+							this.initial = name.toString().substring(0,1).toUpperCase();
 							if (active) this.setActive();
 						};
 
 						this.setActive = function (event) {
 							activeButton(this);
-
 							portlet.last(null); // reset the last item (for the ajax call)
 							newsItems.removeAll(); // remove all the news items
 							message(""); // reset the messages
@@ -789,20 +796,17 @@ var App = new(function () {
 						for (var index in NEWS_BUTTONS) {
 							name = NEWS_BUTTONS[index];
 
-							buttons.push(new Button(name, (name === DEFAULT_ACTIVE_BUTTON)));
+							this.buttons.push(new Button(name, (name === DEFAULT_ACTIVE_BUTTON)));
 						}
 					};
 
 					this.activeButton = activeButton;
 
-					this.all = function () {
-						return buttons();
-					};
 
 					// initialize the object
 					this.init();
-				})();
-
+				})(); 
+				
 				/*
 				 * Returns the full request URL to call reddit.com
 				 * - append the last item on the list so it doenst need to reload the full pannel
@@ -818,6 +822,9 @@ var App = new(function () {
 					return this.url + "/" + activeButton.name + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last()) ? "&after=" + this.last().id : "");
 				};
 
+				this.getButtons = function(){
+					return this.buttons.buttons();
+				}
 				/*
 				 *  this allows more items to come in naturally as the ones that are read dissapear
 				 */
