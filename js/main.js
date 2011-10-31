@@ -426,6 +426,7 @@ var App = new(function () {
 					    title: "More Pics",
 					    content: $("#showMoreList").html(),
 					    event: "click",
+					    render: function(){ ko.applyBindings(App); },
 					    aHide: false
 					})
 				});

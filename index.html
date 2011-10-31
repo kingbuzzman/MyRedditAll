@@ -10,12 +10,11 @@
 
 		<link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon" />
 		<link href="css/styles.css" type="text/css" rel="stylesheet" media="screen" />
-		<link href="css/jquery.contextMenu.css" type="text/css" rel="stylesheet" media="screen" />
 		<link href="css/jquery.ad.gallery.css" type="text/css" rel="stylesheet" media="screen" />
 		<link href="css/colorpicker.css" type="text/css" rel="stylesheet" media="screen" />
 		<link href="css/colorbox.css" type="text/css" rel="stylesheet" media="screen" />
 		<link href="css/miniTip.css" type="text/css" rel="stylesheet" media="screen" />
-		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.css" />
+		<link href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.css" rel="stylesheet" />
 
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js" type="text/javascript" charset="ISO-8859-1"></script>
 		<script src="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.js"></script>
@@ -52,29 +51,84 @@
 
 				<h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
 					<span class="cufonize">Live Dangerously?</span>
-					<a href="#customize" data-rel="dialog" data-transition="pop" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
+					<a href="#customize" data-transition="pop" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
 					<div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:0px; margin-right:1px">
 						<span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.getFrontPage() }"></span>
-						<button class="changePic fg-button ui-corner-right" onclick="$('#loadingOverlay, #metaRedditDialog').toggle()">Meta</button>
 						<div data-bind="click: imageBar.menu.show, visible: imageBar.menu.populatedMenu()" class="buttonBackground" id="showMore">
 							<div style="background-color:#99FF44;">&nbsp;
 							</div>
 						</div>
 					</div>
 				</h2>
-				<div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getPortlets(), afterAdd: function(elem){ console.log(elem) } }"></div>
+				<div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getPortlets() }"></div>
 			</div>
 		</div>
 
 		<div data-role="page" id="customize">
-			<div data-role="header" data-theme="e">
-				<h1>Customize Dialog</h1>
+			<div data-role="header" data-theme="a">
+				<h1>Customize MyRedditAll</h1>
 			</div>
+			<div data-role="content" data-theme="d">
+				<div class="portlet-header ui-widget-header ui-corner-all" style="padding:5px 5px;">
+					<h3>Choose Background</h3>
 
-			<div data-role="content" data-theme="d">	
-				<h2>Popup</h2>
-				<p>I have an id of "popup" on my page container and only look like a dialog because the link to me had a <code>data-rel="dialog"</code> attribute which gives me this inset look and a <code>data-transition="pop"</code> attribute to change the transition to pop. Without this, I'd be styled as a normal page.</p>		
-				<p><a href="#main-page" data-rel="back" data-role="button" data-inline="true" data-icon="back">Back to page "one"</a></p>	
+					<fieldset class="ui-grid-a">
+						<div class="ui-block-a">
+							<fieldset data-role="controlgroup" data-type="horizontal">
+								<legend>Wallpaper</legend>
+								<input type="radio" name="wallpaper-choice-1" id="wallpaper-choice-1" value="choice-1"  />
+								<label for="wallpaper-choice-1">previous</label>
+								
+								<input type="radio" name="wallpaper-choice-1" id="wallpaper-choice-2" value="choice-2"  />
+								<label for="wallpaper-choice-2">next</label>
+								
+							</fieldset>
+						</div>
+						<div class="ui-block-b">
+							<fieldset data-role="controlgroup" data-type="horizontal">
+								<legend>Color</legend>
+								<input type="radio" name="color-choice-1" id="color-choice-1" value="choice-2"  />
+								<label for="color-choice-1">Select</label>
+							</fieldset>		
+						</div>
+					</fieldset>
+					
+					<h3>Add New Section</h3>
+					<div data-role="fieldcontain">
+						<label for="name">Section Name:</label>
+						<input type="text" name="name" id="name" value=""  />
+					</div>
+					
+					<h3>Find New Section</h3>
+					<div class="portlet-content" style="padding-top:5px">
+						<!--  data-bind="template: { name: 'loadMetaButtonTemplate', foreach: metareddits.get() }" -->
+						<fieldset data-role="controlgroup" data-type="horizontal">
+							<input type="radio" name="radio-choice-1" id="radio-choice-1" value="choice-1"  />
+							<label for="radio-choice-1">active</label>
+							
+							<input type="radio" name="radio-choice-1" id="radio-choice-2" value="choice-2"  />
+							<label for="radio-choice-2">over18</label>
+							
+							<input type="radio" name="radio-choice-1" id="radio-choice-3" value="choice-3"  />
+							<label for="radio-choice-3">new</label>
+							
+							<input type="radio" name="radio-choice-1" id="radio-choice-4" value="choice-4"  />
+							<label for="radio-choice-4">self</label>
+							
+							<input type="radio" name="radio-choice-1" id="radio-choice-5" value="choice-5"  />
+							<label for="radio-choice-5">media</label>
+							
+							<input type="radio" name="radio-choice-1" id="radio-choice-6" value="choice-6"  />
+							<label for="radio-choice-6">Favorites</label>
+						</fieldset>
+
+						<div style="clear:both">&nbsp;</div>
+					
+						<ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metareddits.activeList() }"></ul>
+						
+					</div>
+
+				<p><a href="#main-page" data-theme="a" data-rel="back" data-role="button" data-inline="true" data-icon="back">Go Back</a></p>
 			</div>
 		</div>
 

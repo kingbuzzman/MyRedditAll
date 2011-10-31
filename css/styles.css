@@ -7,8 +7,10 @@ h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
 		-moz-column-count: 3; -webkit-column-count: 3;
     }
 }
+body, .ui-widget {
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+}
 .ui-widget {
-    font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;;
     font-size: 1.1em;
     line-height:1.8em;
 }
@@ -28,7 +30,6 @@ ul.portlet-content > li > a.comment { font-size: 12px; }
 .portlet { margin: 1px;  }
 .portlet-header { padding-left:7px; }
 .portlet-header .ui-icon { float: right; }
-.portlet-content {  text-align:center; border-top:1px solid #3D3D3D; }
 .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }
 .ui-sortable-placeholder * { visibility: hidden; }
 .portlet.ui-widget-content { background:url(../images/trans_black.png) repeat scroll 50% top transparent; border:1px solid #3D3D3D; color:#D9D9D9; }
@@ -74,7 +75,7 @@ div.portlet-header a {
 div.portlet-header img, highlightOff { opacity:0.8; }
 div.portlet-header img:hover, .highlightOn { opacity:1; }
 .ui-corner-all { -moz-border-radius: 6px !important; -webkit-border-radius: 6px !important; border-radius: 6px !important; }
-#metaRedditList, #showMoreUL { list-style:none; margin:0 0 0 20px; padding:0; }
+#metaRedditList, #showMoreUL { list-style:none; margin:0px; padding:0; }
 #showMoreList { margin:0; padding:0; }
 #showMoreList li { cursor:pointer; padding:4px 0; font-size:16px; text-align:right; }
 #showMoreList li:hover { background-color:white; }
@@ -186,7 +187,7 @@ div.portlet-header img:hover, .highlightOn { opacity:1; }
 .buttonBackground:hover div {
 	opacity:0.5; 
 }
-#main-page.ui-body-c {
+.ui-body-c {
 	background:none !important;
 	text-shadow:none !important;
 }

@@ -1,15 +1,14 @@
-    <script id="imageButtonTemplate" type="text/html">
-    	<button class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }" id="${ name }">${ name }</button>
-    </script>
+	<script id="imageButtonTemplate" type="text/html">
+		<button class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }" id="${ name }">${ name }</button>
+	</script>
 
-    <!-- TODO: remove the X (remove) from here and add a better UI for this -->
-    <script id="moreImageButtonTemplate" type="text/html">
-      <li data-bind="click: select">
-        ${ name }
-      </li>
-	  <hr>
-    </script>
-    
+	<script id="moreImageButtonTemplate" type="text/html">
+		<li data-bind="click: select">
+			${ name }
+		</li>
+		<hr>
+	</script>
+
 	<script type="text/html" id="newsItemTemplate">
 		<li title="${ title }" data-bind="visible: isVisible()">
 			<div class="itemLICenter">
@@ -20,18 +19,7 @@
 			</div>
 		</li>
     </script>
-    <!--<script type="text/html" id="newsItemTemplate">
-      <li title="${ title }" data-bind="visible: isVisible()">
-        <a target="_blank" href="${ url }" class="link" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
-        <a target="_blank" href="${ permalink }" class="comment" title="${ scoreTitle }">${ score }</a>
-      </li>
-    </script>-->
-	<!--<span data-bind="template: { name: 'newsButton', foreach: getButtons() }, visible: !isMinimized()"></span>
-	<span class="ui-icon ui-icon-closethick ui-close-display"></span>
-	          <span class="ui-icon ui-toggle-display" data-bind="click: toggleMinimize, css: { 'ui-icon-minusthick': !isMinimized(), 'ui-icon-plusthick': isMinimized() }"></span>
-	          <span class="ui-icon toggleView" title="Toggle visited links"></span>
-	          
-	-->
+
     <script type="text/html" id="newsButton">
 		<span title="${ name }" rel="${ name }" class="ui-icon toggleView" data-bind="click: setActive, css: { 'ui-icon-radio-on': !isActive(), 'ui-icon-bullet' : isActive() }">${ initial }</span>
     </script>
@@ -72,9 +60,10 @@
       </li>
     </script>
 
-    <script id="loadMetaButtonTemplate" type="text/html">
-		<button id="${$data.name}" class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }">${$data.name}</button>
-    </script>
+	<script id="loadMetaButtonTemplate" type="text/html">
+		<input type="radio" name="metaList" id="radio-choice-${$data.name}" value="${$data.name}" checked="checked"  data-bind="click: select, css: { 'ui-state-active': selected() }"/>
+		<label for="radio-choice-${$data.name}">${$data.name}</label>
+	</script>
 
 	<script type="text/html" id="imageBarTemplate">
 		<li>  
@@ -83,10 +72,7 @@
 			</a>
 		</li>
 	</script>
-	<!-- data-bind="attr: { href: App.imageBar.activeImage().permalink }" -->
-	<!-- data-bind="attr: { href: App.imageBar.activeImage().href }" -->
-	<!-- data-bind="attr: { title: App.imageBar.activeImage().title, href: App.imageBar.activeImage().href }"-->
-	<!--TODO I wish I could bind it to the activeImagebar directly -->
+
 	<script type="text/html" id="imageButtonsTemplate">
 		<span>
 	        <a
