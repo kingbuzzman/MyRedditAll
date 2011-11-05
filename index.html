@@ -17,7 +17,7 @@
 		<link href="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.css" rel="stylesheet" />
 
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.js" type="text/javascript" charset="ISO-8859-1"></script>
-		<script src="http://code.jquery.com/mobile/1.0rc2/jquery.mobile-1.0rc2.min.js"></script>
+		
 		<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.js" type="text/javascript" charset="ISO-8859-1"></script>
 		<script src="js/jquery.tmpl.min.js" type="text/javascript"></script>
 		<script src="js/jquery.livequery.js" type="text/javascript"></script>
@@ -31,104 +31,95 @@
 		<script src="js/jquery.json.js" type="text/javascript" charset="ISO-8859-1"></script>
 		<script src="js/jquery.jStorage.js" type="text/javascript" charset="ISO-8859-1"></script>
 		<script src="js/main.js" type="text/javascript" charset="ISO-8859-1"></script>
-	
+		<script src="js/jquery.mobile-1.0rc2.js"></script>
 	</head>
 
 	<body data-bind="style: { backgroundColor: settings.background.isColorSet()? settings.background.color(): '', backgroundImage: !settings.background.isColorSet()? 'url(' + settings.background.image() + ')': '' }">
 
 		<div data-role="page" id="main-page">
-			<div id="container">
+			<div id="container" data-role="none">
 				<div class="ad-gallery">
 					<div class="ad-nav">
 						<div class="ad-thumbs">
-						<div class="vertical" data-bind="visible: !imageBar.hasImages()">
-							<div class="loader"></div>
-						</div>
-						<ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: imageBar.getImages(), visible: imageBar.hasImages() }"></ul>
+							<div class="vertical" data-bind="visible: !imageBar.hasImages()">
+								<div class="loader"></div>
+							</div>
+							<ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: imageBar.getImages(), visible: imageBar.hasImages() }"></ul>
 						</div>
 					</div>
 				</div>
 
-				<h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all">
+				<h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all" data-role="none">
 					<span class="cufonize">Live Dangerously?</span>
 					<a href="#customize" data-transition="pop" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
 					<div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:0px; margin-right:1px">
 						<span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.getFrontPage() }"></span>
-						<div data-bind="click: imageBar.menu.show, visible: imageBar.menu.populatedMenu()" class="buttonBackground" id="showMore">
-							<div style="background-color:#99FF44;">&nbsp;
-							</div>
+						<div data-bind="visible: imageBar.menu.populatedMenu()" class="buttonBackground" id="showMore">
+							<div style="background-color:#99FF44;">&nbsp;</div>
 						</div>
 					</div>
 				</h2>
-				<div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getPortlets() }"></div>
+				<div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getPortlets() }, sortableList: subreddits.getSubreddits().getPortlets()" data-role="none"></div>
 			</div>
 		</div>
 
-		<div data-role="page" id="customize">
-			<div data-role="header" data-theme="a">
+		<div data-role="page" id="customize" data-theme="a" data-bind="style: { backgroundColor: settings.background.isColorSet()? settings.background.color(): '', backgroundImage: !settings.background.isColorSet()? 'url(' + settings.background.image() + ')': '' }">
+			<div data-role="header" data-theme="a" data-add-back-btn="true">
+				<a href="#main-page" data-theme="a" data-role="button" data-inline="true" data-icon="back">Go Back</a>	
 				<h1>Customize MyRedditAll</h1>
 			</div>
-			<div data-role="content" data-theme="d">
-				<div class="portlet-header ui-widget-header ui-corner-all" style="padding:5px 5px;">
-					<h3>Choose Background</h3>
+			<div data-role="content">
 
-					<fieldset class="ui-grid-a">
-						<div class="ui-block-a">
-							<fieldset data-role="controlgroup" data-type="horizontal">
-								<legend>Wallpaper</legend>
-								<input type="radio" name="wallpaper-choice-1" id="wallpaper-choice-1" value="choice-1"  />
-								<label for="wallpaper-choice-1">previous</label>
-								
-								<input type="radio" name="wallpaper-choice-1" id="wallpaper-choice-2" value="choice-2"  />
-								<label for="wallpaper-choice-2">next</label>
-								
+				<div data-role="collapsible-set">
+				
+					<div data-role="collapsible" data-collapsed="false" data-content-theme="a">
+						<h3>Browse or Add New Sections</h3>
+						<p>
+							<fieldset class="ui-grid-a">
+								<div class="ui-block-a">
+									<fieldset class="radioFieldset" data-role="controlgroup" data-type="horizontal" data-bind="template: { name: 'loadMetaButtonTemplate', foreach: metareddits.get() }"> 
+									</fieldset>
+								</div>
+								<div class="ui-block-b">
+									<div data-role="fieldcontain">  
+										<input type="search" name="feedName" value="" data-theme="c"/>
+									</div>
+								</div>
 							</fieldset>
-						</div>
-						<div class="ui-block-b">
-							<fieldset data-role="controlgroup" data-type="horizontal">
-								<legend>Color</legend>
-								<input type="radio" name="color-choice-1" id="color-choice-1" value="choice-2"  />
-								<label for="color-choice-1">Select</label>
-							</fieldset>		
-						</div>
-					</fieldset>
-					
-					<h3>Add New Section</h3>
-					<div data-role="fieldcontain">
-						<label for="name">Section Name:</label>
-						<input type="text" name="name" id="name" value=""  />
+							<ul class="jqmList" data-theme="a" data-role="listview" data-inset="true" data-bind="template: { name: 'metaTemplate', foreach: metareddits.activeList() }"></ul>	
+						</p>
 					</div>
-					
-					<h3>Find New Section</h3>
-					<div class="portlet-content" style="padding-top:5px">
-						<!--  data-bind="template: { name: 'loadMetaButtonTemplate', foreach: metareddits.get() }" -->
-						<fieldset data-role="controlgroup" data-type="horizontal">
-							<input type="radio" name="radio-choice-1" id="radio-choice-1" value="choice-1"  />
-							<label for="radio-choice-1">active</label>
-							
-							<input type="radio" name="radio-choice-1" id="radio-choice-2" value="choice-2"  />
-							<label for="radio-choice-2">over18</label>
-							
-							<input type="radio" name="radio-choice-1" id="radio-choice-3" value="choice-3"  />
-							<label for="radio-choice-3">new</label>
-							
-							<input type="radio" name="radio-choice-1" id="radio-choice-4" value="choice-4"  />
-							<label for="radio-choice-4">self</label>
-							
-							<input type="radio" name="radio-choice-1" id="radio-choice-5" value="choice-5"  />
-							<label for="radio-choice-5">media</label>
-							
-							<input type="radio" name="radio-choice-1" id="radio-choice-6" value="choice-6"  />
-							<label for="radio-choice-6">Favorites</label>
-						</fieldset>
+				</div>
 
-						<div style="clear:both">&nbsp;</div>
-					
-						<ul id="metaRedditList" data-bind="template: { name: 'metaTemplate', foreach: metareddits.activeList() }"></ul>
-						
+				<ul class="jqmList" data-theme="a" data-role="listview" data-inset="true" data-bind="template: { name: 'orderPortletsTemplate', foreach: subreddits.getPortlets() }, sortableList: subreddits.getSubreddits().getPortlets()"></ul>
+				
+				<ul class="jqmList"  data-theme="a" data-role="listview" data-inset="true" data-bind="template: { name: 'orderImagebarsTemplate', foreach: imageBar.menu.getButtons() }, sortableList: imageBar.menu.getButtons()"></ul>
+				
+				<ul data-theme="a" data-role="listview" data-inset="true">
+					<li data-role="list-divider" data-dividertheme="a">Choose Background</li>
+					<li>
+						<div data-role="controlgroup" data-type="horizontal" class="ui-grid-a">
+							<a href="#" onclick="App.settings.background.changePrev()" data-role="button" data-icon="arrow-u">Prev</a>
+							<a href="#" onclick="App.settings.background.changeNext()" data-role="button" data-icon="arrow-d">Next</a>
+							<a href="#" onclick="App.settings.background.changeNext()" data-role="button" data-icon="gear">Color</a>
+						</div>	
+					</li>
+				</ul>
+				
+				<p><a href="#main-page" data-theme="a" data-role="button" data-inline="true" data-icon="back">Go Back</a></p>
+			
+				<div class="portlet ui-widget ui-widget-content ui-helper-clearfix ui-corner-all" data-bind="visible: adder.isActive" id="popupAdd" style="display:none;">
+					<div class="portlet-header ui-widget-header ui-corner-all">
+						<span class="ui-icon ui-icon-closethick" data-bind="click: adder.disable" style="margin-top:2px;"></span>
+						<a style="font-size:16px;">Add To Squares or Image Bar</a>
 					</div>
-
-				<p><a href="#main-page" data-theme="a" data-rel="back" data-role="button" data-inline="true" data-icon="back">Go Back</a></p>
+		
+					<div class="portlet-content" style="padding-top:2px;">
+						<a href="#" data-bind="click: adder.pick" data-role="button">News</a>
+						<a href="#" data-bind="click: adder.pick" data-role="button">Pics</a>
+						<a href="#" data-bind="click: adder.pick" data-role="button">Cancel</a>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -138,6 +129,9 @@
 			</span>
 			<div id="showMoreList">
 				<ul id="showMoreUL" data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.menu.get() }"></ul>
+			</div>
+			<div id="viewMoreList" style="display:none;">
+				<div data-bind="template: { name: 'newsButtonTemplate', value: subreddits.activeButtons }" class="viewMoreList"></div>
 			</div>
 		</div>
 	</body>

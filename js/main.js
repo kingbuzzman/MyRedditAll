@@ -1,3 +1,7 @@
+/*$(document).bind("mobileinit", function(){
+	$.mobile.page.prototype.options.addBackBtn = true;
+});*/
+
 if (typeof console == "undefined") {
 	console = {
 		log: function () {},
@@ -5,6 +9,13 @@ if (typeof console == "undefined") {
 		info: function () {}
 	};
 }
+
+$( '#customize' ).live( 'pagecreate',function(event){
+	//This is way hacky I have to find the right event and tap into that
+	setTimeout(function(){
+		App.jqm.refresh();
+	},2000);
+});
 
 /*
  * Setting wrapper
@@ -426,6 +437,7 @@ var App = new(function () {
 					    title: "More Pics",
 					    content: $("#showMoreList").html(),
 					    event: "click",
+					    anchor: 's',
 					    render: function(){ ko.applyBindings(App); },
 					    aHide: false
 					})
@@ -496,25 +508,27 @@ var App = new(function () {
 			 *  Imagebar individual buttons
 			 */
 			var ImageButton = function (name) {
-					this.name = name;
+				this.name = name;
 
-					this.selected = ko.dependentObservable(function () {
-						return (selected() == this);
-					}.bind(this));
+				this.selected = ko.dependentObservable(function () {
+					return (selected() == this);
+				}.bind(this));
 
-					this.select = function () {
-						selected(this);
-						imagebar.loadImages();
-					}
-
-					this.remove = function () {
-						buttons.remove(this);
-					};
-
-					this.toString = function () {
-						return this.name;
-					};
+				this.select = function () {
+					selected(this);
+					imagebar.loadImages();
 				}
+
+				this.remove = function () {
+					buttons.remove(this);
+					self.jqm.refresh();
+					imagebar.save();
+				};
+
+				this.toString = function () {
+					return this.name;
+				};
+			}
 
 			this.addButton = function (name) {
 				if (name.push) {
@@ -644,16 +658,17 @@ var App = new(function () {
 		this.getSubreddits = function () {
 			return this;
 		};
-
+		this.activeButtons = ko.observableArray();
+		
 		var load = function () {
-			$("#newsSection div.viewMore").livequery(function(){
+			/*$("#newsSection div.viewMore").livequery(function(){
 				$(this).miniTip({
 				    title: "View More",
 				    content: "Hot <hr> New <hr> Top <hr> Controversial",
 				    event: "click",
 				    aHide: false
 				})
-			})
+			})*/
 			this.addPortlet(saved_subreddits.split(","));
 			this.save();
 		}.bind(this);
@@ -662,14 +677,16 @@ var App = new(function () {
 		var Portlet = function (name) {
 				var newsItems = ko.observableArray();
 				var portlet = this;
-				var minimized = ko.observable(false);
+				var STORAGE_KEY_NAME = "portlet_" + name; 
+				var DEFAULT_SETTINGS = {
+						minimized: false,
+						showVisited: false
+				}; 
+				var savedSettings = $.jStorage.get(STORAGE_KEY_NAME, DEFAULT_SETTINGS);
+				var minimized = ko.observable(savedSettings.minimized);
 				var message = ko.observable("");
+				var showVisited = ko.observable(savedSettings.showVisited);
 
-				this.showVisited = ko.observable(false);
-
-				this.toggleVisited = function () {
-					this.showVisited((this.showVisited() ^ true) === 1);
-				};
 
 				/*
 				 * Loads the content for the subreddit
@@ -700,51 +717,51 @@ var App = new(function () {
 					}.bind(this);
 
 				var NewsItem = function (item) {
-						var MAX_TITLE_LENGTH = 95;
+					var MAX_TITLE_LENGTH = 95;
 
-						this.id = item.id;
-						this.title = item.title;
-						this.text = item.title.substring(0, MAX_TITLE_LENGTH) + ((item.title.length > MAX_TITLE_LENGTH) ? "..." : "");
-						this.redditURL = BASE_URL + "/tb/" + item.id; // nicer link with comments, upvote.. etc at the top (iframed)
-						this.url = item.url;
-						this.score = parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
-						this.scoreTitle = this.score + " of People Like It"; /* Reddit removes their own domain name from the permalink to save space so append it back in */
-						this.permalink = BASE_URL + item.permalink;
-						this.visited = ko.observable(self.visitedLinks.visited(this.id));
+					this.id = item.id;
+					this.title = item.title;
+					this.text = item.title.substring(0, MAX_TITLE_LENGTH) + ((item.title.length > MAX_TITLE_LENGTH) ? "..." : "");
+					this.redditURL = BASE_URL + "/tb/" + item.id; // nicer link with comments, upvote.. etc at the top (iframed)
+					this.url = item.url;
+					this.score = parseInt((item.ups / (item.downs + item.ups)) * 100, 10) + "%";
+					this.scoreTitle = this.score + " of People Like It"; /* Reddit removes their own domain name from the permalink to save space so append it back in */
+					this.permalink = BASE_URL + item.permalink;
+					this.visited = ko.observable(self.visitedLinks.visited(this.id));
 
 
-						/*
-						 * Observable that checks whether or not the link is visible
-						 */
-						this.isVisible = ko.dependentObservable(function () {
-							// checks the the link to see if its been visited, or if all the news items are visible
-							return !this.visited() || portlet.showVisited();
-						}.bind(this));
+					/*
+					 * Observable that checks whether or not the link is visible
+					 */
+					this.isVisible = ko.dependentObservable(function () {
+						// checks the the link to see if its been visited, or if all the news items are visible
+						return !this.visited() || showVisited();
+					}.bind(this));
 
-						/*
-						 * Marks the page as seen/visited
-						 */
-						this.visitPage = function (evt) {
-							var element = $(evt.target);
+					/*
+					 * Marks the page as seen/visited
+					 */
+					this.visitPage = function (evt) {
+						var element = $(evt.target);
 
-							// replace link with reddit's link for it only if its not Youtube.com which has a glitch with reddit's frame
-							if (this.url.indexOf("youtube.com") == -1) element.attr('href', this.redditURL)
+						// replace link with reddit's link for it only if its not Youtube.com which has a glitch with reddit's frame
+						if (this.url.indexOf("youtube.com") == -1) element.attr('href', this.redditURL)
 
-							setTimeout(function () {
-								// swap back the original link
-								element.attr('href', this.url);
+						setTimeout(function () {
+							// swap back the original link
+							element.attr('href', this.url);
 
-								// set the page as visited
-								this.visited(true);
+							// set the page as visited
+							this.visited(true);
 
-								// TODO: this needs to GO, should not reference settings like that
-								self.visitedLinks.add(this.id);
-								self.settings.save();
-							}.bind(this), 1000);
+							// TODO: this needs to GO, should not reference settings like that
+							self.visitedLinks.add(this.id);
+							self.settings.save();
+						}.bind(this), 1000);
 
-							return true;
-						};
+						return true;
 					};
+				};
 
 				// attributes
 				this.name = name 
@@ -762,15 +779,13 @@ var App = new(function () {
 					var DEFAULT_ACTIVE_BUTTON = "hot";
 					var NEWS_BUTTONS = ['hot', 'new', 'top', 'controversial'];					
 					var activeButton = ko.observable();
-					
-					this.buttons = ko.observableArray();
+					var buttons = ko.observableArray();
 					/*
 					 * Button specifics
 					 */
 					var Button = function (name, active) {
 						this.init = function (name, active) {
 							this.name = name;
-							this.initial = name.toString().substring(0,1).toUpperCase();
 							if (active) this.setActive();
 						};
 
@@ -797,13 +812,16 @@ var App = new(function () {
 						for (var index in NEWS_BUTTONS) {
 							name = NEWS_BUTTONS[index];
 
-							this.buttons.push(new Button(name, (name === DEFAULT_ACTIVE_BUTTON)));
+							buttons.push(new Button(name, (name === DEFAULT_ACTIVE_BUTTON)));
 						}
 					};
 
 					this.activeButton = activeButton;
 
-
+					this.all = function () {
+						return buttons();
+					};
+					
 					// initialize the object
 					this.init();
 				})(); 
@@ -823,8 +841,8 @@ var App = new(function () {
 					return this.url + "/" + activeButton.name + "/.json?&limit=" + NEWS_ITEMS_PER_REQUEST + ((this.last()) ? "&after=" + this.last().id : "");
 				};
 
-				this.getButtons = function(){
-					return this.buttons.buttons();
+				this.setActive = function(){
+					SubReddits.activeButtons(this.buttons.all());
 				}
 				/*
 				 *  this allows more items to come in naturally as the ones that are read dissapear
@@ -841,7 +859,14 @@ var App = new(function () {
 				this.isMinimized = function () {
 					return minimized();
 				};
-
+				
+				/*
+				 * Returns the state of the showVisited property
+				 */
+				this.isShowingVisited = function(){
+					return showVisited();
+				}
+				
 				/*
 				 * Toggles the state of the minimized property
 				 */
@@ -850,8 +875,17 @@ var App = new(function () {
 					// ie. true ^ true -> false
 					// ie. false ^ true -> true
 					minimized((minimized() ^ true) === 1);
+					this.save();
 				};
 
+				/*
+				 * Toggles whether it shows the visited links or not
+				 */
+				this.toggleVisited = function () {
+					showVisited((showVisited() ^ true) === 1);
+					this.save();
+				};
+				
 				/*
 				 * Triggers the display of the load bar to the user if there are no items.
 				 * - its ignored if there is a message
@@ -878,7 +912,7 @@ var App = new(function () {
 					this.amountVisible(this.amountVisible() + 10);
 					load();
 				};
-
+				
 				/*
 				 * Remove portlet
 				 */
@@ -888,6 +922,13 @@ var App = new(function () {
 					}
 				}.bind(this);
 
+				this.save = function(){
+					$.jStorage.set(STORAGE_KEY_NAME, {
+							minimized: minimized(),
+							showVisited: showVisited()
+					});
+				}
+				
 				this.toString = function () {
 					return this.name;
 				}.bind(this);
@@ -922,7 +963,8 @@ var App = new(function () {
 		 */
 		this.removePortlet = function (portlet) {
 			portlets.remove(portlet);
-			//self.preferences.save();
+			self.jqm.refresh();
+			this.save();
 		};
 
 		/*
@@ -957,30 +999,33 @@ var App = new(function () {
 
 	this.metareddits = new(function () {
 		var context = this;
-		var defaults = ['active', 'over18', 'new', 'self', 'media', 'Favorites'];
+		var defaults = ['active', 'over18', 'new', 'self', 'media'];
 		var metas = ko.observableArray();
 		var activeReddits = ko.observableArray();
 		var selected = ko.observable();
 
 		var meta = function (name) {
-				var item = this;
-				this.name = name;
+			var item = this;
+			this.name = name;
 
-				this.select = function () {
-					selected(this);
-					context.request(item.name);
-				}.bind(this);
+			this.select = function () {
+				selected(this);
+				context.request(item.name);
+			}.bind(this);
 
-				this.selected = ko.dependentObservable(function () {
-					return (selected() == this);
-				}.bind(this));
-			}
+			this.selected = ko.dependentObservable(function () {
+				return (selected() == this);
+			}.bind(this));
+		}
 
 		var load = function () {
-				$.each(defaults, function () {
-					metas.push(new meta(this));
-				});
-			}
+			$.each(defaults, function () {
+				metas.push(new meta(this));
+			});
+			$("input[name=metaList]").live("change", function(e){
+			    context.request(e.target.value);
+			});
+		}
 
 		var MAX_IMAGE_BAR_BUTTONS = 4;
 		var buttons = ko.observableArray();
@@ -988,19 +1033,20 @@ var App = new(function () {
 		 * A RedditSection defines an item within a meta that allows you to add them to the imageBar or subreddits
 		 */
 		var RedditSection = function (item) {
-				this.name = item.content;
-				this.section = item.href.split('/')[2];
-
-				this.add = function (e) {
-					self.adder.show(e.target, this.name);
-				}
-				this.view = function () {
-					self.imageBar.loadImages(this.name);
-				}
-				this.open = function () {
-					window.open(BASE_URL + '/r/' + this.section, "_blank")
-				}
+			this.name = item.content;
+			this.section = item.href.split('/')[2];
+			this.count = item.title.replace(/[^0-9]/g, '');
+			
+			this.add = function (e) {
+				self.adder.show(e.target, this.name);
 			}
+			this.view = function () {
+				self.imageBar.loadImages(this.name);
+			}
+			this.open = function () {
+				window.open(BASE_URL + '/r/' + this.section, "_blank")
+			}
+		}
 
 		this.get = function () {
 			return metas();
@@ -1024,6 +1070,10 @@ var App = new(function () {
 				$.each(data.query.results.a, function (i, o) {
 					activeReddits.push(new RedditSection(o));
 				});
+				activeReddits(activeReddits.sort(function (a, b) {
+				    return b.count - a.count;
+				}));
+				self.jqm.refresh();
 			}
 		}
 
@@ -1031,20 +1081,28 @@ var App = new(function () {
 	})();
 
 	this.adder = new(function () {
+		var context = this;
 		this.activeSection = ko.observable("");
 		this.isActive = ko.dependentObservable(function () {
 			return this.activeSection() != "";
 		}.bind(this));
 		
+		var load = function(){
+			$('#customize input[name=feedName]').live("keyup", function(e){
+				if (e.keyCode == 13)
+					context.show(this, this.value);
+			});
+		}
+		
 		this.disable = function () {
 			this.activeSection("");
 		}.bind(this);
 
-		this.show = function (target, name) {
+		this.show = function (target, name) { 
 			this.activeSection(name);
 			$("#popupAdd").position({
 				of: target,
-				my: "right top",
+				my: "left top",
 				at: "left bottom",
 				offset: 0,
 				collision: "flip flip"
@@ -1052,7 +1110,7 @@ var App = new(function () {
 		}
 
 		this.pick = function (e) {
-			var section = e.target.value;
+			var section = e.target.childNodes[0].innerHTML;
 			if (section == "News"){ 
 				self.subreddits.addPortlet(this.activeSection());
 				self.subreddits.save();
@@ -1062,9 +1120,22 @@ var App = new(function () {
 				self.imageBar.save();
 			}
 			this.disable();	
+			self.jqm.refresh();
 		}.bind(this);
+		
+		load();
 	})();
 
+	this.jqm = new (function(){
+		
+		this.refresh = function(){
+			$("ul.jqmList").listview('refresh');
+			$("input").textinput();
+			$.mobile.checkboxradio.prototype.enhanceWithin( $("fieldset.radioFieldset") );
+			$( ":jqmData(role='controlgroup')" ).controlgroup({ excludeInvisible: false });
+			//$("#popupAdd a[data-role=button]").buttonMarkup();
+		}
+	})()
 /*this.toString = function(){
         return ko.toJSON({
             background: {
@@ -1083,6 +1154,7 @@ var App = new(function () {
 ko.bindingHandlers.sortableList = {
 	init: function (element, valueAccessor) {
 		var list = valueAccessor();
+		
 		$(element).sortable({
 			update: function (event, ui) {
 				//retrieve our actual data item
@@ -1095,9 +1167,21 @@ ko.bindingHandlers.sortableList = {
 					list.remove(item);
 					list.splice(position, 0, item);
 				}
-
+				App.jqm.refresh();
 			}
 		});
+	}
+};
+
+ko.bindingHandlers.miniTipMore = {
+	init: function (element, valueAccessor) {
+		$(element).miniTip({
+		    title: "View More",
+		    content: $("#viewMoreList").html(),
+		    render: function(){ ko.applyBindings(App); },
+		    event: "click",
+		    aHide: false
+		})
 	}
 };
 

@@ -18,50 +18,74 @@
 				<a target="_blank" class="comment" href="${ permalink }" title="${ scoreTitle }">${ score }</a>
 			</div>
 		</li>
-    </script>
+	</script>
 
-    <script type="text/html" id="newsButton">
-		<span title="${ name }" rel="${ name }" class="ui-icon toggleView" data-bind="click: setActive, css: { 'ui-icon-radio-on': !isActive(), 'ui-icon-bullet' : isActive() }">${ initial }</span>
-    </script>
+	<script type="text/html" id="newsButtonTemplate">
+		{{each(index, name) subreddits.activeButtons()}}
+			<div title="${ name }" rel="${ name }" data-bind="click: setActive, css: { 'ui-state-active' : isActive() }">${ name }</div>
+			<hr>
+		{{/each}}
+	</script>
 
-    <script id="subredditTemplate" type="text/html">
-      <div>
-	      <div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
-	        <div class="portlet-header ui-widget-header ui-corner-all">
-	          <a href="${ url }" target="_blank">${ name }</a>
-				<div class="portletButton buttonBackground" title="Remove Section" data-bind="click: remove">
-					<div style="background-color:#990000;">&nbsp;</div>
-				</div>	
-				<div class="portletButton buttonBackground" title="Toggle Visited" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'highlightOff': showVisited(), 'highlightOn': !showVisited() }">
-					<div style="background-color:#3A3A3A;">&nbsp;</div>
-				</div>
-				<div class="portletButton buttonBackground viewMore" title="View More">
-					<div style="background-color:#000066;">&nbsp;
+	<script id="subredditTemplate" type="text/html">
+		<div>
+			<div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
+				<div class="portlet-header ui-widget-header ui-corner-all">
+					<a href="${ url }" target="_blank">${ name }</a>
+					<div class="portletButton buttonBackground" title="Minimize Section" data-bind="click: toggleMinimize">
+						<div style="background-color:#990000;">&nbsp;</div>
+					</div>	
+					<div class="portletButton buttonBackground" title="Toggle Visited" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'highlightOff': isShowingVisited(), 'highlightOn': !isShowingVisited() }">
+						<div style="background-color:#3A3A3A;">&nbsp;</div>
 					</div>
-				</div>			  
-	        </div>
-	        <ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
-	        <div class="loader" data-bind="visible: getShowLoadingBar()">&nbsp;</div>
-	        <div class="ui-icon-more" data-bind="click: populateNext, visible: !isMinimized()">
-	          <div>
-	            <span class="ui-icon ui-icon-carat-1-s" style="float:left"></span>
-	            <span class="text" style="float:right;">Read More</span>
-	          </div>
-	        </div>
-	      </div>
-      </div>
-    </script>
-   
-    <script type="text/html" id="metaTemplate">
-      <li id="metaSection">
-	      <img class="metaAdd" src="images/fileTypes/add.png" width="16" height="16" id="add_${ $data.SECTION }" data-bind="click: add ">
-	      <img class="metaView" src="images/fileTypes/picture.png" width="16" height="16" id="view_${ $data.SECTION }" data-bind="click: view" >
-	      <span class="metaText" data-bind="click: open">${$data.name}</span>
-      </li>
-    </script>
+					<div class="portletButton buttonBackground" title="View More" data-bind="click: setActive, visible: !isMinimized(), miniTipMore: $data">
+						<div style="background-color:#000066;">&nbsp;</div>
+					</div>
+				</div>
+				<ul class="portlet-content" data-bind="template: { name: 'newsItemTemplate', foreach: getNewsItems() }, visible: !isMinimized()"></ul>
+				<div class="loader" data-bind="visible: getShowLoadingBar()">&nbsp;</div>
+				<div class="readMore" data-bind="click: populateNext, visible: !isMinimized()">
+					<div style="width:84%">
+						<div class="ui-icon ui-icon-carat-1-s" class="moreIcon">&nbsp;</div>
+					</div>
+					<div class="moreText">Read More</div>
+				</div>
+			</div>
+		</div>
+	</script>
+
+	<script type="text/html" id="orderPortletsTemplate">
+		{{if App.subreddits.getPortlets().indexOf($data) == 0}}
+			<li data-role="list-divider" data-dividertheme="a">News</li>
+		{{/if}}		
+		<li>
+			<a href="index.html">${ name }</a>
+			<a data-bind="click: remove" data-icon="delete">Sort</a>
+		</li>
+	</script>
+	
+	<script type="text/html" id="orderImagebarsTemplate">
+		{{if App.imageBar.menu.getButtons().indexOf($data) == 0}}
+			<li data-role="list-divider" data-dividertheme="a">Pics</li>
+		{{/if}}
+		<li>
+			<a href="index.html">${ name }</a>
+			<a data-bind="click: remove" data-icon="delete">Sort</a>
+		</li>
+	</script>	
+	
+	<script type="text/html" id="metaTemplate">
+		<li data-bind="click: add">
+			<a href="#">
+				<img src="images/fileTypes/picture.png" alt="View" class="ui-li-icon">
+				<span>${$data.name}</span>
+				<span class="ui-li-count">${$data.count}</span>
+			</a>
+		</li>
+	</script>
 
 	<script id="loadMetaButtonTemplate" type="text/html">
-		<input type="radio" name="metaList" id="radio-choice-${$data.name}" value="${$data.name}" checked="checked"  data-bind="click: select, css: { 'ui-state-active': selected() }"/>
+		<input type="radio" name="metaList" id="radio-choice-${$data.name}" value="${$data.name}" checked="checked"  data-bind="click: select"/>
 		<label for="radio-choice-${$data.name}">${$data.name}</label>
 	</script>
 
@@ -75,7 +99,7 @@
 
 	<script type="text/html" id="imageButtonsTemplate">
 		<span>
-	        <a
+			<a
 				title="View comments" onclick="App.imageBar.activeImage().viewComment(); return false;" class="cufonize">
 				<img src="images/fileTypes/comments.png" align="absmiddle" width="16" height="16">
 				<span data-bind="visible: App.imageBar.overlayOpen()">View Comments</span>
@@ -85,7 +109,7 @@
 				<img src="images/fileTypes/image_link.png" align="absmiddle" width="16" height="16">
 				<span data-bind="visible: App.imageBar.overlayOpen()">New Tab</span>
 			</a>
-	        <a title="Copy Link To Clipboard" onclick="return false;" class="cufonize copyLink">
+			<a title="Copy Link To Clipboard" onclick="return false;" class="cufonize copyLink">
 				<img src="images/fileTypes/link.png" align="absmiddle" width="16" height="16">
 				<span data-bind="visible: App.imageBar.overlayOpen()">Copy</span>
 			</a>

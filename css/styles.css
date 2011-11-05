@@ -7,7 +7,7 @@ h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
 		-moz-column-count: 3; -webkit-column-count: 3;
     }
 }
-body, .ui-widget {
+body, .ui-widget, #customize {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
 .ui-widget {
@@ -29,14 +29,12 @@ ul.portlet-content > li > a.comment { font-size: 12px; }
 
 .portlet { margin: 1px;  }
 .portlet-header { padding-left:7px; }
-.portlet-header .ui-icon { float: right; }
 .ui-sortable-placeholder { border: 1px dotted black; visibility: visible !important; height: 50px !important; }
 .ui-sortable-placeholder * { visibility: hidden; }
 .portlet.ui-widget-content { background:url(../images/trans_black.png) repeat scroll 50% top transparent; border:1px solid #3D3D3D; color:#D9D9D9; }
 
 .fg-button { outline: 0; margin:0 4px 0 0; padding: .4em 0.8em; text-decoration:none !important; cursor:pointer; position: relative; text-align: center; zoom: 1;  font-size:14px; }
 .fg-button .ui-icon { position: absolute; top: 50%; margin-top: -8px; left: 50%; margin-left: -8px; }
-.portlet-header .ui-icon { margin-top:9px; float:right; cursor:pointer; }
 /* remove extra button width in IE */
 button.fg-button { width:auto; overflow:visible; }
 
@@ -66,7 +64,7 @@ button.fg-button { width:auto; overflow:visible; }
 
 .ui-dialog .ui-dialog-content { overflow:visible; }
 .portlet-header {  border:none !important; }
-div.portlet-header a {
+#main-page div.portlet-header a {
     color: #EEEEEE;
     font-size: 24px;
     font-weight: normal;
@@ -74,11 +72,12 @@ div.portlet-header a {
 }
 div.portlet-header img, highlightOff { opacity:0.8; }
 div.portlet-header img:hover, .highlightOn { opacity:1; }
+.portlet-content {  text-align:center; border-top:1px solid #3D3D3D; }
 .ui-corner-all { -moz-border-radius: 6px !important; -webkit-border-radius: 6px !important; border-radius: 6px !important; }
-#metaRedditList, #showMoreUL { list-style:none; margin:0px; padding:0; }
 #showMoreList { margin:0; padding:0; }
 #showMoreList li { cursor:pointer; padding:4px 0; font-size:16px; text-align:right; }
 #showMoreList li:hover { background-color:white; }
+#showMoreUL { list-style:none; margin:0px; padding:0; }
 #moreTemplate li { white-space:nowrap; }
 #metaRedditDialog { 
     border: 0 none;
@@ -100,14 +99,15 @@ div.portlet-header img:hover, .highlightOn { opacity:1; }
 	opacity:0.8;
 }
 #metaRedditDialog .fg-button { float:none; }
-#metaRedditList li { cursor:pointer; float:left; padding:3px; width:200px; text-align:left; }
 #popupAdd {
 	display:inline-block; 
 	padding:2px; 
 	font-size:12px; 
 	position:absolute;	
 	z-index:20000;
+	width:300px;
 }
+input.ui-input-text, textarea.ui-input-text { width:83% !important; }
 .ad-thumbs { height:150px; }
 .vertical { position:absolute; top:5em; width:100%; z-index:100; }
 .vertical > .loader { z-index:100; }
@@ -148,7 +148,16 @@ div.portlet-header img:hover, .highlightOn { opacity:1; }
 
 .ad-preloads { display:none; }
 #showMore, #searchButton { height:31px; display:block; width:31px; margin:0; padding:0; }
-.moreText { font-size:11px; }
+.moreText { 
+	font-size:11px;
+  	height: 18px;
+    position: relative;
+    top: -5px;
+    width: 15%;
+}
+.readMore { height:18px; }
+.readMore div { display:inline-block; }
+.moreIcon { vertical-align:middle; margin-left:5px; }
 #searchField { float:left; }
 #customizeDialog { 
     border: 0 none;
@@ -187,7 +196,11 @@ div.portlet-header img:hover, .highlightOn { opacity:1; }
 .buttonBackground:hover div {
 	opacity:0.5; 
 }
+
 .ui-body-c {
 	background:none !important;
 	text-shadow:none !important;
 }
+
+.viewMoreList div { display:block; cursor:pointer;  }
+.viewMoreList .ui-state-active { color:yellow; }

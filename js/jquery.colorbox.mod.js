@@ -55,7 +55,7 @@
             }
         },  
         current: function(){  
-        	return $("#activeImageButtons").html();
+        	return $("#activeImageButtons").find("span").show().html();
         },
 		onCleanup: false,
 		onClosed: false,
@@ -161,6 +161,7 @@
 		settings.title = element.title; 
 		
 		for (i in settings) {
+			
 			if ($.isFunction(settings[i]) && i.substring(0, 2) !== 'on') { // checks to make sure the function isn't one of the callbacks, they will be handled at the appropriate time.
 			    settings[i] = settings[i].call(element);
 			}
