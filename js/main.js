@@ -308,6 +308,7 @@ var App = new(function () {
 				this.title = item.title;
 				this.thumbnail = item.thumbnail;
 				this.created = item.created;
+				this.id = item.id;
 				this.permalink = BASE_URL + item.permalink;
 				this.open = function () {
 					$.colorbox.setIndex(images.indexOf(this));
@@ -362,12 +363,25 @@ var App = new(function () {
 				// load the complete feed
 				loader.call(url, function (data) {
 
-					// populate each of the images into the imageBar
-					for (var index in data)
+					var profile = { "ids": [], url: url };
+
+					for (var index in data){
+						profile.ids.push(data[index].data.id);
 						isImage(data[index].data, function (cleanItem) {
 							images.push(new ImageBox(cleanItem));
-						})
+						});
+					}
+					
+					new self.AutoRefresh(profile, function(data){
+						console.log(data);
+						isImage(data, function (cleanItem) {
+							images.unshift(new ImageBox(cleanItem));
+							$.colorbox.incrementIndex();
+						});
+					}.bind(this));	
+					
 					self.imageBar.sortImagesByDate();
+					
 				}.bind(this));
 
 			}
@@ -377,119 +391,119 @@ var App = new(function () {
 			 */
 		var load = function () {
 
+			/*
+			 * Loads the default image section
+			 */
+			this.menu.addButton(saved_imagebar.split(","));
+			this.save();
+
+			/*
+			 * This provides the copy to share functionality
+			 */
+			$("a.copyLink").live("mouseover", function (e) {
+				var copyLink = $(e.target);
 				/*
-				 * Loads the default image section
+				 * needs to be recraeted everytime the image changes
 				 */
-				this.menu.addButton(saved_imagebar.split(","));
-				this.save();
-
-				/*
-				 * This provides the copy to share functionality
-				 */
-				$("a.copyLink").live("mouseover", function (e) {
-					var copyLink = $(e.target);
-					/*
-					 * needs to be recraeted everytime the image changes
-					 */
-					if (typeof clip == "undefined") {
-						ZeroClipboard.setMoviePath('ZeroClipboard.swf');
-						window.clip = new ZeroClipboard.Client();
-						clip.setHandCursor(true);
-						clip.addEventListener('onComplete', function () {
-							$("a.copyLink").html('copied');
-						}.bind(this));
-					}
-					/*
-					 * this piece moves the embed/object to over the link to make it clickable
-					 */
-					if (clip.div) {
-						clip.reposition(copyLink.get(0));
-					} else {
-						clip.glue(copyLink.get(0));
-					}
-					this.activeImage().setClipboardText();
-
-				}.bind(this));
-
-
-				$(document).ready(function () {
-					/*
-					 * the idea is to have adGallery monitor the selector rather than having to reinit it
-					 */
-					$("div.ad-gallery").adGallery();
-					/*
-					 * The following provides Facebook share functionality
-					 */
-					var e = document.createElement("script");
-					e.async = true;
-					e.onload = function () {
-						FB.init({
-							appId: "148360715252023",
-							status: true,
-							cookie: true,
-							xfbml: true
-						});
-					}
-					e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
-					document.getElementById("fb-root").appendChild(e);
-
-					$("#showMore").miniTip({
-					    title: "More Pics",
-					    content: $("#showMoreList").html(),
-					    event: "click",
-					    anchor: 's',
-					    render: function(){ ko.applyBindings(App); },
-					    aHide: false
-					})
-				});
-
-			}.bind(this);
-
-		var isImage = function (pic, callback) {
-				var regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif)$");
-				/*
-				 * Size formats used by Imgur to optimize imageBar loading
-				 */
-				var size = "m" //s-small, m-medium, l-large
-				/*
-				 * javascript.xml also found in the git repo, reads the mimetype of the file to determine if its an image
-				 */
-				var getHeaders = function (pic) {
-						var sql = "USE 'http://javarants.com/yql/javascript.xml' AS j;\
-                                   select content-type from j where code='response.object = y.rest(\"" + pic.url + "\").followRedirects(false).get().headers';";
-						var reqURL = "http://query.yahooapis.com/v1/public/yql?format=json&q=" + escape(sql);
-						$.ajax({
-							type: 'GET',
-							url: reqURL,
-							dataType: 'jsonp',
-							success: function (data) {
-								try {
-									if (data.query.results.result['content-type'].indexOf("image") >= 0) {
-										callback(pic);
-									}
-								} catch (e) {}
-							}
-						});
-					}
-				pic.thumbnail = pic.url;
-				/*
-				 * This part finds images that maybe i.imgur.com or imgur.com that dont have an extension and are not /a/ which are for albums
-				 * maybe in the future add support for getting the pics within an album using the official imgur api and retrieving it but for now ignore
-				 */
-				if (pic.url.indexOf("imgur.com/") >= 0 && pic.url.indexOf("imgur.com/a/") == -1 && !regex.exec(pic.url)) {
-					pic.url = pic.url + ".jpg";
+				if (typeof clip == "undefined") {
+					ZeroClipboard.setMoviePath('ZeroClipboard.swf');
+					window.clip = new ZeroClipboard.Client();
+					clip.setHandCursor(true);
+					clip.addEventListener('onComplete', function () {
+						$("a.copyLink").html('copied');
+					}.bind(this));
 				}
-				//change the url to thumbnails
-				if (pic.url.indexOf("imgur.com/") >= 0) {
-					var file = pic.url.split("/")[pic.url.split("/").length - 1].split(".");
-					pic.thumbnail = "http://imgur.com/" + file[0].substring(0, 5) + size + "." + (file[1] || "jpg");
-				}
-				if (regex.exec(pic.url)) {
-					callback(pic);
+				/*
+				 * this piece moves the embed/object to over the link to make it clickable
+				 */
+				if (clip.div) {
+					clip.reposition(copyLink.get(0));
 				} else {
-					getHeaders(pic, callback);
+					clip.glue(copyLink.get(0));
 				}
+				this.activeImage().setClipboardText();
+
+			}.bind(this));
+
+
+			$(document).ready(function () {
+				/*
+				 * the idea is to have adGallery monitor the selector rather than having to reinit it
+				 */
+				$("div.ad-gallery").adGallery();
+				/*
+				 * The following provides Facebook share functionality
+				 */
+				var e = document.createElement("script");
+				e.async = true;
+				e.onload = function () {
+					FB.init({
+						appId: "148360715252023",
+						status: true,
+						cookie: true,
+						xfbml: true
+					});
+				}
+				e.src = document.location.protocol + "//connect.facebook.net/en_US/all.js";
+				document.getElementById("fb-root").appendChild(e);
+
+				$("#showMore").miniTip({
+				    title: "More Pics",
+				    content: $("#showMoreList").html(),
+				    event: "click",
+				    anchor: 's',
+				    render: function(){ ko.applyBindings(App); },
+				    aHide: false
+				})
+			});
+
+		}.bind(this);
+		
+		var isImage = function (pic, callback) {
+			var regex = new RegExp("(.*?)\.(jpg|jpeg|png|gif)$");
+			/*
+			 * Size formats used by Imgur to optimize imageBar loading
+			 */
+			var size = "m" //s-small, m-medium, l-large
+			/*
+			 * javascript.xml also found in the git repo, reads the mimetype of the file to determine if its an image
+			 */
+			var getHeaders = function (pic) {
+				var sql = "USE 'http://javarants.com/yql/javascript.xml' AS j;\
+                           select content-type from j where code='response.object = y.rest(\"" + pic.url + "\").followRedirects(false).get().headers';";
+				var reqURL = "http://query.yahooapis.com/v1/public/yql?format=json&q=" + escape(sql);
+				$.ajax({
+					type: 'GET',
+					url: reqURL,
+					dataType: 'jsonp',
+					success: function (data) {
+						try {
+							if (data.query.results.result['content-type'].indexOf("image") >= 0) {
+								callback(pic);
+							}
+						} catch (e) {}
+					}
+				});
 			}
+			pic.thumbnail = pic.url;
+			/*
+			 * This part finds images that maybe i.imgur.com or imgur.com that dont have an extension and are not /a/ which are for albums
+			 * maybe in the future add support for getting the pics within an album using the official imgur api and retrieving it but for now ignore
+			 */
+			if (pic.url.indexOf("imgur.com/") >= 0 && pic.url.indexOf("imgur.com/a/") == -1 && !regex.exec(pic.url)) {
+				pic.url = pic.url + ".jpg";
+			}
+			//change the url to thumbnails
+			if (pic.url.indexOf("imgur.com/") >= 0) {
+				var file = pic.url.split("/")[pic.url.split("/").length - 1].split(".");
+				pic.thumbnail = "http://imgur.com/" + file[0].substring(0, 5) + size + "." + (file[1] || "jpg");
+			}
+			if (regex.exec(pic.url)) {
+				callback(pic);
+			} else {
+				getHeaders(pic, callback);
+			}
+		}
 
 		this.requestURL = function (name) {
 			var section = name || this.menu.activeButton().name;
@@ -713,6 +727,13 @@ var App = new(function () {
 							// set the last item field
 							// used for the next call; we continue loading content from this point on
 							this.last(newsItems()[newsItems().length - 1]);
+							var profile = { "ids": $.map(newsItems(), function(o){ return o.id; }), url: url };
+							
+							new self.AutoRefresh(profile, function(item){
+								console.log(item);
+								newsItems.unshift(new NewsItem(item));
+							}.bind(this));
+							
 						}.bind(this));
 					}.bind(this);
 
@@ -1133,20 +1154,35 @@ var App = new(function () {
 			$("input").textinput();
 			$.mobile.checkboxradio.prototype.enhanceWithin( $("fieldset.radioFieldset") );
 			$( ":jqmData(role='controlgroup')" ).controlgroup({ excludeInvisible: false });
-			//$("#popupAdd a[data-role=button]").buttonMarkup();
 		}
 	})()
-/*this.toString = function(){
-        return ko.toJSON({
-            background: {
-                color: this.background.color(),
-                image: this.background.image()
-            },
-            subreddits: this.getSubreddits().toStringArray(),
-            imageBar: this.imageBar.toStringArray(),
-            visitedLinks: this.visitedLinks.toString()
-        });
-    };*/
+
+	// Set URL of your WebSocketMain.swf here:
+	window.WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
+	// Set this to dump debug message from Flash to console.log:
+	window.WEB_SOCKET_DEBUG = false;		
+	
+	this.AutoRefresh = (function (profile, callback) {
+		var refresher = this;
+		var ws = new WebSocket("ws://richardp.co.cc:1228");
+		ws.onopen = function() {
+			console.log("on open sending profile")
+			ws.send(JSON.stringify(profile));											
+		}
+		ws.onmessage = function(e) { 
+			var data = {};
+			try {
+				data = JSON.parse(e.data);
+			}catch(err){
+				console.log(err);
+			} 
+			//console.log(e.data);
+			if (typeof data.message != 'undefined')
+				console.log(data.message)
+			if (typeof data.id != 'undefined')
+				callback(data);
+		}
+	})
 })();
 
 
@@ -1184,5 +1220,15 @@ ko.bindingHandlers.miniTipMore = {
 		})
 	}
 };
+
+/*ko.bindingHandlers.miniTipThumbnail = {
+	init: function (element, valueAccessor) {
+		$(element).miniTip({
+		    title: "Image Preview",
+		    content: $("<img>").attr({ "src":valueAccessor().url, "height": "120"}),
+		    render: function(){ ko.applyBindings(App); }
+		})
+	}
+};*/
 
 $(document).ready(App.init);

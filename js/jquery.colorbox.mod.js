@@ -821,7 +821,11 @@
 	publicMethod.setIndex = function(newIndex){
 		index = newIndex;
 	}
-
+	
+	publicMethod.incrementIndex = function(){
+		return index++;
+	}
+	
 	// Note: to use this within an iframe use the following format: parent.$.fn.colorbox.close();
 	publicMethod.close = function () {
 		if (open && !closing) {
