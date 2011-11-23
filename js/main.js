@@ -31,6 +31,7 @@ var App = new(function () {
 	this.init = function () {
 		$.get("templates.html", function (r) {
 			$("head").append(r);
+			ko.setTemplateEngine(new mustacheTemplateEngine());
 			ko.applyBindings(self);
 		});
 	};
@@ -525,9 +526,14 @@ var App = new(function () {
 					imagebar.save();
 				};
 
+				this.isFirst = function(){
+					return buttons.indexOf(this) == 0;	
+				}
+				
 				this.toString = function () {
 					return this.name;
 				};
+				
 			}
 
 			this.addButton = function (name) {
@@ -912,6 +918,10 @@ var App = new(function () {
 					this.amountVisible(this.amountVisible() + 10);
 					load();
 				};
+				
+				this.isFirst = function(){
+					return portlets.indexOf(this) == 0;	
+				}
 				
 				/*
 				 * Remove portlet

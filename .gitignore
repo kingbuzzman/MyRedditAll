@@ -6,6 +6,7 @@
 # windows 
 *.bak
 *.cfm
+dwsync.xml
 
 # everywhere
 *.swp

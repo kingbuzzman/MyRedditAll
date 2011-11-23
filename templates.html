@@ -1,44 +1,44 @@
 	<script id="imageButtonTemplate" type="text/html">
-		<button class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }" id="${ name }">${ name }</button>
+		<button class="changePic fg-button" data-bind="click: select, css: { 'ui-state-active': selected() }" id="{{ name }}">{{ name }}</button>
 	</script>
 
 	<script id="moreImageButtonTemplate" type="text/html">
 		<li data-bind="click: select">
-			${ name }
+			{{ name }}
 		</li>
 		<hr>
 	</script>
 
 	<script type="text/html" id="newsItemTemplate">
-		<li title="${ title }" data-bind="visible: isVisible()">
+		<li title="{{ title }}" data-bind="visible: isVisible()">
 			<div class="itemLICenter">
-				<a target="_blank" class="link" href="${ url }" data-bind="click: visitPage, css: { visited: visited }">${ text }</a>
+				<a target="_blank" class="link" href="{{ url }}" data-bind="click: visitPage, css: { visited: visited }">{{ text }}</a>
 			</div>
 			<div class="itemLIRight">
-				<a target="_blank" class="comment" href="${ permalink }" title="${ scoreTitle }">${ score }</a>
+				<a target="_blank" class="comment" href="{{ permalink }}" title="{{ scoreTitle }}">{{ score }}</a>
 			</div>
 		</li>
 	</script>
 
 	<script type="text/html" id="newsButtonTemplate">
 		{{each(index, name) subreddits.activeButtons()}}
-			<div title="${ name }" rel="${ name }" data-bind="click: setActive, css: { 'ui-state-active' : isActive() }">${ name }</div>
+			<div title="{{ name }}" rel="{{ name }}" data-bind="click: setActive, css: { 'ui-state-active' : isActive() }">{{ name }}</div>
 			<hr>
 		{{/each}}
 	</script>
-
+	<!-- , miniTipMore: portlet -->
 	<script id="subredditTemplate" type="text/html">
 		<div>
-			<div class="portlet ui-widget ui-widget-content ui-corner-all" title="${ name }">
+			<div class="portlet ui-widget ui-widget-content ui-corner-all" title="{{ name }}">
 				<div class="portlet-header ui-widget-header ui-corner-all">
-					<a href="${ url }" target="_blank">${ name }</a>
+					<a href="{{ url }}" target="_blank">{{ name }}</a>
 					<div class="portletButton buttonBackground" title="Minimize Section" data-bind="click: toggleMinimize">
 						<div style="background-color:#990000;">&nbsp;</div>
 					</div>	
 					<div class="portletButton buttonBackground" title="Toggle Visited" data-bind="click: toggleVisited, visible: !isMinimized(), css: { 'highlightOff': isShowingVisited(), 'highlightOn': !isShowingVisited() }">
 						<div style="background-color:#3A3A3A;">&nbsp;</div>
 					</div>
-					<div class="portletButton buttonBackground" title="View More" data-bind="click: setActive, visible: !isMinimized(), miniTipMore: $data">
+					<div class="portletButton buttonBackground" title="View More" data-bind="click: setActive, visible: !isMinimized()">
 						<div style="background-color:#000066;">&nbsp;</div>
 					</div>
 				</div>
@@ -55,21 +55,21 @@
 	</script>
 
 	<script type="text/html" id="orderPortletsTemplate">
-		{{if App.subreddits.getPortlets().indexOf($data) == 0}}
+		{{#isFirst}}
 			<li data-role="list-divider" data-dividertheme="a">News</li>
-		{{/if}}		
+		{{/isFirst}}
 		<li>
-			<a href="index.html">${ name }</a>
+			<a href="index.html">{{ name }}</a>
 			<a data-bind="click: remove" data-icon="delete">Sort</a>
 		</li>
 	</script>
 	
 	<script type="text/html" id="orderImagebarsTemplate">
-		{{if App.imageBar.menu.getButtons().indexOf($data) == 0}}
+		{{#isFirst}}
 			<li data-role="list-divider" data-dividertheme="a">Pics</li>
-		{{/if}}
+		{{/isFirst}}
 		<li>
-			<a href="index.html">${ name }</a>
+			<a href="index.html">{{ name }}</a>
 			<a data-bind="click: remove" data-icon="delete">Sort</a>
 		</li>
 	</script>	
@@ -78,21 +78,21 @@
 		<li data-bind="click: add">
 			<a href="#">
 				<img src="images/fileTypes/picture.png" alt="View" class="ui-li-icon">
-				<span>${$data.name}</span>
-				<span class="ui-li-count">${$data.count}</span>
+				<span>{{ name }}</span>
+				<span class="ui-li-count">{{ count }}</span>
 			</a>
 		</li>
 	</script>
 
 	<script id="loadMetaButtonTemplate" type="text/html">
-		<input type="radio" name="metaList" id="radio-choice-${$data.name}" value="${$data.name}" checked="checked"  data-bind="click: select"/>
-		<label for="radio-choice-${$data.name}">${$data.name}</label>
+		<input type="radio" name="metaList" id="radio-choice-{{ name }}" value="{{ name }}" checked="checked"  data-bind="click: select"/>
+		<label for="radio-choice-{{ name }}">{{ name }}</label>
 	</script>
 
 	<script type="text/html" id="imageBarTemplate">
 		<li>  
-			<a data-bind="attr:{ title: $data.title, href: $data.url }, click: open" rel="prettyPhoto[reddit]" target="_blank">
-				<img height="150" data-bind="attr: { src: $data.thumbnail }" onerror="$(this).parent().parent().remove()">
+			<a title="{{ title }}" href="{{ url }}" data-bind="click: open" rel="prettyPhoto[reddit]" target="_blank">
+				<img height="150" src="{{ thumbnail }}" onerror="$(this).parent().parent().remove()">
 			</a>
 		</li>
 	</script>
