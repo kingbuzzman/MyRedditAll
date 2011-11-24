@@ -204,3 +204,8 @@ input.ui-input-text, textarea.ui-input-text { width:83% !important; }
 
 .viewMoreList div { display:block; cursor:pointer;  }
 .viewMoreList .ui-state-active { color:yellow; }
+div.fg-buttonset .fg-button.ui-state-active { 
+	border: 1px solid #096AC8;
+    color: #75ABFF;
+    font-weight: bold;
+}

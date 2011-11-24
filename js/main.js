@@ -17,6 +17,8 @@ $( '#customize' ).live( 'pagecreate',function(event){
 	},2000);
 });
 
+var PhotoSwipe = window.Code.PhotoSwipe;
+
 /*
  * Setting wrapper
  * - handles all the that needs to persist
@@ -27,6 +29,17 @@ var App = new(function () {
 	 */
 	var self = this;
 	var BASE_URL = "http://www.reddit.com";
+	var agent = navigator.userAgent; 
+	var isWebkit = (agent.indexOf("AppleWebKit") > 0);
+	var isIPad = (agent.indexOf("iPad") > 0);
+	var isIOS = (agent.indexOf("iPhone") > 0 || agent.indexOf("iPod") > 0);
+	var isAndroid = (agent.indexOf("Android")  > 0);
+	var isNewBlackBerry = (agent.indexOf("AppleWebKit") > 0 && agent.indexOf("BlackBerry") > 0);
+	var isWebOS = (agent.indexOf("webOS") > 0);
+	var isWindowsMobile = (agent.indexOf("Windows Phone OS") > 0);
+	var isSmallScreen = (screen.width < 767 || (isAndroid && screen.width < 1000));
+	var isUnknownMobile = (isWebkit && isSmallScreen);
+	var isMobile = (isIOS || isAndroid || isNewBlackBerry || isWebOS || isWindowsMobile || isUnknownMobile);
 
 	this.init = function () {
 		$.get("templates.html", function (r) {
@@ -297,6 +310,7 @@ var App = new(function () {
 		var DEFAULT_IMAGE_BAR = "Pics,WTF,NSFW,Funny,F7U12,Bacon";
 		var STORAGE_KEY_NAME = "imagebar";
 		var images = ko.observableArray();
+		var overlays = ko.observableArray();
 		var IMAGES_PER_REQUEST = 100;
 		var saved_imagebar = $.jStorage.get(STORAGE_KEY_NAME, DEFAULT_IMAGE_BAR);
 		/*
@@ -305,77 +319,103 @@ var App = new(function () {
 		this.activeImage = ko.observable();
 
 		var ImageBox = function (item) {
-				this.href = item.url;
-				this.title = item.title;
-				this.thumbnail = item.thumbnail;
-				this.created = item.created;
-				this.permalink = BASE_URL + item.permalink;
-				this.open = function () {
-					$.colorbox.setIndex(images.indexOf(this));
+			var image = this;	
+			this.href = item.url;
+			this.title = item.title;
+			this.thumbnail = item.thumbnail;
+			this.created = item.created;
+			this.permalink = BASE_URL + item.permalink;
+			this.open = function () { 
+				var index = images.indexOf(this);
+				if( isMobile ){ 
+					instance.show(index);
+				}
+				else {
+					$.colorbox.setIndex(index);
 					$.colorbox({
 						href: this.href,
 						title: this.title
-					});
-					imagebar.activeImage(this);
+					});	
 				}
-				this.viewComment = function () {
-					window.open(this.permalink, '_blank');
-				}
-				this.viewOriginal = function () {
-					window.open(this.href, '_blank');
-				}
-				this.setClipboardText = function () {
-					clip.setText(this.title + ": " + this.href);
-				}
-				this.shareOnFacebook = function () {
-					FB.ui({
-						method: 'stream.publish',
-						display: 'popup',
-						message: 'gettingeducatedaboutFacebookConnect',
-						attachment: {
-							name: 'MyRedditAll.com',
-							caption: this.title,
-							description: "",
-							'media': [{
-								'type': 'image',
-								'src': this.href,
-								'href': this.href
-							}],
-							href: this.href
-						},
-						action_links: [{
-							text: 'Code',
-							href: this.href
-						}]
-					});
-				}
+				imagebar.activeImage(this);
 			}
+			this.viewComment = function () {
+				window.open(this.permalink, '_blank');
+			}
+			this.viewOriginal = function () {
+				window.open(this.href, '_blank');
+			}
+			this.setClipboardText = function () {
+				clip.setText(this.title + ": " + this.href);
+			}
+			this.shareOnFacebook = function () {
+				FB.ui({
+					method: 'stream.publish',
+					display: 'popup',
+					message: 'gettingeducatedaboutFacebookConnect',
+					attachment: {
+						name: 'MyRedditAll.com',
+						caption: this.title,
+						description: "",
+						'media': [{
+							'type': 'image',
+							'src': this.href,
+							'href': this.href
+						}],
+						href: this.href
+					},
+					action_links: [{
+						text: 'Code',
+						href: this.href
+					}]
+				});
+			}
+			
+			var Util = window.Code.Util;
+			//PhotoSwipe Class
+			image.__photoSwipeClickHandler = PhotoSwipe.onTriggerElementClick.bind(instance);
+			Util.Events.remove(image, 'click', image.__photoSwipeClickHandler);
+			Util.Events.add(image, 'click', image.__photoSwipeClickHandler);
+			instance.originalImages.push(image);
+			//Cache Class
+			src = instance.settings.getImageSource(image);
+			caption = instance.settings.getImageCaption(image);
+			metaData = instance.settings.getImageMetaData(image);
+			instance.cache.images.push(new PhotoSwipe.Image.ImageClass(image, src, caption, metaData));
+				
+		}
 
-			/*
-			 * removeAll can be used to load a new section, accepts parameter name to load a button that isnt in the list 
-			 * just to preview the section w/o commiting to add it
-			 */
-			this.loadImages = function (name) {
-				var url = this.requestURL(name);
 
-				images.removeAll();
+		/*
+		 * removeAll can be used to load a new section, accepts parameter name to load a button that isnt in the list 
+		 * just to preview the section w/o commiting to add it
+		 */
+		this.loadImages = function (name) {
+			var url = this.requestURL(name);
 
-				// load the complete feed
-				loader.call(url, function (data) {
+			images.removeAll();
 
-					// populate each of the images into the imageBar
-					for (var index in data)
-						isImage(data[index].data, function (cleanItem) {
-							images.push(new ImageBox(cleanItem));
-						})
+			// load the complete feed
+			loader.call(url, function (data) {
+
+				// populate each of the images into the imageBar
+				for (var index in data){
+					isImage(data[index].data, function (cleanItem) {
+						images.push(new ImageBox(cleanItem));
+					})
+				}
+				/*
+					this is a temporary hack because of the way photoswipe works, need to figure out a way to improve this
+				*/	
+				if (!isMobile)
 					self.imageBar.sortImagesByDate();
-				}.bind(this));
+			}.bind(this));
 
-			}
+		}
 
-			/*
-			 * Loads the content for the active image button
-			 */
+		/*
+		 * Loads the content for the active image button
+		 */
 		var load = function () {
 
 				/*
@@ -441,7 +481,21 @@ var App = new(function () {
 					    anchor: 's',
 					    render: function(){ ko.applyBindings(App); },
 					    aHide: false
-					})
+					});
+					
+					window.instance = PhotoSwipe.attach(
+						[ ], //empty array gets added by liveQuery
+						{
+							getImageSource: function(el){
+								return el.href;
+							},
+							getImageCaption: function(el){
+								return el.title;
+							},
+							cacheMode: Code.PhotoSwipe.Cache.Mode.aggressive
+						}
+					);
+									
 				});
 
 			}.bind(this);
