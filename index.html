@@ -40,29 +40,37 @@
 	</head>
 
 	<body data-bind="style: { backgroundColor: settings.background.isColorSet()? settings.background.color(): '', backgroundImage: !settings.background.isColorSet()? 'url(' + settings.background.image() + ')': '' }">
-
 		<div data-role="page" id="main-page">
 			<div id="container" data-role="none">
 				<div class="ad-gallery">
 					<div class="ad-nav">
-						<div class="ad-thumbs">
-							<div class="vertical" data-bind="visible: !imageBar.hasImages()">
-								<div class="loader"></div>
-							</div>
+						<div class="ad-thumbs" id="ad-thumbs">
 							<ul class="ad-thumb-list" data-bind="template: { name: 'imageBarTemplate', foreach: imageBar.getImages(), visible: imageBar.hasImages() }"></ul>
 						</div>
 					</div>
 				</div>
 
 				<h2 id="customizeStrip" class="portlet ui-widget-content ui-helper-clearfix ui-corner-all" data-role="none">
-					<span class="cufonize">Live Dangerously?</span>
-					<a href="#customize" data-transition="pop" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
-					<div class="fg-buttonset fg-buttonset-single" style="float: right; margin-top:0px; margin-right:1px">
-						<span data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.getFrontPage() }"></span>
-						<div data-bind="visible: imageBar.menu.populatedMenu()" class="buttonBackground" id="showMore">
-							<div style="background-color:#99FF44;">&nbsp;</div>
-						</div>
-					</div>
+					<div class="ui-grid-a">
+                        <div class="ui-block-a" style="min-width:320px;">
+                            <span class="tagLine">Live Dangerously?</span>
+                            <a href="#customize" data-transition="pop" class="cufonize" style="color:#9F4">Customize&nbsp;This</a>
+                        </div>
+                        <div class="ui-block-b" style="text-align:right;">
+							<div class="fg-buttonset fg-buttonset-single" style="display:inline-block; margin-top:0px; margin-right:1px">
+                            	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+                                    <tr>
+                                        <td><span class="frontPageButtons" data-bind="template: { name: 'imageButtonTemplate', foreach: imageBar.menu.getFrontPage() }"></span></td>
+                                        <td>
+                                            <span data-bind="visible: imageBar.menu.populatedMenu()" class="buttonBackground" id="showMore">
+                                                <div style="background-color:#99FF44;">&nbsp;</div>
+                                            </span>        
+                                        </td>
+                                    </tr>
+                                </table>                                
+                            </div>
+                        </div>
+                    </div>
 				</h2>
 				<div id="newsSection" data-bind="template: { name: 'subredditTemplate', foreach: subreddits.getPortlets() }, sortableList: subreddits.getSubreddits().getPortlets()" data-role="none"></div>
 			</div>
@@ -136,7 +144,7 @@
 				<ul id="showMoreUL" data-bind="template: { name: 'moreImageButtonTemplate', foreach: imageBar.menu.get() }"></ul>
 			</div>
 			<div id="viewMoreList" style="display:none;">
-				<div data-bind="template: { name: 'newsButtonTemplate', value: subreddits.activeButtons }" class="viewMoreList"></div>
+				<div data-bind="template: { name: 'newsButtonTemplate', foreach: subreddits.activeButtons() }" class="viewMoreList"></div>
 			</div>
 		</div>
 	</body>

@@ -317,6 +317,7 @@
           	  anchor: 's',
           	  title: $("#activeImageButtons").html()
           });
+
           var link = false;
           if(thumb.data('ad-link')) {
             link = thumb.data('ad-link');

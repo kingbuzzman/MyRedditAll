@@ -7,6 +7,20 @@ h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
 		-moz-column-count: 3; -webkit-column-count: 3;
     }
 }
+@media screen and (max-width: 655px) {
+	.frontPageButtons button {
+		display:none;	
+	}
+	.ui-block-b {
+		width:auto !important;
+		float:right !important;
+	}
+}
+@media screen and (min-width: 370px) {
+	.tagLine {
+		display:none;	
+	}
+}
 body, .ui-widget, #customize {
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 }
@@ -135,7 +149,7 @@ input.ui-input-text, textarea.ui-input-text { width:83% !important; }
     font-size: 20px;
     height: 31px;
     margin: 5px 0 10px;
-    padding: 0 0 0 10px;
+    padding: 0 0 0 5px;
 }
 
 .imgLoader {
@@ -147,7 +161,7 @@ input.ui-input-text, textarea.ui-input-text { width:83% !important; }
 #customizeHeader { cursor:move; }
 
 .ad-preloads { display:none; }
-#showMore, #searchButton { height:31px; display:block; width:31px; margin:0; padding:0; }
+#showMore, #searchButton { height:31px; width:31px; margin:0; padding:0; }
 .moreText { 
 	font-size:11px;
   	height: 18px;
@@ -185,6 +199,7 @@ input.ui-input-text, textarea.ui-input-text { width:83% !important; }
 	width:30px;
 	height:31px;
 	float:right;
+	display:inline;
 }
 .buttonBackground {
 	background:url(../images/headersBG.png) repeat scroll 50% 50% transparent;
