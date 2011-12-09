@@ -170,7 +170,7 @@ input.ui-input-text, textarea.ui-input-text { width:83% !important; }
     width: 15%;
 }
 .readMore { height:18px; }
-.readMore div { display:inline-block; }
+.readMore div { display:inline-block; white-space:nowrap; }
 .moreIcon { vertical-align:middle; margin-left:5px; }
 #searchField { float:left; }
 #customizeDialog { 
