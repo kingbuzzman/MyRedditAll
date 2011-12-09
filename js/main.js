@@ -497,10 +497,7 @@ var App = new(function () {
 						})	
 					}
 					else {
-						$("#ad-thumbs")
-							.append('<div class="vertical" data-bind="visible: !imageBar.hasImages()">\
-								<div class="loader"></div>\
-							</div>');
+						$("#ad-thumbs").append('<div class="vertical" data-bind="visible: !imageBar.hasImages()"><div class="loader"></div></div>');
 						$("div.ad-gallery").adGallery();	
 					}
 						
@@ -543,8 +540,7 @@ var App = new(function () {
 				 * javascript.xml also found in the git repo, reads the mimetype of the file to determine if its an image
 				 */
 				var getHeaders = function (pic) {
-						var sql = "USE 'http://javarants.com/yql/javascript.xml' AS j;\
-                                   select content-type from j where code='response.object = y.rest(\"" + pic.url + "\").followRedirects(false).get().headers';";
+						var sql = "USE 'http://javarants.com/yql/javascript.xml' AS j; select content-type from j where code='response.object = y.rest(\"" + pic.url + "\").followRedirects(false).get().headers';";
 						var reqURL = "http://query.yahooapis.com/v1/public/yql?format=json&q=" + escape(sql);
 						$.ajax({
 							type: 'GET',
