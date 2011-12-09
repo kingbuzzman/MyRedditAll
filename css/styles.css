@@ -15,9 +15,9 @@ h2 { padding:0px 5px; clear: both; padding-top:1.5em; margin-top:0; }
 		width:auto !important;
 		float:right !important;
 	}
-}
+} 
 @media screen and (min-width: 370px) {
-	.tagLine {
+	.tagLine { 
 		display:none;	
 	}
 }
@@ -73,14 +73,14 @@ button.fg-button { width:auto; overflow:visible; }
  * Overwrite for having a carousel with dynamic width.
  */
 .ui-dialog .ui-dialog-content { overflow:visible; }
-.ui-dialog-titlebar  { padding:0 !important; padding-left:0.3em !important; }
+.ui-dialog-titlebar  { padding:0 !important; padding-left:0.3em !important; } 
 
 
 .ui-dialog .ui-dialog-content { overflow:visible; }
 .portlet-header {  border:none !important; }
 #main-page div.portlet-header a {
     color: #EEEEEE;
-    font-size: 24px;
+    font-size: 24px; 
     font-weight: normal;
     line-height: 35px;
 }
