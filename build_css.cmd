@@ -1,2 +1,2 @@
 ECHO compass compile .
-packer -o res\main.css -m cssmin css\*.css
+packer -o ..\res\main.css -m cssmin *.css
