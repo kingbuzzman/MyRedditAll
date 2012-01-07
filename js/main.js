@@ -373,7 +373,6 @@ var App = new(function () {
 					}
 					
 					self.AutoRefresh.add(profile, function(data){
-						console.log(data);
 						isImage(data, function (cleanItem) {
 							images.unshift(new ImageBox(cleanItem));
 							$.colorbox.incrementIndex();
