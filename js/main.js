@@ -356,14 +356,14 @@ var App = new(function () {
 			 * just to preview the section w/o commiting to add it
 			 */
 			this.loadImages = function (name) {
-				var url = this.requestURL(name);
 
+				var url = this.requestURL(name);
 				images.removeAll();
 
 				// load the complete feed
 				loader.call(url, function (data) {
 
-					var profile = { "ids": [], url: url };
+					var profile = { "ids": [], name: this.menu.activeButton().name };
 
 					for (var index in data){
 						profile.ids.push(data[index].data.id);
@@ -372,7 +372,7 @@ var App = new(function () {
 						});
 					}
 					
-					new self.AutoRefresh(profile, function(data){
+					self.AutoRefresh.add(profile, function(data){
 						console.log(data);
 						isImage(data, function (cleanItem) {
 							images.unshift(new ImageBox(cleanItem));
@@ -722,17 +722,16 @@ var App = new(function () {
 
 							// populate each of the news item inside the portlet
 							for (var index in data)
-							newsItems.push(new NewsItem(data[index].data));
+								newsItems.push(new NewsItem(data[index].data));
 
 							// set the last item field
 							// used for the next call; we continue loading content from this point on
 							this.last(newsItems()[newsItems().length - 1]);
-							var profile = { "ids": $.map(newsItems(), function(o){ return o.id; }), url: url };
+							var profile = { "ids": $.map(newsItems(), function(o){ return o.id; }), name: portlet.name };
 							
-							new self.AutoRefresh(profile, function(item){
-								console.log(item);
+							self.AutoRefresh.add(profile, function(item){
 								newsItems.unshift(new NewsItem(item));
-							}.bind(this));
+							}.bind(this))
 							
 						}.bind(this));
 					}.bind(this);
@@ -1155,33 +1154,33 @@ var App = new(function () {
 			$.mobile.checkboxradio.prototype.enhanceWithin( $("fieldset.radioFieldset") );
 			$( ":jqmData(role='controlgroup')" ).controlgroup({ excludeInvisible: false });
 		}
-	})()
-
-	// Set URL of your WebSocketMain.swf here:
-	window.WEB_SOCKET_SWF_LOCATION = "WebSocketMain.swf";
-	// Set this to dump debug message from Flash to console.log:
-	window.WEB_SOCKET_DEBUG = false;		
+	})()	
 	
-	this.AutoRefresh = (function (profile, callback) {
-		var refresher = this;
-		var ws = new WebSocket("ws://richardp.co.cc:1228");
-		ws.onopen = function() {
-			console.log("on open sending profile")
-			ws.send(JSON.stringify(profile));											
+	this.AutoRefresh = new (function () {
+		var ar = this;
+		this.registry = {}
+		
+		this.add = function(profile, callback){
+			ar.registry[profile.name.toLowerCase()] = {
+				ids: profile.ids,
+				callback: callback,
+				name: profile.name
+			}
+			//console.log("subscribing to " + profile.name)
+			redditlive.on('connect', function () {
+			    redditlive.subscribe([ profile.name ]);
+			});			
 		}
-		ws.onmessage = function(e) { 
-			var data = {};
-			try {
-				data = JSON.parse(e.data);
-			}catch(err){
-				console.log(err);
-			} 
-			//console.log(e.data);
-			if (typeof data.message != 'undefined')
-				console.log(data.message)
-			if (typeof data.id != 'undefined')
-				callback(data);
-		}
+		
+		redditlive.on('post', function (post) {
+			var profile = ar.registry[post.subreddit.toLowerCase()];
+			if (!profile.ids[post.id]){
+				//console.log('Article Added to: ' + profile.name + " " + post.title)
+				profile.callback(post)
+			}
+		});
+		
+		redditlive.connect();
 	})
 })();
 
