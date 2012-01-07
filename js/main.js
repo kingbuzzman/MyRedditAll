@@ -29,13 +29,14 @@ var App = new(function () {
 	 */
 	var self = this;
 	var BASE_URL = "http://www.reddit.com";
-	var agent = navigator.userAgent; 
+	var agent = navigator.userAgent;  
 	var isWebkit = (agent.indexOf("AppleWebKit") > 0);
 	var isIPad = (agent.indexOf("iPad") > 0);
 	var isIOS = (agent.indexOf("iPhone") > 0 || agent.indexOf("iPod") > 0);
 	var isAndroid = (agent.indexOf("Android")  > 0);
 	var isNewBlackBerry = (agent.indexOf("AppleWebKit") > 0 && agent.indexOf("BlackBerry") > 0);
-	var isWebOS = (agent.indexOf("webOS") > 0);
+	var isWebOS = (agent.indexOf("webOS") > 0 || agent.indexOf("wOSBrowser") > 0);
+	
 	var isWindowsMobile = (agent.indexOf("Windows Phone OS") > 0);
 	var isSmallScreen = (screen.width < 767 || (isAndroid && screen.width < 1000));
 	var isUnknownMobile = (isWebkit && isSmallScreen);
@@ -371,18 +372,19 @@ var App = new(function () {
 				});
 			}
 			
-			var Util = window.Code.Util;
-			//PhotoSwipe Class
-			image.__photoSwipeClickHandler = PhotoSwipe.onTriggerElementClick.bind(instance);
-			Util.Events.remove(image, 'click', image.__photoSwipeClickHandler);
-			Util.Events.add(image, 'click', image.__photoSwipeClickHandler);
-			instance.originalImages.push(image);
-			//Cache Class
-			src = instance.settings.getImageSource(image);
-			caption = instance.settings.getImageCaption(image);
-			metaData = instance.settings.getImageMetaData(image);
-			instance.cache.images.push(new PhotoSwipe.Image.ImageClass(image, src, caption, metaData));
-				
+			if (isMobile){
+				var Util = window.Code.Util;
+				//PhotoSwipe Class
+				image.__photoSwipeClickHandler = PhotoSwipe.onTriggerElementClick.bind(instance);
+				Util.Events.remove(image, 'click', image.__photoSwipeClickHandler);
+				Util.Events.add(image, 'click', image.__photoSwipeClickHandler);
+				instance.originalImages.push(image);
+				//Cache Class
+				src = instance.settings.getImageSource(image);
+				caption = instance.settings.getImageCaption(image);
+				metaData = instance.settings.getImageMetaData(image);
+				instance.cache.images.push(new PhotoSwipe.Image.ImageClass(image, src, caption, metaData));				
+			} 
 		}
 
 
@@ -397,18 +399,53 @@ var App = new(function () {
 
 			// load the complete feed
 			loader.call(url, function (data) {
+				
+				if (isMobile){
+					if (typeof window.instance != "undefined" && window.instance != null) {
+						PhotoSwipe.detatch(window.instance);
+						window.instance = null;
+					}
+					window.instance = PhotoSwipe.attach(
+						[ ], //empty array gets added by liveQuery
+						{
+							getImageSource: function(el){
+								return el.href;
+							},
+							getImageCaption: function(el){
+								return el.title;
+							},
+							cacheMode: Code.PhotoSwipe.Cache.Mode.aggressive
+						}
+					);		
+				}
 
-				// populate each of the images into the imageBar
+				var profile = { "ids": [], name: this.menu.activeButton().name };
+
 				for (var index in data){
+					profile.ids.push(data[index].data.id);
 					isImage(data[index].data, function (cleanItem) {
 						images.push(new ImageBox(cleanItem));
-					})
+					});
 				}
+				
+				self.AutoRefresh.add(profile, function(data){
+					isImage(data, function (cleanItem) {
+						images.unshift(new ImageBox(cleanItem));
+						$.colorbox.incrementIndex();
+					});
+				}.bind(this));	
 				/*
 					this is a temporary hack because of the way photoswipe works, need to figure out a way to improve this
 				*/	
 				if (!isMobile)
 					self.imageBar.sortImagesByDate();
+					
+				if (isMobile){
+					setTimeout(function () {
+						window.iScroller.refresh();	
+					}, 0);
+				}
+					
 			}.bind(this));
 
 		}
@@ -457,7 +494,25 @@ var App = new(function () {
 					/*
 					 * the idea is to have adGallery monitor the selector rather than having to reinit it
 					 */
-					$("div.ad-gallery").adGallery();
+					if (isMobile){
+						//TODO fix the window. scoping
+						window.iScroller = new iScroll('ad-thumbs', {
+							hScroll: true,
+							hScrollbar: false,
+							vScroll: false,
+							vScrollbar: false,
+							momentum: true,
+							fadeScrollbar: false
+						})	
+					}
+					else {
+						$("#ad-thumbs")
+							.append('<div class="vertical" data-bind="visible: !imageBar.hasImages()">\
+								<div class="loader"></div>\
+							</div>');
+						$("div.ad-gallery").adGallery();	
+					}
+						
 					/*
 					 * The following provides Facebook share functionality
 					 */
@@ -481,21 +536,8 @@ var App = new(function () {
 					    anchor: 's',
 					    render: function(){ ko.applyBindings(App); },
 					    aHide: false
-					});
+					});					
 					
-					window.instance = PhotoSwipe.attach(
-						[ ], //empty array gets added by liveQuery
-						{
-							getImageSource: function(el){
-								return el.href;
-							},
-							getImageCaption: function(el){
-								return el.title;
-							},
-							cacheMode: Code.PhotoSwipe.Cache.Mode.aggressive
-						}
-					);
-									
 				});
 
 			}.bind(this);
@@ -627,7 +669,7 @@ var App = new(function () {
 			 * returns string[] of those buttons that should appear in the drop-down list
 			 */
 			this.get = ko.dependentObservable(function () {
-				return buttons().slice(MAX_IMAGE_BAR_BUTTONS, buttons().length);
+				return buttons().slice(isMobile ? 0 : MAX_IMAGE_BAR_BUTTONS, buttons().length);
 			}.bind(this));
 
 			this.activeButton = function () {
@@ -637,7 +679,7 @@ var App = new(function () {
 			this.getButtons = function () {
 				return buttons();
 			}
-
+			
 		})();
 
 		/*
@@ -721,14 +763,15 @@ var App = new(function () {
 		this.activeButtons = ko.observableArray();
 		
 		var load = function () {
-			/*$("#newsSection div.viewMore").livequery(function(){
+			$("div.viewMore").livequery(function(e){
 				$(this).miniTip({
-				    title: "View More",
-				    content: "Hot <hr> New <hr> Top <hr> Controversial",
-				    event: "click",
-				    aHide: false
+					title: "View More",
+					content: $("#viewMoreList").html(),
+					render: function(){ ko.applyBindings(App); },
+					event: "click",
+					aHide: false
 				})
-			})*/
+			});
 			this.addPortlet(saved_subreddits.split(","));
 			this.save();
 		}.bind(this);
@@ -773,6 +816,13 @@ var App = new(function () {
 							// set the last item field
 							// used for the next call; we continue loading content from this point on
 							this.last(newsItems()[newsItems().length - 1]);
+							
+							var profile = { "ids": $.map(newsItems(), function(o){ return o.id; }), name: portlet.name };
+							
+							self.AutoRefresh.add(profile, function(item){
+								newsItems.unshift(new NewsItem(item));
+							}.bind(this))
+							
 						}.bind(this));
 					}.bind(this);
 
@@ -1200,17 +1250,34 @@ var App = new(function () {
 			//$("#popupAdd a[data-role=button]").buttonMarkup();
 		}
 	})()
-/*this.toString = function(){
-        return ko.toJSON({
-            background: {
-                color: this.background.color(),
-                image: this.background.image()
-            },
-            subreddits: this.getSubreddits().toStringArray(),
-            imageBar: this.imageBar.toStringArray(),
-            visitedLinks: this.visitedLinks.toString()
-        });
-    };*/
+	
+	this.AutoRefresh = new (function () {
+		var ar = this;
+		this.registry = {}
+		
+		this.add = function(profile, callback){
+			ar.registry[profile.name.toLowerCase()] = {
+				ids: profile.ids,
+				callback: callback,
+				name: profile.name
+			}
+			//console.log("subscribing to " + profile.name)
+			redditlive.on('connect', function () {
+			    redditlive.subscribe([ profile.name ]);
+			});			
+		}
+		
+		redditlive.on('post', function (post) {
+			var profile = ar.registry[post.subreddit.toLowerCase()];
+			if (!profile.ids[post.id]){
+				//console.log('Article Added to: ' + profile.name + " " + post.title)
+				profile.callback(post)
+			}
+		});
+		
+		redditlive.connect();
+	})	
+
 })();
 
 
