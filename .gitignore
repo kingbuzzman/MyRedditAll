@@ -1,29 +1,29 @@
+*.swp
+bower_components/
+node_modules/
+.sass-cache/
+
 # mac
+.DS_Store
 *.orig
 *.tmp_*
 
-# windows 
+# windows
 *.bak
-*.cfm
-dwsync.xml
-
-# everywhere
-*.swp
-.sass-cache/*
 *.cmd
+dwsync.xml
 
 # Logs and databases #
 ######################
 *.log
 *.sql
 *.sqlite
+*.db
 
 # OS generated files #
 ######################
-.DS_Store*
-ehthumbs.db
 Icon?
-Thumbs.db
 
 # Private Files
 private.js
+*.cfm
