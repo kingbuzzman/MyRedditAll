@@ -1,0 +1,17 @@
+{
+  "name": "myredditall",
+  "author": "Richard Pinedo, Javier Buzzi",
+  "dependencies": {
+    "grunt": ">= 0.4.5",
+    "grunt-cli": ">= 0.1.13",
+    "grunt-haml": ">= 0.9.0",
+    "grunt-contrib-connect": ">= 0.7.1",
+    "grunt-contrib-watch": ">= 0.6.1",
+    "grunt-contrib-coffee": ">= 0.10.1",
+
+    "bower": ">= 1.3.3",
+
+    "coffee-script": ">= 1.7.1"
+  },
+  "engine": "node 0.10.26"
+}

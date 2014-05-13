@@ -2,6 +2,13 @@ h1. MyRedditAll
 
 Write good code; fix bad code.
 
+h2. Dev environment
+UNIX:
+`. activate.sh`
+`grunt dev`
+
+Windows: *TODO*
+
 h2. TODO list
 
 * zoom in image like imgur
