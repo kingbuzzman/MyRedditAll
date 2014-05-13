@@ -83,6 +83,15 @@ module.exports = function(grunt) {
         ext: '.js'
       },
 
+      views: {
+        expand: true,
+        flatten: true,
+        cwd: './coffee/views',
+        src: ['*.coffee'],
+        dest: '.js/views',
+        ext: '.js'
+      },
+
       models: {
         expand: true,
         flatten: true,
@@ -100,7 +109,7 @@ module.exports = function(grunt) {
       },
 
       js: {
-        files: ['coffee/*.coffee', 'coffee/collections/*.coffee', 'coffee/models/*.coffee'],
+        files: ['coffee/*.coffee', 'coffee/collections/*.coffee', 'coffee/models/*.coffee', 'coffee/views/*.coffee'],
         tasks: ['coffee'],
         options: {
           spawn: false,

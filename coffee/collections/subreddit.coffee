@@ -3,30 +3,30 @@ define [
   'jquery'
   'models/subreddit'
 ], (Backbone, $, SubRedditModel) ->
-  class SubReddit extends Backbone.Collection
+  class SubRedditCollection extends Backbone.Collection
     model: SubRedditModel
+    limit: 10
 
-    constructor: (subreddit) ->
-      @subreddit = subreddit
-      @last = null
+    constructor: (name) ->
+      @name = name
+      @after = null
 
       super null, {}
       return
 
     url: () ->
-      return "http://www.reddit.com/r/#{@subreddit}.json"
+      return "http://www.reddit.com/r/#{@name}.json?limit=#{@limit}&after=#{@after or ''}"
 
     sync: (method, model, options) ->
       options = _.extend
         type: 'GET'
         dataType: 'json'
-        data:
-          limit: 10
-          after: @last or ''
       , options
 
       return super method, model, options
 
     parse: (resp, options) ->
-      @last = resp.data.after
+      if @last isnt resp.data.after
+        @after = resp.data.after
+        @trigger 'change:after', @after, @
       return resp.data.children
