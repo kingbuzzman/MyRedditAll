@@ -10,17 +10,30 @@
     %meta{content: "width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0", name: "viewport"}
 
     %link{href: "images/favicon.ico", rel: "shortcut icon", type: "image/x-icon"}
-    %link{href: "css/styles.css", media: "screen", rel: "stylesheet", type: "text/css"}
+    %link{href: "css/main.css", media: "screen", rel: "stylesheet", type: "text/css"}
 
     %script{src: "/bower_components/requirejs/require.js", "data-main": "/js/dev", type: "text/javascript"}
 
   %body
-    #main-page
-      #container
-        .ad-gallery
-          .ad-nav
-            .ad-thumbs
-              .vertical
-                .loader
-              %ul.ad-thumb-list
-        #newsSection
+    %header
+
+    %nav
+      %ul
+        %li
+          %a Pics
+        %li
+          %a Funny
+        %li
+          %a NSFW
+        %li
+          %a WTF
+
+    %main
+      %article
+        %header Pic
+        %ul
+          %li
+            %a.title dude
+            %a.rating %60
+
+    %footer

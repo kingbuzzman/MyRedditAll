@@ -19,6 +19,14 @@ module.exports = function(grunt) {
             return path.replace(/haml\//, '').replace(/\.haml$/, '');
           }
         })
+      },
+
+      includes: {
+        files: grunt.file.expandMapping(['./haml/includes/*.haml'], '.', {
+          rename: function(base, path) {
+            return path.replace(/haml\//, '').replace(/\.haml$/, '');
+          }
+        })
       }
     },
 
