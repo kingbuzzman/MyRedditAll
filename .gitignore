@@ -1,7 +1,12 @@
 *.swp
+*.xml
 bower_components/
 node_modules/
 .sass-cache/
+.css/
+.html/
+.js/
+dist/
 
 # mac
 .DS_Store
@@ -11,19 +16,4 @@ node_modules/
 # windows
 *.bak
 *.cmd
-dwsync.xml
-
-# Logs and databases #
-######################
-*.log
-*.sql
-*.sqlite
-*.db
-
-# OS generated files #
-######################
 Icon?
-
-# Private Files
-private.js
-*.cfm

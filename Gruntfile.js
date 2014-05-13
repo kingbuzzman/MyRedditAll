@@ -1,9 +1,27 @@
 module.exports = function(grunt) {
+  var fs = require('fs');
+
   grunt.loadNpmTasks('grunt-haml');
   grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
+
+  function setUpDevelopment() {
+    if (grunt.file.exists('dist')) {
+      grunt.file.delete('dist');
+    }
+
+    grunt.file.mkdir('dist');
+    fs.symlinkSync('../images', 'dist/images', 'dir');
+    fs.symlinkSync('../.css', 'dist/css', 'dir');
+    fs.symlinkSync('../.js', 'dist/js', 'dir');
+    fs.symlinkSync('../.html/includes', 'dist/includes', 'dir');
+    fs.symlinkSync('../.html/index.html', 'dist/index.html', 'file');
+    fs.symlinkSync('../bower_components', 'dist/bower_components', 'dir');
+  }
+
+  setUpDevelopment();
 
   grunt.initConfig({
     pkg: require('./package.json'),
@@ -14,17 +32,17 @@ module.exports = function(grunt) {
       },
 
       dist: {
-        files: grunt.file.expandMapping(['./haml/*.haml'], '.', {
+        files: grunt.file.expandMapping(['haml/*.haml'], '.html/', {
           rename: function(base, path) {
-            return path.replace(/haml\//, '').replace(/\.haml$/, '');
+            return base + path.replace(/haml\//, '').replace(/\.haml$/, '');
           }
         })
       },
 
       includes: {
-        files: grunt.file.expandMapping(['./haml/includes/*.haml'], '.', {
+        files: grunt.file.expandMapping(['haml/includes/*.haml'], '.html/', {
           rename: function(base, path) {
-            return path.replace(/haml\//, '').replace(/\.haml$/, '');
+            return base + path.replace(/haml\//, '').replace(/\.haml$/, '');
           }
         })
       }
@@ -37,7 +55,7 @@ module.exports = function(grunt) {
         },
 
         files: {
-          'css/main.css': 'scss/main.scss'
+          '.css/main.css': 'scss/main.scss'
         }
       }
     },
@@ -52,7 +70,7 @@ module.exports = function(grunt) {
         flatten: true,
         cwd: './coffee/',
         src: ['*.coffee'],
-        dest: 'js/',
+        dest: '.js/',
         ext: '.js'
       },
 
@@ -61,7 +79,7 @@ module.exports = function(grunt) {
         flatten: true,
         cwd: './coffee/collections',
         src: ['*.coffee'],
-        dest: 'js/collections',
+        dest: '.js/collections',
         ext: '.js'
       },
 
@@ -70,7 +88,7 @@ module.exports = function(grunt) {
         flatten: true,
         cwd: './coffee/models',
         src: ['*.coffee'],
-        dest: 'js/models',
+        dest: '.js/models',
         ext: '.js'
       }
     },
@@ -111,7 +129,7 @@ module.exports = function(grunt) {
         options: {
           port: 8000,
           debug: true,
-          base: '.'
+          base: 'dist'
         }
       }
     }
