@@ -1,0 +1,26 @@
+!!!
+%html
+  %head
+    %title MyRedditAll
+
+    %meta{charset: "UTF-8"}
+    %meta{content: "yes", name: "apple-mobile-web-app-capable"}
+    %meta{content: "white", name: "apple-mobile-web-app-status-bar-style"}
+    %meta{content: "telephone=no", name: "format-detection"}
+    %meta{content: "width=device-width, user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0", name: "viewport"}
+
+    %link{href: "images/favicon.ico", rel: "shortcut icon", type: "image/x-icon"}
+    %link{href: "css/styles.css", media: "screen", rel: "stylesheet", type: "text/css"}
+
+    %script{src: "/bower_components/requirejs/require.js", "data-main": "/js/dev", type: "text/javascript"}
+
+  %body
+    #main-page
+      #container
+        .ad-gallery
+          .ad-nav
+            .ad-thumbs
+              .vertical
+                .loader
+              %ul.ad-thumb-list
+        #newsSection
