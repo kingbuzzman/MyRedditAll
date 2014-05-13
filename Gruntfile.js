@@ -8,6 +8,10 @@ module.exports = function(grunt) {
     pkg: require('./package.json'),
 
     haml: {
+      options: {
+        language: 'coffee'
+      },
+
       dist: {
         files: grunt.file.expandMapping(['./haml/*.haml'], '.', {
           rename: function(base, path) {
@@ -22,12 +26,30 @@ module.exports = function(grunt) {
         bare: true,
       },
 
-      dist: {
+      root: {
         expand: true,
         flatten: true,
-        cwd: './coffee',
+        cwd: './coffee/',
         src: ['*.coffee'],
         dest: 'js/',
+        ext: '.js'
+      },
+
+      collections: {
+        expand: true,
+        flatten: true,
+        cwd: './coffee/collections',
+        src: ['*.coffee'],
+        dest: 'js/collections',
+        ext: '.js'
+      },
+
+      models: {
+        expand: true,
+        flatten: true,
+        cwd: './coffee/models',
+        src: ['*.coffee'],
+        dest: 'js/models',
         ext: '.js'
       }
     },
@@ -39,7 +61,7 @@ module.exports = function(grunt) {
       },
 
       js: {
-        files: ['coffee/*.coffee'],
+        files: ['coffee/*.coffee', 'coffee/collections/*.coffee', 'coffee/models/*.coffee'],
         tasks: ['coffee'],
         options: {
           spawn: false,
