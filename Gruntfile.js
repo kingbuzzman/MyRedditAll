@@ -1,5 +1,6 @@
 module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-haml');
+  grunt.loadNpmTasks('grunt-sass');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-contrib-watch');
@@ -18,6 +19,18 @@ module.exports = function(grunt) {
             return path.replace(/haml\//, '').replace(/\.haml$/, '');
           }
         })
+      }
+    },
+
+    sass: {
+      dist: {
+        options: {
+          outputStyle: 'nested'
+        },
+
+        files: {
+          'css/main.css': 'scss/main.scss'
+        }
       }
     },
 
@@ -65,7 +78,15 @@ module.exports = function(grunt) {
         tasks: ['coffee'],
         options: {
           spawn: false,
-        },
+        }
+      },
+
+      css: {
+        files: ['scss/*.scss'],
+        tasks: ['sass'],
+        options: {
+          spawn: false,
+        }
       },
 
       html: {
@@ -73,7 +94,7 @@ module.exports = function(grunt) {
         tasks: ['haml'],
         options: {
           spawn: false,
-        },
+        }
       }
     },
 
@@ -89,6 +110,6 @@ module.exports = function(grunt) {
 
   });
 
-  grunt.registerTask('default', ['haml', 'coffee']);
+  grunt.registerTask('default', ['haml', 'coffee', 'scss']);
   grunt.registerTask('dev', ['connect', 'watch']);
 };
