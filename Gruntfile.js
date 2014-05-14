@@ -125,7 +125,7 @@ module.exports = function(grunt) {
       },
 
       html: {
-        files: ['haml/*.haml'],
+        files: ['haml/*.haml', 'haml/includes/*.haml'],
         tasks: ['haml'],
         options: {
           spawn: false,
