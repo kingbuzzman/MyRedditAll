@@ -15,7 +15,10 @@ define [
       return
 
     url: () ->
-      return "http://www.reddit.com/r/#{@name}.json?limit=#{@limit}&after=#{@after or ''}"
+      url = "http://www.reddit.com/r/#{@name}.json?limit=#{@limit}"
+      if @after
+        url += "&after=#{@after or ''}"
+      return url
 
     sync: (method, model, options) ->
       options = _.extend
@@ -26,7 +29,7 @@ define [
       return super method, model, options
 
     parse: (resp, options) ->
-      if @last isnt resp.data.after
+      if @after isnt resp.data.after
         @after = resp.data.after
         @trigger 'change:after', @after, @
       return resp.data.children
