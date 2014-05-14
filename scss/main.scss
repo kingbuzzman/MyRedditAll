@@ -1,3 +1,30 @@
+body, html, ul, li, a { margin: 0; padding: 0; }
+
 body {
   background-color: red;
+}
+
+body > header {
+  height: 160px;
+  overflow: scroll;
+
+  ul {
+    display: block;
+    width: 1000000px;
+
+    li {
+      display: block;
+      list-style: none;
+
+      a {
+        display: block;
+        float: left;
+
+        img {
+          margin: 5px;
+          margin-right: 0px;
+        }
+      }
+    }
+  }
 }
