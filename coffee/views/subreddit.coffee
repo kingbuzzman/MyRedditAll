@@ -1,12 +1,12 @@
 define [
   'backbone'
   'underscore'
-  'views/item'
-  'text!includes/subreddit.html'
   'collections/subreddit'
-], (Backbone, _, Item, template, SubRedditCollection) ->
+  'text!includes/subreddit.html'
+  'text!includes/subreddit_item.html'
+], (Backbone, _, SubRedditCollection, templateView, templateItem) ->
   class SubRedditView extends Backbone.View
-    template: _.template(template)
+    template: _.template(templateView)
     tagName: 'article'
 
     events:
@@ -24,7 +24,7 @@ define [
       list = @$('ul')
 
       for model in @collection.models
-        item = new Item(model)
+        item = new SubRedditItemView(model)
         list.append item.render().el
         @items.push item
 
@@ -45,3 +45,20 @@ define [
     updateAfter: (event, after) ->
       @$('footer a').attr 'href', @collection.url()
       return
+
+
+  class SubRedditItemView extends Backbone.View
+    template: _.template(templateItem)
+    tagName: 'li'
+
+    initialize: (model) ->
+      @model = model
+      return
+
+    render: () ->
+      data = @model.attributes
+      @$el.append @template(data)
+      return @
+
+
+  return SubRedditView
