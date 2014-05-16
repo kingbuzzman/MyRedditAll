@@ -25,10 +25,12 @@ define [
 
     if type in ['album', 'gallery']
       apiUrl = "https://api.imgur.com/3/#{type}/#{id}"
-      console.log url, apiUrl
       $.ajax
         url: apiUrl
         dataType: 'json'
+        beforeSend: (xhr) ->
+            xhr.setRequestHeader 'Authorization', 'Client-ID e2a9ca3ebc1c362'
+            return
         success: (resp, statusText, jqXHR) ->
           for image in resp.data.images
             imageData =
