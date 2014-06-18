@@ -15,7 +15,7 @@ define [
       return
 
     url: () ->
-      url = "http://www.reddit.com/r/#{@name}.json?limit=#{@limit}"
+      url = "http://www.reddit.com/r/#{@name}.json?limit=#{@limit-1}"
       if @after
         url += "&after=#{@after or ''}"
       return url

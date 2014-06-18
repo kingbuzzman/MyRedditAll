@@ -13,7 +13,7 @@ define [
       @listenTo @collection, 'sync', @renderItems
       @listenTo @collection, 'add', @addItem
       @listenTo @collection, 'destroy', @removeItem
-      @collection.fetch()
+      @collection.fetch(silent: true)
       return
 
     render: () ->
@@ -22,7 +22,7 @@ define [
     removeItem: (model) ->
       items = []
       for item in @items
-        if item.model.cid == model.cid
+        if _.isEmpty model or item.model.cid == model.cid
           item.remove()
           continue
         items.push item
@@ -36,6 +36,7 @@ define [
       return
 
     renderItems: () ->
+      @removeItem()
       for model in @collection.models
         @addItem model
       return

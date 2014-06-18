@@ -3,6 +3,11 @@ define [
   'collections/subreddit'
   'models/image'
 ], (_, SubRedditCollection, ImageModel) ->
+  IMGUR_TYPES = ['album', 'gallery']
+
+  isImgur = (url) ->
+    return url.search('imgur.com') > 0
+
   getImgurId = (url, type) ->
     part = _.last(url.split('/'))
     id = _.first(part.split('.')).replace(/\#.*$/, '')
@@ -16,21 +21,27 @@ define [
       type = 'album'
     if type is 'g'
       type = 'gallery'
-    return if type in ['album', 'gallery'] then type else null
+    return if type in IMGUR_TYPES then type else null
 
   extractImgurData = (data, collection) ->
     url = data.data.url
+
+    unless isImgur url
+      console.debug "Incorrect image domain: #{data.data.domain} - id: #{data.data.id}"
+      return
+
     type = getImgurType(url)
     id = getImgurId(url, type)
 
-    if type in ['album', 'gallery']
-      apiUrl = "https://api.imgur.com/3/#{type}/#{id}"
+    console.debug "id: #{id} url: #{url} type: #{type}"
+
+    if type in IMGUR_TYPES
       $.ajax
-        url: apiUrl
+        url: "https://api.imgur.com/3/#{type}/#{id}"
         dataType: 'json'
         beforeSend: (xhr) ->
-            xhr.setRequestHeader 'Authorization', 'Client-ID e2a9ca3ebc1c362'
-            return
+          xhr.setRequestHeader 'Authorization', 'Client-ID e2a9ca3ebc1c362'
+          return
         success: (resp, statusText, jqXHR) ->
           for image in resp.data.images
             imageData =
@@ -47,6 +58,8 @@ define [
     data =
       data: _.defaults
         id: id
+        original_id: data.data.id
+        original_url: data.data.url
         url: "http://i.imgur.com/#{id}.png"
         thumbnail: "http://i.imgur.com/#{id}b.png"
       , data.data
@@ -57,18 +70,10 @@ define [
     limit: 25
     model: ImageModel
 
-    url: () ->
-      return "http://www.reddit.com/r/#{@name}.json?limit=#{@limit}&after=#{@after or ''}"
-
     parse: (resp, options) ->
       resp = super(resp, options)
       data = []
       for image in resp
-        url = image.data.url
-        if url.search('imgur') == -1
-          console.warn "Incorrect image domain: #{image.data.domain}"
-          continue
-
         image = extractImgurData(image, @)
         if image
           data.push image

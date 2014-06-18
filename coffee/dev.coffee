@@ -17,4 +17,20 @@ requirejs.config
       'underscore':
         exports: '_'
 
+# # debug, logs all events from the app
+# require ['backbone'], (Backbone) ->
+#   trigger = (event) ->
+#     console.log arguments
+#     return Backbone.Events.trigger.apply @, arguments
+#
+#   Backbone.Model.prototype.trigger = trigger
+#   Backbone.Collection.prototype.trigger = trigger
+#   Backbone.View.prototype.trigger = trigger
+#   Backbone.View.prototype.trigger = trigger
+#   Backbone.Router.prototype.trigger = trigger
+#   Backbone.History.prototype.trigger = trigger
+#
+#   return
+
+# start app
 require ['app']
