@@ -36,7 +36,7 @@ define [
       return
 
     addItem: (model) ->
-      item = new CarouselItem(model)
+      item = new CarouselItem(model: model)
       @items.push item
       @$el.append item.render().el
       return
@@ -51,10 +51,6 @@ define [
   class CarouselItem extends Backbone.View
     template: _.template templateItem
     tagName: 'li'
-
-    initialize: (model) ->
-      @model = model
-      return
 
     render: () ->
       @$el.append @template(@model.attributes)
