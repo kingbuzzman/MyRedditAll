@@ -5,7 +5,7 @@
     "jquery-cookie": "1.4.1",
     "lodash": "2.4.1",
     "backbone": "1.1.2",
-    "requirejs": "2.1.11",
+    "requirejs": "2.1.14",
     "requirejs-text": "2.0.12",
     "almond": "0.2.9"
   }
