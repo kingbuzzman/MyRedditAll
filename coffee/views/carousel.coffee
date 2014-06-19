@@ -16,13 +16,19 @@ define [
       @collection.fetch(silent: true)
       return
 
+    setSubreddit: (subreddit) ->
+      @collection.setName subreddit
+      @collection.fetch()
+      return
+
     render: () ->
+      @renderItems()
       return @
 
     removeItem: (model) ->
       items = []
       for item in @items
-        if _.isEmpty model or item.model.cid == model.cid
+        if _.isEmpty(model) or item.model.cid == model.cid
           item.remove()
           continue
         items.push item

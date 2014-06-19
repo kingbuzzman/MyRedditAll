@@ -14,6 +14,11 @@ define [
       super null, {}
       return
 
+    setName: (name) ->
+      @name = name
+      @after = null
+      return
+
     url: () ->
       url = "http://www.reddit.com/r/#{@name}.json?limit=#{@limit-1}"
       if @after

@@ -1,4 +1,7 @@
-define ['backbone', 'underscore'], (Backbone, _) ->
+define [
+  'backbone'
+  'underscore'
+], (Backbone, _) ->
   class SubRedditModel extends Backbone.Model
     parse: (resp, options) ->
       data = resp.data

@@ -43,6 +43,10 @@ define [
           xhr.setRequestHeader 'Authorization', 'Client-ID e2a9ca3ebc1c362'
           return
         success: (resp, statusText, jqXHR) ->
+          unless resp.data.images
+            # TODO: figure out why this is failing!!
+            return
+
           for image in resp.data.images
             imageData =
               data: _.defaults
