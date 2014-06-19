@@ -1,27 +1,11 @@
 module.exports = (grunt) ->
-  fs = require('fs')
-
   grunt.loadNpmTasks('grunt-haml')
   grunt.loadNpmTasks('grunt-sass')
   grunt.loadNpmTasks('grunt-contrib-coffee')
   grunt.loadNpmTasks('grunt-contrib-connect')
   grunt.loadNpmTasks('grunt-contrib-watch')
 
-  make_dev = () ->
-    grunt.file.delete('.css')
-    grunt.file.delete('.html')
-    grunt.file.delete('.js')
-    grunt.file.delete('dist')
-
-    grunt.file.mkdir('dist')
-    fs.symlinkSync('../images', 'dist/images', 'dir')
-    fs.symlinkSync('../.css', 'dist/css', 'dir')
-    fs.symlinkSync('../.js', 'dist/js', 'dir')
-    fs.symlinkSync('../.html/includes', 'dist/includes', 'dir')
-    fs.symlinkSync('../.html/index.html', 'dist/index.html', 'file')
-    fs.symlinkSync('../bower_components', 'dist/bower_components', 'dir')
-
-  make_dev()
+  make_dev grunt
 
   grunt.initConfig
     pkg: require './package.json'
@@ -49,6 +33,7 @@ module.exports = (grunt) ->
 
     coffee:
       options:
+        sourceMap: false
         bare: true
       coffee:
         expand: true
@@ -116,3 +101,21 @@ module.exports = (grunt) ->
 
   grunt.registerTask('default', ['connect', 'watch'])
   # TODO: add grunt task to create a production worthy build
+
+make_dev = (grunt) ->
+  fs = require('fs')
+
+  grunt.file.delete('.css')
+  grunt.file.delete('.html')
+  grunt.file.delete('.js')
+  grunt.file.delete('dist')
+
+  grunt.file.mkdir('dist')
+  fs.symlinkSync('../images', 'dist/images', 'dir')
+  fs.symlinkSync('../.css', 'dist/css', 'dir')
+  fs.symlinkSync('../.js', 'dist/js', 'dir')
+  fs.symlinkSync('../.html/includes', 'dist/includes', 'dir')
+  fs.symlinkSync('../.html/index.html', 'dist/index.html', 'file')
+  fs.symlinkSync('../bower_components', 'dist/bower_components', 'dir')
+  fs.symlinkSync('../coffee', 'dist/coffee', 'dir')
+  return
