@@ -6,10 +6,14 @@ requirejs.config
     underscore: '/bower_components/lodash/dist/lodash'
     jquery: '/bower_components/jquery/dist/jquery'
     text: '/bower_components/requirejs-text/text'
+    cookie: '/bower_components/jquery-cookie/jquery.cookie'
 
     includes: '/includes'
 
     shim:
+      'cookie':
+        deps: ['jquery']
+
       'backbone':
         deps: ['underscore', 'jquery']
         exports: 'Backbone'
