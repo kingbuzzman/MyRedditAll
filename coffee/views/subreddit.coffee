@@ -20,8 +20,15 @@ define [
       @collection.fetch()
       return
 
+    removeItems: () ->
+      for item in @items
+        item.remove()
+      @items = []
+      return
+
     renderItems: () ->
       list = @$('ul')
+      @removeItems()
 
       for model in @collection.models
         item = new SubRedditItemView(model)
@@ -39,7 +46,7 @@ define [
 
     loadMore: (event) ->
       event.preventDefault()
-      @collection.fetch()
+      @collection.fetch remove: false
       return
 
     updateAfter: (event, after) ->
