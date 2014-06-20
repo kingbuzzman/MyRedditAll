@@ -1,13 +1,29 @@
 #!/bin/sh
-if [ -z "$__PS1" ]; then
-  export PATH=$(npm bin):$PATH
-  export __PS1=$PS1
+first_time=false
+if [ -z "$__OLD_PS1" ]; then
+  first_time=true
+  export __OLD_PATH=$PATH
+  export __OLD_PS1=$PS1
 
-  PS1="(${PWD##*/}) $__PS1"
+  export PATH=$(npm bin):$PATH
+
+  PS1="(${PWD##*/}) $__OLD_PS1"
 
   deactivate () {
-    PS1="$__PS1"
-    unset __PS1
+    # removes anything grunt may have done
+    if hash grunt 2>/dev/null; then
+      sudo grunt deactivate
+    fi
+
+    # adds the old bash prompt
+    PS1=$__OLD_PS1
+
+    # adds the old path varible
+    export PATH=$__OLD_PATH
+
+    # removes all variables used
+    unset __OLD_PATH
+    unset __OLD_PS1
   }
 
   clean () {
@@ -17,3 +33,8 @@ fi
 
 npm install
 bower install
+
+if [ "$first_time" = true ]; then
+  sudo grunt activate
+  printf "\nEvironment set, to start type 'grunt'\n\n"
+fi

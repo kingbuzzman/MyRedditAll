@@ -1,11 +1,10 @@
 module.exports = (grunt) ->
-  grunt.loadNpmTasks('grunt-haml')
-  grunt.loadNpmTasks('grunt-sass')
-  grunt.loadNpmTasks('grunt-contrib-coffee')
-  grunt.loadNpmTasks('grunt-contrib-connect')
-  grunt.loadNpmTasks('grunt-contrib-watch')
-
-  make_dev grunt
+  grunt.loadNpmTasks 'grunt-haml'
+  grunt.loadNpmTasks 'grunt-sass'
+  grunt.loadNpmTasks 'grunt-localhosts'
+  grunt.loadNpmTasks 'grunt-contrib-coffee'
+  grunt.loadNpmTasks 'grunt-contrib-connect'
+  grunt.loadNpmTasks 'grunt-contrib-watch'
 
   grunt.initConfig
     pkg: require './package.json'
@@ -92,6 +91,22 @@ module.exports = (grunt) ->
         options:
           spawn: false
 
+    localhosts:
+      activate:
+        options:
+          rules: [
+            type: 'set'
+            ip: '127.0.0.1'
+            hostname: 'dev.myredditall.com'
+          ]
+      deactivate:
+        options:
+          rules: [
+            type: 'remove'
+            ip: '127.0.0.1'
+            hostname: 'dev.myredditall.com'
+          ]
+
     connect:
       server:
         options:
@@ -99,23 +114,26 @@ module.exports = (grunt) ->
           debug: true
           base: 'dist'
 
-  grunt.registerTask('default', ['connect', 'watch'])
+  grunt.registerTask 'development', 'Generates development environment', () ->
+    fs = require('fs')
+
+    grunt.file.delete('.css') if fs.existsSync('.css')
+    grunt.file.delete('.html') if fs.existsSync('.html')
+    grunt.file.delete('.js') if fs.existsSync('.js')
+    grunt.file.delete('dist') if fs.existsSync('dist')
+
+    grunt.file.mkdir('dist')
+    fs.symlinkSync('../images', 'dist/images', 'dir')
+    fs.symlinkSync('../.css', 'dist/css', 'dir')
+    fs.symlinkSync('../.js', 'dist/js', 'dir')
+    fs.symlinkSync('../.html/includes', 'dist/includes', 'dir')
+    fs.symlinkSync('../.html/index.html', 'dist/index.html', 'file')
+    fs.symlinkSync('../bower_components', 'dist/bower_components', 'dir')
+    fs.symlinkSync('../coffee', 'dist/coffee', 'dir')
+
+    return
+
+  grunt.registerTask 'default', ['development', 'connect', 'watch']
+  grunt.registerTask 'activate', ['localhosts:activate'] # needs to be 'sudo'
+  grunt.registerTask 'deactivate', ['localhosts:deactivate'] # needs to be 'sudo'
   # TODO: add grunt task to create a production worthy build
-
-make_dev = (grunt) ->
-  fs = require('fs')
-
-  grunt.file.delete('.css')
-  grunt.file.delete('.html')
-  grunt.file.delete('.js')
-  grunt.file.delete('dist')
-
-  grunt.file.mkdir('dist')
-  fs.symlinkSync('../images', 'dist/images', 'dir')
-  fs.symlinkSync('../.css', 'dist/css', 'dir')
-  fs.symlinkSync('../.js', 'dist/js', 'dir')
-  fs.symlinkSync('../.html/includes', 'dist/includes', 'dir')
-  fs.symlinkSync('../.html/index.html', 'dist/index.html', 'file')
-  fs.symlinkSync('../bower_components', 'dist/bower_components', 'dir')
-  fs.symlinkSync('../coffee', 'dist/coffee', 'dir')
-  return
