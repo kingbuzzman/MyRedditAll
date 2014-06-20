@@ -14,5 +14,9 @@
 
     "coffee-script": ">= 1.7.1"
   },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/kingbuzzman/MyRedditAll.git"
+  },
   "engine": "node 0.10.26"
 }

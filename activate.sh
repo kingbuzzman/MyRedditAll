@@ -1,10 +1,15 @@
 #!/bin/sh
-export PATH=$(npm bin):$PATH
+if [ -z "$__PS1" ]; then
+  export PATH=$(npm bin):$PATH
+  export __PS1=$PS1
 
-if [ ! -d node_modules ]; then
-  npm install
+  PS1="(${PWD##*/}) $__PS1"
+
+  deactivate () {
+    PS1="$__PS1"
+    unset __PS1
+  }
 fi
 
-if [ ! -d bower_components ]; then
-  bower install
-fi
+npm install
+bower install

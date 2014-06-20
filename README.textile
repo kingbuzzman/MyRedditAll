@@ -6,8 +6,10 @@ h2. Dev environment
 
 UNIX:
 
-`. activate.sh`
-`grunt dev`
+* `. activate.sh`
+* `grunt`
+
+Once finished, and you wish to exit the the `activate.sh` and scope your terminal to its original settings; type `deactivate`
 
 Windows:
 
