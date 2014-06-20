@@ -9,6 +9,10 @@ if [ -z "$__PS1" ]; then
     PS1="$__PS1"
     unset __PS1
   }
+
+  clean () {
+    rm -rf .css .html .js dist bower_components node_modules
+  }
 fi
 
 npm install
