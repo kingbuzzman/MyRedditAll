@@ -12,7 +12,7 @@ if [ -z "$__OLD_PS1" ]; then
   deactivate () {
     # removes anything grunt may have done
     if hash grunt 2>/dev/null; then
-      sudo grunt deactivate
+      sudo -p "Enter the sudo password to remove the host entry: " grunt deactivate
     fi
 
     # adds the old bash prompt
@@ -24,6 +24,8 @@ if [ -z "$__OLD_PS1" ]; then
     # removes all variables used
     unset __OLD_PATH
     unset __OLD_PS1
+    unset deactivate
+    unset clean
   }
 
   clean () {
@@ -35,6 +37,6 @@ npm install
 bower install
 
 if [ "$first_time" = true ]; then
-  sudo grunt activate
+  sudo -p "Enter the sudo password to insert the host entry: " grunt activate
   printf "\nEvironment set, to start type 'grunt'\n\n"
 fi
